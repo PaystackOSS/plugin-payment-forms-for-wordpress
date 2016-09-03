@@ -276,7 +276,7 @@ function create_paystack_form_pages()
     global $post_type;
 
     if ($post_type == 'paystack_form') {
-        echo "<style>#edit-slug-box {display:none;}</style>";
+        echo "<style>#edit-slug-box,#message p > a{display:none;}</style>";
       add_action("admin_print_footer_scripts", "shortcode_button_script");
       add_filter( 'user_can_richedit' , '__return_false', 50 );
       add_action( 'wp_dashboard_setup', 'remove_dashboard_widgets' );
@@ -331,9 +331,27 @@ function create_paystack_form_pages()
     extract(shortcode_atts(array(
       'name' => 'Title',
    ), $atts));
-    return '<input type="text"  /><br />';
+   $text = '<label> '.$name.'<input type="text" name="'.to_slug($name).'" /></label><br />';
+    return $text;
   }
   add_shortcode('text', 'text_shortcode');
+  function email_shortcode($atts) {
+    extract(shortcode_atts(array(
+      'name' => 'Email',
+   ), $atts));
+   $text = '<label>'.$name.'<input type="email" name="'.to_slug($name).'" /></label><br />';
+    return $text;
+  }
+  add_shortcode('email', 'email_shortcode');
+  function submit_shortcode($atts) {
+    extract(shortcode_atts(array(
+      'name' => 'Email',
+   ), $atts));
+   $text = '<br /><input type="submit" value="'.$name.'"><br />';
+    return $text;
+  }
+  //
+  add_shortcode('submit', 'submit_shortcode');
   function textarea_shortcode() {
     return '<textarea></textarea><br />';
   }
@@ -342,3 +360,28 @@ function create_paystack_form_pages()
     return '<textarea></textarea><br />';
   }
   add_shortcode('radio', 'radio_shortcode');
+
+  function to_slug($text){
+      $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+
+        // transliterate
+      // $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+      $text = preg_replace('~[^-\w]+~', '', $text);
+
+        // trim
+      $text = trim($text, '-');
+
+        // remove duplicate -
+      $text = preg_replace('~-+~', '-', $text);
+
+        // lowercase
+      $text = strtolower($text);
+
+      if (empty($text)) {
+          return 'n-a';
+      }
+
+      return $text;
+  }
