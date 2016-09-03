@@ -99,5 +99,5 @@ class Paystack_Forms_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/paystack-forms-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
-	
+
 }

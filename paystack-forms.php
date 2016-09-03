@@ -30,6 +30,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-paystack-forms-activator.php
@@ -73,6 +75,7 @@ function run_paystack_forms() {
 
 }
 run_paystack_forms();
+
 function register_cpt_paystack_form() {
 
     $labels = array(
@@ -94,8 +97,7 @@ function register_cpt_paystack_form() {
         'labels' => $labels,
         'hierarchical' => true,
         'description' => 'Paystack Forms filterable by genre',
-        'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'trackbacks', 'custom-fields', 'comments', 'revisions', 'page-attributes' ),
-        'taxonomies' => array( 'genres' ),
+        'supports' => array( 'title', 'editor',  'thumbnail'),
         'public' => true,
         'show_ui' => true,
         'show_in_menu' => true,
@@ -104,13 +106,24 @@ function register_cpt_paystack_form() {
         'show_in_nav_menus' => true,
         'publicly_queryable' => true,
         'exclude_from_search' => false,
-        'has_archive' => true,
+        'has_archive' => false,
         'query_var' => true,
         'can_export' => true,
-        'rewrite' => true,
+        'rewrite' => false,
+        'comments' => false,
         'capability_type' => 'post'
     );
-
+//     title: Text input field to create a post title.
+// editor: Content TinyMCE editor for writing.
+// author: A select box for changing the post author.
+// thumbnail: Featured image capability.
+// excerpt: A textarea for writing a custom excerpt.
+// trackbacks: Ability to turn trackbacks and pingbacks on/off.
+// custom-fields: Custom fields input field.
+// comments: Turn comments on/off.
+// revisions: Allows revisions to be made of your post.
+// post-formats: Add post formats, see the ‘Post Formats’ section
+// page-attributes
     register_post_type( 'paystack_form', $args );
 }
 
@@ -131,7 +144,7 @@ function genres_taxonomy() {
         )
     );
 }
-add_action( 'init', 'genres_taxonomy');
+// add_action( 'init', 'genres_taxonomy');
 // Function used to automatically create Paystack Forms page.
 function create_paystack_form_pages()
   {
@@ -151,3 +164,185 @@ function create_paystack_form_pages()
     update_option( 'mrpage', $newvalue );
   }
   register_activation_hook( __FILE__, 'create_paystack_form_pages');
+  function html_form_code() {
+
+
+  //  $args = array('post_type' => 'paystack_form');
+
+//Define the loop based on arguments
+
+       echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
+      echo '<p>';
+      echo 'Your Name (required) <br />';
+      echo '<input type="text" name="cf-name" pattern="[a-zA-Z0-9 ]+" value="' . ( isset( $_POST["cf-name"] ) ? esc_attr( $_POST["cf-name"] ) : '' ) . '" size="40" />';
+      echo '</p>';
+      echo '<p>';
+      echo 'Your Email (required) <br />';
+      echo '<input type="email" name="cf-email" value="' . ( isset( $_POST["cf-email"] ) ? esc_attr( $_POST["cf-email"] ) : '' ) . '" size="40" />';
+      echo '</p>';
+      echo '<p>';
+      echo 'Subject (required) <br />';
+      echo '<input type="text" name="cf-subject" pattern="[a-zA-Z ]+" value="' . ( isset( $_POST["cf-subject"] ) ? esc_attr( $_POST["cf-subject"] ) : '' ) . '" size="40" />';
+      echo '</p>';
+      echo '<p>';
+      echo 'Your Message (required) <br />';
+      echo '<textarea rows="10" cols="35" name="cf-message">' . ( isset( $_POST["cf-message"] ) ? esc_attr( $_POST["cf-message"] ) : '' ) . '</textarea>';
+      echo '</p>';
+      echo '<p><input type="submit" name="cf-submitted" value="Send"/></p>';
+      echo '</form>';
+  }
+  function deliver_mail() {
+
+      // if the submit button is clicked, send the email
+      if ( isset( $_POST['cf-submitted'] ) ) {
+
+          // sanitize form values
+          $name    = sanitize_text_field( $_POST["cf-name"] );
+          $email   = sanitize_email( $_POST["cf-email"] );
+          $subject = sanitize_text_field( $_POST["cf-subject"] );
+          $message = esc_textarea( $_POST["cf-message"] );
+
+          // get the blog administrator's email address
+          $to = get_option( 'admin_email' );
+
+          $headers = "From: $name <$email>" . "\r\n";
+
+          // If email has been process for sending, display a success message
+          if ( wp_mail( $to, $subject, $message, $headers ) ) {
+              echo '<div>';
+              echo '<p>Thanks for contacting me, expect a response soon.</p>';
+              echo '</div>';
+          } else {
+              echo 'An unexpected error occurred';
+          }
+      }
+  }
+  function cf_shortcode($atts) {
+      ob_start();
+      extract(shortcode_atts(array(
+        'id' => 0,
+     ), $atts));
+     echo "<pre>";
+     if ($id != 0) {
+       $obj = get_post($id);
+       if ($obj->post_type == 'paystack_form') {
+         print_r(do_shortcode($obj->post_content));
+      }
+     }
+     echo "</pre>";
+
+
+      // deliver_mail();
+      html_form_code();
+
+      return ob_get_clean();
+  }
+  add_shortcode( 'paystack_form', 'cf_shortcode' );
+
+  function text_shortcode() {
+    return '<input type="text"  /><br />';
+  }
+  add_shortcode('text', 'text_shortcode');
+  function shortcode_button_script()
+  {
+      if(wp_script_is("quicktags"))
+      {
+          ?>
+              <script type="text/javascript">
+
+                  //this function is used to retrieve the selected text from the text editor
+                  function getSel()
+                  {
+                      var txtarea = document.getElementById("content");
+                      var start = txtarea.selectionStart;
+                      var finish = txtarea.selectionEnd;
+                      return txtarea.value.substring(start, finish);
+                  }
+
+                  QTags.addButton(
+                      "code_shortcode",
+                      "Code",
+                      callback
+                  );
+
+                  function callback()
+                  {
+                      var selected_text = getSel();
+                      QTags.insertContent("[code]" +  selected_text + "[/code]");
+                  }
+              </script>
+          <?php
+      }
+  }
+
+  add_filter('user_can_richedit', 'disable_wyswyg_for_custom_post_type');
+  function disable_wyswyg_for_custom_post_type( $default ){
+    global $post_type;
+
+    if ($post_type == 'paystack_form') {
+        echo "<style>#edit-slug-box {display:none;}</style>";
+      add_action("admin_print_footer_scripts", "shortcode_button_script");
+      add_filter( 'user_can_richedit' , '__return_false', 50 );
+      add_action( 'wp_dashboard_setup', 'remove_dashboard_widgets' );
+
+    };
+
+    return $default;
+  }
+  function remove_dashboard_widgets() {
+	remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );   // Right Now
+	remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' ); // Recent Comments
+	remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );  // Incoming Links
+	remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );   // Plugins
+	remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );  // Quick Press
+	remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );  // Recent Drafts
+	remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );   // WordPress blog
+	remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );   // Other WordPress News
+	// use 'dashboard-network' as the second parameter to remove widgets from a network dashboard.
+}
+
+  $prefix = 'dbt_';
+
+  $meta_box = array(
+      'id' => 'my-meta-box',
+      'title' => 'Custom meta box',
+      'page' => 'post',
+      'context' => 'normal',
+      'priority' => 'high',
+      'fields' => array(
+          array(
+              'name' => 'Text box',
+              'desc' => 'Enter something here',
+              'id' => $prefix . 'text',
+              'type' => 'text',
+              'std' => 'Default value 1'
+          ),
+          array(
+              'name' => 'Textarea',
+              'desc' => 'Enter big text here',
+              'id' => $prefix . 'textarea',
+              'type' => 'textarea',
+              'std' => 'Default value 2'
+          ),
+          array(
+              'name' => 'Select box',
+              'id' => $prefix . 'select',
+              'type' => 'select',
+              'options' => array('Option 1', 'Option 2', 'Option 3')
+          ),
+          array(
+              'name' => 'Radio',
+              'id' => $prefix . 'radio',
+              'type' => 'radio',
+              'options' => array(
+                  array('name' => 'Name 1', 'value' => 'Value 1'),
+                  array('name' => 'Name 2', 'value' => 'Value 2')
+              )
+          ),
+          array(
+              'name' => 'Checkbox',
+              'id' => $prefix . 'checkbox',
+              'type' => 'checkbox'
+          )
+      )
+  );
