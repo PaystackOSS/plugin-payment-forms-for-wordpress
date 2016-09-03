@@ -222,29 +222,25 @@ function create_paystack_form_pages()
       extract(shortcode_atts(array(
         'id' => 0,
      ), $atts));
-     echo "<pre>";
-     if ($id != 0) {
+    //  echo "<pres>";
+    echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
+   if ($id != 0) {
        $obj = get_post($id);
        if ($obj->post_type == 'paystack_form') {
          print_r(do_shortcode($obj->post_content));
       }
      }
-     echo "</pre>";
+    //  echo "</pres>";
+    echo '</form>';
 
 
       // deliver_mail();
-      html_form_code();
+      // html_form_code();
 
       return ob_get_clean();
   }
   add_shortcode( 'paystack_form', 'cf_shortcode' );
-
-  function text_shortcode() {
-    return '<input type="text"  /><br />';
-  }
-  add_shortcode('text', 'text_shortcode');
-  function shortcode_button_script()
-  {
+  function shortcode_button_script(){
       if(wp_script_is("quicktags"))
       {
           ?>
@@ -290,59 +286,59 @@ function create_paystack_form_pages()
     return $default;
   }
   function remove_dashboard_widgets() {
-	remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );   // Right Now
-	remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' ); // Recent Comments
-	remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );  // Incoming Links
-	remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );   // Plugins
-	remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );  // Quick Press
-	remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );  // Recent Drafts
-	remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );   // WordPress blog
-	remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );   // Other WordPress News
-	// use 'dashboard-network' as the second parameter to remove widgets from a network dashboard.
-}
+  	remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );   // Right Now
+  	remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' ); // Recent Comments
+  	remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );  // Incoming Links
+  	remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );   // Plugins
+  	remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );  // Quick Press
+  	remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );  // Recent Drafts
+  	remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );   // WordPress blog
+  	remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );   // Other WordPress News
+  	// use 'dashboard-network' as the second parameter to remove widgets from a network dashboard.
+  }
+  add_filter( 'manage_edit-paystack_form_columns', 'my_edit_paystack_form_columns' ) ;
 
-  $prefix = 'dbt_';
+  function my_edit_paystack_form_columns( $columns ) {
 
-  $meta_box = array(
-      'id' => 'my-meta-box',
-      'title' => 'Custom meta box',
-      'page' => 'post',
-      'context' => 'normal',
-      'priority' => 'high',
-      'fields' => array(
-          array(
-              'name' => 'Text box',
-              'desc' => 'Enter something here',
-              'id' => $prefix . 'text',
-              'type' => 'text',
-              'std' => 'Default value 1'
-          ),
-          array(
-              'name' => 'Textarea',
-              'desc' => 'Enter big text here',
-              'id' => $prefix . 'textarea',
-              'type' => 'textarea',
-              'std' => 'Default value 2'
-          ),
-          array(
-              'name' => 'Select box',
-              'id' => $prefix . 'select',
-              'type' => 'select',
-              'options' => array('Option 1', 'Option 2', 'Option 3')
-          ),
-          array(
-              'name' => 'Radio',
-              'id' => $prefix . 'radio',
-              'type' => 'radio',
-              'options' => array(
-                  array('name' => 'Name 1', 'value' => 'Value 1'),
-                  array('name' => 'Name 2', 'value' => 'Value 2')
-              )
-          ),
-          array(
-              'name' => 'Checkbox',
-              'id' => $prefix . 'checkbox',
-              'type' => 'checkbox'
-          )
-      )
-  );
+  	$columns = array(
+  		'cb' => '<input type="checkbox" />',
+  		'title' => __( 'Name' ),
+  		'shortcode' => __( 'Shortcode' ),
+  		'date' => __( 'Date' )
+  	);
+
+  	return $columns;
+  }
+  add_action( 'manage_paystack_form_posts_custom_column', 'my_manage_movie_columns', 10, 2 );
+
+  function my_manage_movie_columns( $column, $post_id ) {
+  	global $post;
+
+  	switch( $column ) {
+      case 'shortcode' :
+        echo '<span class="shortcode">
+        <input type="text" class="large-text code" value="[paystack_form id=&quot;'.$post_id.'&quot;]"
+        readonly="readonly" onfocus="this.select();"></span>';
+
+  			break;
+      default :
+  			break;
+  	}
+  }
+  //////
+
+  function text_shortcode($atts) {
+    extract(shortcode_atts(array(
+      'name' => 'Title',
+   ), $atts));
+    return '<input type="text"  /><br />';
+  }
+  add_shortcode('text', 'text_shortcode');
+  function textarea_shortcode() {
+    return '<textarea></textarea><br />';
+  }
+  add_shortcode('textarea', 'textarea_shortcode');
+  function radio_shortcode() {
+    return '<textarea></textarea><br />';
+  }
+  add_shortcode('radio', 'radio_shortcode');
