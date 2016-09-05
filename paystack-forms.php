@@ -145,25 +145,7 @@ function genres_taxonomy() {
     );
 }
 // add_action( 'init', 'genres_taxonomy');
-// Function used to automatically create Paystack Forms page.
-function create_paystack_form_pages()
-  {
-   //post status and options
-    $post = array(
-          'comment_status' => 'closed',
-          'ping_status' =>  'closed' ,
-          'post_date' => date('Y-m-d H:i:s'),
-          'post_name' => 'paystack_form',
-          'post_status' => 'publish' ,
-          'post_title' => 'Paystack Forms',
-          'post_type' => 'page',
-    );
-    //insert page and save the id
-    $newvalue = wp_insert_post( $post, false );
-    //save the id in the database
-    update_option( 'mrpage', $newvalue );
-  }
-  register_activation_hook( __FILE__, 'create_paystack_form_pages');
+
   function html_form_code() {
 
 
@@ -224,13 +206,13 @@ function create_paystack_form_pages()
      ), $atts));
     //  echo "<pres>";
     echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
-   if ($id != 0) {
+    echo '<input type="hidden" name="id" value="' . $id . '" />';
+    if ($id != 0) {
        $obj = get_post($id);
        if ($obj->post_type == 'paystack_form') {
          print_r(do_shortcode($obj->post_content));
       }
      }
-    //  echo "</pres>";
     echo '</form>';
 
 
@@ -353,7 +335,11 @@ function create_paystack_form_pages()
   //
   add_shortcode('submit', 'submit_shortcode');
   function textarea_shortcode() {
-    return '<textarea></textarea><br />';
+
+      extract(shortcode_atts(array(
+        'name' => 'Email',
+     ), $atts));
+     return '<textarea name="'.to_slug($name).'"></textarea><br />';
   }
   add_shortcode('textarea', 'textarea_shortcode');
   function radio_shortcode() {
@@ -363,25 +349,87 @@ function create_paystack_form_pages()
 
   function to_slug($text){
       $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-
-        // transliterate
-      // $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-
-        // remove unwanted characters
       $text = preg_replace('~[^-\w]+~', '', $text);
-
-        // trim
       $text = trim($text, '-');
-
-        // remove duplicate -
       $text = preg_replace('~-+~', '-', $text);
-
-        // lowercase
       $text = strtolower($text);
-
       if (empty($text)) {
           return 'n-a';
       }
-
       return $text;
   }
+
+  add_action( 'add_meta_boxes', 'add_events_metaboxes' );
+  function add_events_metaboxes() {
+
+      add_meta_box('wpt_events_location', 'Event Location', 'wpt_events_location', 'paystack_form', 'side', 'default');
+
+  }
+  function wpt_events_locations() {
+  	global $post;
+
+  	// Noncename needed to verify where the data originated
+  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+  	// Get the location data if its already been entered
+  	$location = get_post_meta($post->ID, '_location', true);
+
+  	// Echo out the field
+  	echo '<input type="text" name="_location" value="' . $location  . '" class="widefat" />';
+
+  }
+  function wpt_events_location() {
+  	global $post;
+
+  	// Noncename needed to verify where the data originated
+  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+  	// Get the location data if its already been entered
+  	$location = get_post_meta($post->ID, '_location', true);
+          $dresscode = get_post_meta($post->ID, '_dresscode', true);
+
+  	// Echo out the field
+          echo '<p>Enter the location:</p>';
+  	echo '<input type="text" name="_location" value="' . $location  . '" class="widefat" />';
+          echo '<p>How Should People Dress?</p>';
+          echo '<input type="text" name="_dresscode" value="' . $dresscode  . '" class="widefat" />';
+
+  }
+  // Save the Metabox Data
+
+function wpt_save_events_meta($post_id, $post) {
+
+	// verify this came from the our screen and with proper authorization,
+	// because save_post can be triggered at other times
+	if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
+	return $post->ID;
+	}
+
+	// Is the user allowed to edit the post or page?
+	if ( !current_user_can( 'edit_post', $post->ID ))
+		return $post->ID;
+
+	// OK, we're authenticated: we need to find and save the data
+	// We'll put it into an array to make it easier to loop though.
+
+  $events_meta['_location'] = $_POST['_location'];
+$events_meta['_dresscode'] = $_POST['_dresscode'];
+
+	// Add values of $events_meta as custom fields
+
+	foreach ($events_meta as $key => $value) { // Cycle through the $events_meta array!
+		if( $post->post_type == 'revision' ) return; // Don't store custom data twice
+		$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
+		if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
+			update_post_meta($post->ID, $key, $value);
+		} else { // If the custom field doesn't have a value
+			add_post_meta($post->ID, $key, $value);
+		}
+		if(!$value) delete_post_meta($post->ID, $key); // Delete if blank
+	}
+
+}
+
+add_action('save_post', 'wpt_save_events_meta', 1, 2); // save the custom fields
