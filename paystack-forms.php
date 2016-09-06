@@ -207,6 +207,7 @@ function genres_taxonomy() {
     //  echo "<pres>";
     echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
     echo '<input type="hidden" name="id" value="' . $id . '" />';
+    echo '<iframe width="1024" height="768" src="https://paystack.com/pay/w4n" style="-webkit-transform:scale(0.5);-moz-transform-scale(0.5);"></iframe>';
     if ($id != 0) {
        $obj = get_post($id);
        if ($obj->post_type == 'paystack_form') {
