@@ -95,11 +95,17 @@ class Paystack_Forms_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
+		// settings_fields( 'paystack-form-settings-group' ); do_settings_sections( 'paystack-form-settings-group' );
+		$mode =  esc_attr( get_option('mode') );
+		if ($mode == 'test') {
+			$key = esc_attr( get_option('tpk') );
+		}else{
+			$key = esc_attr( get_option('lpk') );
+		}
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
 		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
-		wp_localize_script( 'paystack_frontend', 'php_vars', ['fish'=> 'OKAY!'] );
+		wp_localize_script( 'paystack_frontend', 'settings', ['key'=> $key]);
 
 	}
 

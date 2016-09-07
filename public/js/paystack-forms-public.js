@@ -29,8 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 	 $(document).ready(function($) {
-		 console.log(php_vars);
-			$('.paystack-form').on('submit', function(e) {
+		 	$('.paystack-form').on('submit', function(e) {
 				var self = $( this );
 				var $form = $(this);
 
@@ -48,7 +47,7 @@
 					 loaderContainer.remove();
 					 if (data.result == 'success'){
 				         var handler = PaystackPop.setup({
-              key: 'pk_test_ed34ec15c8e95e2cacdb5460ce9862f5f48e40fe',
+              key: settings.key,
               email: data.email,
               amount: data.total,
               ref: data.code,

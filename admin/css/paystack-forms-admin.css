@@ -396,3 +396,8 @@ ul.config-error li a.external {
 .card .inside .form-table td {
 	padding: 10px 10px;
 }
+
+
+.paystack_setting_page   input{
+	width: 50%;
+}

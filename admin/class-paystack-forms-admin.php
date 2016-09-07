@@ -52,13 +52,52 @@ class Paystack_Forms_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		add_action('admin_menu' , 'add_settings_page');
+		add_action( 'admin_init', 'register_paystack_setting_page' );
 
 		function add_settings_page() {
 			add_submenu_page('edit.php?post_type=paystack_form', 'Api Keys Settings', 'Api Keys Settings', 'edit_posts', basename(__FILE__), 'paystack_setting_page');
 		}
+		function register_paystack_setting_page() {
+			register_setting( 'paystack-form-settings-group', 'mode' );
+			register_setting( 'paystack-form-settings-group', 'tsk' );
+			register_setting( 'paystack-form-settings-group', 'tpk' );
+			register_setting( 'paystack-form-settings-group', 'lsk' );
+			register_setting( 'paystack-form-settings-group', 'lpk' );
+		}
 		function paystack_setting_page() {
-			 echo "<h1>Hello World!</h1>";
+			?>
+			 <h1>Paystack Forms API KEYS Settings!</h1>
+			 <form method="post" action="options.php">
+	    <?php settings_fields( 'paystack-form-settings-group' ); do_settings_sections( 'paystack-form-settings-group' ); ?>
+	    <table class="form-table paystack_setting_page">
+					<tr valign="top">
+					<th scope="row">Mode</th>
+					<td><input type="text" name="mode" value="<?php echo esc_attr( get_option('mode') ); ?>" /></td>
+					</tr>
+					<tr valign="top">
+	        <th scope="row">Test Secret Key</th>
+	        <td><input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
+	        </tr>
 
+	        <tr valign="top">
+	        <th scope="row">Test Public Key</th>
+	        <td><input type="text" name="tpk" value="<?php echo esc_attr( get_option('tpk') ); ?>" /></td>
+	        </tr>
+
+	        <tr valign="top">
+	        <th scope="row">Live Secret Key</th>
+	        <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lsk') ); ?>" /></td>
+	        </tr>
+					<tr valign="top">
+	        <th scope="row">Live Public Key</th>
+	        <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
+	        </tr>
+	    </table>
+
+    <?php submit_button(); ?>
+
+</form>
+			 <?php
 		}
 		add_action( 'init', 'register_cpt_paystack_form' );
 		function register_cpt_paystack_form() {
