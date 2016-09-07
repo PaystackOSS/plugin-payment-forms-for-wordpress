@@ -205,9 +205,14 @@ function genres_taxonomy() {
         'id' => 0,
      ), $atts));
     //  echo "<pres>";
-    echo '<form action="' . esc_url( $_SERVER['REQUEST_URI'] ) . '" method="post">';
+    echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
+    echo '<input type="hidden" name="action" value="paystack_submit_action">';
+
     echo '<input type="hidden" name="id" value="' . $id . '" />';
-    echo '<iframe width="1024" height="768" src="https://paystack.com/pay/w4n" style="-webkit-transform:scale(0.5);-moz-transform-scale(0.5);"></iframe>';
+    echo '<p>';
+    echo 'Your Email (required) <br />';
+    echo '<input type="email" name="email"  required/>';
+    echo '</p>';
     if ($id != 0) {
        $obj = get_post($id);
        if ($obj->post_type == 'paystack_form') {
@@ -434,3 +439,35 @@ $events_meta['_dresscode'] = $_POST['_dresscode'];
 }
 
 add_action('save_post', 'wpt_save_events_meta', 1, 2); // save the custom fields
+
+
+add_action( 'wp_ajax_paystack_submit_action', 'paystack_submit_action' );
+add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
+function paystack_submit_action() {
+    // A default response holder, which will have data for sending back to our js file
+    $response = array(
+    	'error' => false,
+    );
+
+    // Example for creating an response with error information, to know in our js file
+    // about the error and behave accordingly, like adding error message to the form with JS
+    if (trim($_POST['email']) == '') {
+      $response['error'] = true;
+    	$response['error_message'] = 'Email is required';
+
+    	// Exit here, for not processing further because of the error
+    	exit(json_encode($response));
+    }
+    print_r($_POST);
+    $table = $wpdb->prefix."paystack_forms_payments";
+    $wpdb->insert(
+        $table,
+        array(
+            'email' => strip_tags($_POST["email"], "");
+        )
+    );
+    // ... Do some code here, like storing inputs to the database, but don't forget to properly sanitize input data!
+
+    // Don't forget to exit at the end of processing
+    exit(json_encode($response));
+}
