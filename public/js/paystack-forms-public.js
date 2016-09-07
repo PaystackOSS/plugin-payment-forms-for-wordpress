@@ -50,7 +50,7 @@
 				         var handler = PaystackPop.setup({
               key: 'pk_test_ed34ec15c8e95e2cacdb5460ce9862f5f48e40fe',
               email: data.email,
-              amount: data.total*100,
+              amount: data.total,
               ref: data.code,
               callback: function(response){
                   // $.ajax({
