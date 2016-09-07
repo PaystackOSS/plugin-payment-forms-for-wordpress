@@ -446,28 +446,37 @@ add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
 function paystack_submit_action() {
     // A default response holder, which will have data for sending back to our js file
     $response = array(
-    	'error' => false,
+      'result' => 'success',
+      'code' => '09283IJHu32309',
+      'email' => 'kend@yhao.com',
+    	'total' => '10000',
     );
 
     // Example for creating an response with error information, to know in our js file
     // about the error and behave accordingly, like adding error message to the form with JS
-    if (trim($_POST['email']) == '') {
+    if (trim($_POST['pf-pemail']) == '') {
       $response['error'] = true;
     	$response['error_message'] = 'Email is required';
 
     	// Exit here, for not processing further because of the error
     	exit(json_encode($response));
     }
-    print_r($_POST);
+    // print_r($_POST);
+    global $wpdb;
+
     $table = $wpdb->prefix."paystack_forms_payments";
     $wpdb->insert(
         $table,
         array(
-            'email' => strip_tags($_POST["email"], "");
+          'post_id' => strip_tags($_POST["pf-id"], ""),
+          'email' => strip_tags($_POST["pf-pemail"], "")
+            'amount' => strip_tags($_POST["pf-amount"], "")
         )
     );
     // ... Do some code here, like storing inputs to the database, but don't forget to properly sanitize input data!
 
     // Don't forget to exit at the end of processing
-    exit(json_encode($response));
+    echo json_encode($response);
+
+    die();
 }

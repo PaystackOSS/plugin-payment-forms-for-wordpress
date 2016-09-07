@@ -98,8 +98,9 @@ class Paystack_Forms_Public {
 
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
-		
+		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
+		wp_localize_script( 'paystack_frontend', 'php_vars', ['fish'=> 'OKAY!'] );
+	  
 	}
 
 }

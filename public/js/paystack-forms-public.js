@@ -29,7 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 	 $(document).ready(function($) {
-
+		 console.log(php_vars);
 			$('.paystack-form').on('submit', function(e) {
 				var self = $( this );
 				var $form = $(this);
@@ -46,26 +46,27 @@
 
 				$.post($form.attr('action'), $form.serialize(), function(data) {
 					 loaderContainer.remove();
-					 if (data.result == 'online'){
+					 if (data.result == 'success'){
 				         var handler = PaystackPop.setup({
               key: 'pk_test_ed34ec15c8e95e2cacdb5460ce9862f5f48e40fe',
               email: data.email,
               amount: data.total*100,
               ref: data.code,
               callback: function(response){
-                  $.ajax({
-                      method:'post',
-                      url: '/registry/confirm_online_payment',
-                      data: {
-                          '_token':$('meta[name="csrf_token"]').attr('content'),
-                          'code':response.trxref
-                      }
-                  }).success(function(data){
-                      if (data.result == 'success'){
-                          $scope.cart.items = [];
-                          window.location.href = data.link;
-                      }
-                  });
+                  // $.ajax({
+                  //     method:'post',
+                  //     url: '/registry/confirm_online_payment',
+                  //     data: {
+                  //         '_token':$('meta[name="csrf_token"]').attr('content'),
+                  //         'code':response.trxref
+                  //     }
+                  // }).success(function(data){
+                  //     if (data.result == 'success'){
+                  //         $scope.cart.items = [];
+                  //         window.location.href = data.link;
+                  //     }
+                  // });
+									alert('Paid');
               },
               onClose: function(){
 
