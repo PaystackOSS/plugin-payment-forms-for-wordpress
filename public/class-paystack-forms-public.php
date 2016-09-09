@@ -350,7 +350,7 @@ function paystack_submit_action() {
 	        $table,
 	        $insert
 	    );
-   }
+	}
 
 	 $response = array(
      'result' => 'success',
@@ -428,7 +428,7 @@ function paystack_confirm_payment() {
 
 		}
 	}else{
-		$message = "Try Submitting Form again";
+		$message = "Payment Verification Failed.";
 		$result = "failed";
 
 	}

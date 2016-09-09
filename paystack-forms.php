@@ -75,6 +75,7 @@ function run_paystack_forms() {
 
 }
 run_paystack_forms();
+
 function shortcode_button_script(){
     if(wp_script_is("quicktags")){
         ?>
