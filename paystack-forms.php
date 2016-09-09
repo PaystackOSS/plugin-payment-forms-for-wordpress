@@ -90,7 +90,7 @@ function shortcode_button_script(){
                 }
 
                 QTags.addButton(
-                    "code_shortcode",
+                    "t_shortcode",
                     "Insert Text",
                     insertText
                 );
@@ -98,12 +98,20 @@ function shortcode_button_script(){
                     QTags.insertContent('[text name="Text Title"]');
                 }
 								QTags.addButton(
-                    "code_shortcode",
-                    "Insert Required Text",
-                    insertRText
+                    "ta_shortcode",
+                    "Insert Textarea",
+                    insertTextarea
                 );
-								function insertRText(){
-                    QTags.insertContent('[text required="required" name="Text Title"]');
+								function insertTextarea(){
+                    QTags.insertContent('[textarea name="Text Title"]');
+                }
+								QTags.addButton(
+                    "s_shortcode",
+                    "Insert Select Dropdown",
+                    insertSelect
+                );
+								function insertSelect(){
+                    QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 2"]');
                 }
             </script>
         <?php

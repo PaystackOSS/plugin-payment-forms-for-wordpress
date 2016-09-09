@@ -48,7 +48,7 @@
 				}
 		 	$('.paystack-form').on('submit', function(e) {
 				var stop = false;
-				$(this).find("input, select, textarea").each(function() {
+				$(this).find("input, textarea").each(function() {
 						$(this).css({ "border-color":"#d1d1d1" });
 				});
 				var email = $(this).find("#pf-email").val();
@@ -57,6 +57,8 @@
 				}else{
 					$(this).find("#pf-amount").css({ "border-color":"red" });
 					stop = true;
+
+
 				}
 				if (!validateEmail(email)) {
 			    $(this).find("#pf-email").css({ "border-color":"red" });
@@ -65,7 +67,7 @@
 					$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
               $(this).css({ "border-color":"red" });
 							stop = true;
-          });
+					});
 				if (stop) {
 					return false;
 				}
@@ -89,11 +91,13 @@
 											data = JSON.parse(newdata);
 											if (data.result == 'success'){
 												$('.paystack-form')[0].reset();
+												$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+
 												self.before('<pre>'+data.message+'</pre>');
 												$(this).find("input, select, textarea").each(function() {
 														$(this).css({ "border-color":"#d1d1d1" });
 												});
-												
+
 												$.unblockUI();
 											}else{
 												self.before('<pre>'+data.message+'</pre>');

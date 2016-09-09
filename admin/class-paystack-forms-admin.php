@@ -41,6 +41,14 @@ class Paystack_Forms_Admin {
 			register_setting( 'paystack-form-settings-group', 'lsk' );
 			register_setting( 'paystack-form-settings-group', 'lpk' );
 		}
+		function txncheck($name,$txncharge){
+			if ($name == $txncharge) {
+				$result = "selected";
+			}else{
+				$result = "";
+			}
+			return $result;
+		}
 		function paystack_setting_page() {
 			?>
 			 <h1>Paystack Forms API KEYS Settings!</h1>
@@ -49,11 +57,18 @@ class Paystack_Forms_Admin {
 				    <table class="form-table paystack_setting_page">
 								<tr valign="top">
 								<th scope="row">Mode</th>
-								<td><input type="text" name="mode" value="<?php echo esc_attr( get_option('mode') ); ?>" /></td>
+
+								<td><select class="form-control" name="mode" id="parent_id">
+								<option value="live" <?php echo txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
+								<option value="test" <?php echo txncheck('test',esc_attr( get_option('mode') )) ?>>Test Mode</option>
+							</select>
+							<!-- <input type="text" name="mode" value="<?php echo esc_attr( get_option('mode') ); ?>" /></td> -->
 								</tr>
 								<tr valign="top">
 				        <th scope="row">Test Secret Key</th>
-				        <td><input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
+				        <td>
+
+								<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
 				        </tr>
 
 				        <tr valign="top">
@@ -216,7 +231,8 @@ class Paystack_Forms_Admin {
 	  	$columns = array(
 	  		'cb' => '<input type="checkbox" />',
 	  		'title' => __( 'Name' ),
-	  		'shortcode' => __( 'Shortcode' ),
+				'shortcode' => __( 'Shortcode' ),
+	  		'payments' => __( 'Payments' ),
 	  		'date' => __( 'Date' )
 	  	);
 
@@ -225,7 +241,8 @@ class Paystack_Forms_Admin {
 		add_action( 'manage_paystack_form_posts_custom_column', 'my_paystack_form_columns', 10, 2 );
 
 		function my_paystack_form_columns( $column, $post_id ) {
-			global $post;
+			global $post,$wpdb;
+			$table = $wpdb->prefix . 'paystack_forms_payments';
 
 			switch( $column ) {
 				case 'shortcode' :
@@ -234,6 +251,13 @@ class Paystack_Forms_Admin {
 					readonly="readonly" onfocus="this.select();"></span>';
 
 					break;
+				case 'payments':
+
+						$count_query = 'select count(*) from '.$table.' WHERE post_id = "'.$post_id.'" AND paid = "1"';
+						$num = $wpdb->get_var($count_query);
+
+						echo '<a href="'.admin_url('admin.php?page=submissions&form='.$post_id) .'">'. $num.'</a>';
+						break;
 				default :
 					break;
 			}
@@ -278,7 +302,8 @@ class Paystack_Forms_Admin {
 
 			?>
 			<div class="awesome-meta-admin">
-				To make an input compulsory add <code> required="required" </code> to the shortcode <br />
+				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
+				It should look like this <code> [text name="Full Name" required="required" ]</code>
 
 			</div>
 
@@ -306,15 +331,7 @@ class Paystack_Forms_Admin {
 			$txncharge = get_post_meta($post->ID, '_txncharge', true);
 			$loggedin = get_post_meta($post->ID, '_loggedin', true);
 	    $currency = get_post_meta($post->ID, '_currency', true);
-			function txncheck($name,$txncharge){
 
-				if ($name == $txncharge) {
-					$result = "selected";
-				}else{
-					$result = "";
-				}
-				return $result;
-			}
 			if ($amount == "") {$amount = 0;}
 			if ($paybtn == "") {$paybtn = 'Pay';}
 			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
@@ -490,7 +507,7 @@ class Payments_List_Table extends WP_List_Table{
 
 		  $table = $wpdb->prefix."paystack_forms_payments";
 			$data = array();
-			$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '0')");
+			$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')");
 
 			foreach ($alldbdata as $key => $dbdata) {
 				$newkey = $key+1;
@@ -508,7 +525,7 @@ class Payments_List_Table extends WP_List_Table{
        $hidden = $this->get_hidden_columns();
        $sortable = $this->get_sortable_columns();
        usort( $data, array( &$this, 'sort_data' ) );
-       $perPage = 6;
+       $perPage = 20;
        $currentPage = $this->get_pagenum();
        $totalItems = count($data);
        $this->set_pagination_args( array(

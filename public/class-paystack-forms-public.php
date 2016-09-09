@@ -157,7 +157,7 @@ function cf_shortcode($atts) {
 			 $loggedin = get_post_meta($id,'_loggedin',true);
 			 $txncharge = get_post_meta($id,'_txncharge',true);
 			 $currency = get_post_meta($id,'_currency',true);
-			 print_r($loggedin);
+			//  print_r($loggedin);
 			 if ($loggedin == 'no') {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
 			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
@@ -173,11 +173,11 @@ function cf_shortcode($atts) {
 			 if ($amount == 0) {
 				 echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
 			 }else{
-				 echo '<input type="number" name="pf-amount" value="'.$amount.'" readonly required/>';
+				 echo '<input type="number" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
 			 }
 			  echo '</p>';
 		   echo(do_shortcode($obj->post_content));
-			 echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
+			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
 		   echo '</form>';
@@ -217,11 +217,19 @@ function select_shortcode($atts) {
 		'options' => '',
     'required' => '0',
  	), $atts));
-	$code = '<label> '.$name.'<input  class="form-control"  type="text" name="'.$name.'"';
+	$code = '<label> '.$name.'<br /><select class="form-control" name="'.$name.'"';
+
 	if ($required == 'required') {
 		 $code.= ' required="reduired" ';
 	}
-	$code.= '" /></label><br />';
+	$code.=" style='width:100%;'>";
+	$soptions = explode(',', $options);
+	if (count($soptions) > 0) {
+		foreach ($soptions as $key => $option) {
+			$code.= '<option  value="'.$option.'" >'.$option.'</option>';
+		}
+	}
+	$code.= '" </select></label><br />';
   return $code;
 }
 add_shortcode('select', 'select_shortcode');
