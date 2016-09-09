@@ -75,3 +75,37 @@ function run_paystack_forms() {
 
 }
 run_paystack_forms();
+function shortcode_button_script(){
+    if(wp_script_is("quicktags")){
+        ?>
+            <script type="text/javascript">
+
+                //this function is used to retrieve the selected text from the text editor
+                function getSel()
+                {
+                    var txtarea = document.getElementById("content");
+                    var start = txtarea.selectionStart;
+                    var finish = txtarea.selectionEnd;
+                    return txtarea.value.substring(start, finish);
+                }
+
+                QTags.addButton(
+                    "code_shortcode",
+                    "Insert Text",
+                    insertText
+                );
+								function insertText(){
+                    QTags.insertContent('[text name="Text Title"]');
+                }
+								QTags.addButton(
+                    "code_shortcode",
+                    "Insert Required Text",
+                    insertRText
+                );
+								function insertRText(){
+                    QTags.insertContent('[text required="required" name="Text Title"]');
+                }
+            </script>
+        <?php
+    }
+}

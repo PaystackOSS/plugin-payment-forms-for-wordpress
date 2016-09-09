@@ -140,8 +140,13 @@ class Paystack_Forms_Admin {
 		    register_post_type( 'paystack_form', $args );
 		}
 		add_filter('user_can_richedit', 'disable_wyswyg_for_custom_post_type');
-	  function disable_wyswyg_for_custom_post_type( $default ){
-	    global $post_type;
+		function wpa_47010( $qtInit ) {
+				$qtInit['buttons'] = 'fullscreen';
+				return $qtInit;
+		}
+		function disable_wyswyg_for_custom_post_type( $default ){
+	    global $post_type, $_wp_theme_features;;
+
 
 	    if ($post_type == 'paystack_form') {
 	        echo "<style>#edit-slug-box,#message p > a{display:none;}</style>";
@@ -149,11 +154,9 @@ class Paystack_Forms_Admin {
 	      add_filter( 'user_can_richedit' , '__return_false', 50 );
 	      add_action( 'wp_dashboard_setup', 'remove_dashboard_widgets' );
 				remove_action( 'media_buttons', 'media_buttons' );
-				function wpa_47010( $qtInit ) {
-				    $qtInit['buttons'] = 'fullscreen';
-				    return $qtInit;
-				}
+				remove_meta_box( 'postimagediv','post','side' );
 				add_filter('quicktags_settings', 'wpa_47010');
+				 unset( $_wp_theme_features['post-thumbnails']);
 	    };
 
 	    return $default;
@@ -233,6 +236,9 @@ class Paystack_Forms_Admin {
 	  	$paybtn = get_post_meta($post->ID, '_paybtn', true);
 	    $successmsg = get_post_meta($post->ID, '_successmsg', true);
 
+			if ($amount == "") {$amount = 0;}
+			if ($paybtn == "") {$paybtn = 'Pay';}
+			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
 	  	// Echo out the field
 	    echo '<p>Amount to be paid(Set 0 for customer input):</p>';
 	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';

@@ -175,44 +175,20 @@ function cf_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode( 'paystack_form', 'cf_shortcode' );
-function shortcode_button_script(){
-    if(wp_script_is("quicktags"))
-    {
-        ?>
-            <script type="text/javascript">
 
-                //this function is used to retrieve the selected text from the text editor
-                function getSel()
-                {
-                    var txtarea = document.getElementById("content");
-                    var start = txtarea.selectionStart;
-                    var finish = txtarea.selectionEnd;
-                    return txtarea.value.substring(start, finish);
-                }
-
-                QTags.addButton(
-                    "code_shortcode",
-                    "Code",
-                    callback
-                );
-
-                function callback()
-                {
-                    var selected_text = getSel();
-                    QTags.insertContent("[code]" +  selected_text + "[/code]");
-                }
-            </script>
-        <?php
-    }
-}
 
 //////
 
 function text_shortcode($atts) {
   extract(shortcode_atts(array(
-    'name' => 'Title',
- ), $atts));
- $text = '<label> '.$name.'<input type="text" name="'.$name.'" /></label><br />';
+		'name' => 'Title',
+    'required' => '0',
+ 	), $atts));
+	$text = '<label> '.$name.'<input type="text" name="'.$name.'"';
+	if ($required == 'required') {
+		 $text.= ' required="reduired" ';
+	}
+	$text.= '" /></label><br />';
   return $text;
 }
 add_shortcode('text', 'text_shortcode');
@@ -224,15 +200,6 @@ function email_shortcode($atts) {
   return $text;
 }
 add_shortcode('email', 'email_shortcode');
-function submit_shortcode($atts) {
-  extract(shortcode_atts(array(
-    'name' => 'Email',
- ), $atts));
- $text = '<br /><input type="submit" value="'.$name.'"><br />';
-  return $text;
-}
-//
-add_shortcode('submit', 'submit_shortcode');
 function textarea_shortcode() {
 
     extract(shortcode_atts(array(
