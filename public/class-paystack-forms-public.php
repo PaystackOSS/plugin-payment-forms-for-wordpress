@@ -1,25 +1,6 @@
 <?php
 
-/**
- * The public-facing functionality of the plugin.
- *
- * @link       kendyson.com
- * @since      1.0.0
- *
- * @package    Paystack_Forms
- * @subpackage Paystack_Forms/public
- */
 
-/**
- * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Paystack_Forms
- * @subpackage Paystack_Forms/public
- * @author     kendysond <kendyson@kendyson.com>
- */
 class Paystack_Forms_Public {
 
 	/**
