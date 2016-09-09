@@ -148,7 +148,12 @@ class Paystack_Forms_Admin {
 	      add_action("admin_print_footer_scripts", "shortcode_button_script");
 	      add_filter( 'user_can_richedit' , '__return_false', 50 );
 	      add_action( 'wp_dashboard_setup', 'remove_dashboard_widgets' );
-
+				remove_action( 'media_buttons', 'media_buttons' );
+				function wpa_47010( $qtInit ) {
+				    $qtInit['buttons'] = 'fullscreen';
+				    return $qtInit;
+				}
+				add_filter('quicktags_settings', 'wpa_47010');
 	    };
 
 	    return $default;

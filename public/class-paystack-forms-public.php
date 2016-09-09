@@ -148,6 +148,7 @@ function cf_shortcode($atts) {
 			 $amount = get_post_meta($id,'_amount',true);
 			 $thankyou = get_post_meta($id,'_successmsg',true);
 			 $paybtn = get_post_meta($id,'_paybtn',true);
+			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
 			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
 		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';

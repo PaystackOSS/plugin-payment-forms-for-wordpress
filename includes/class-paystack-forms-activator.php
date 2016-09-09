@@ -44,6 +44,7 @@ class Paystack_Forms_Activator {
 			txn_code varchar(255) DEFAULT '' NOT NULL,
 		  amount varchar(255) DEFAULT '' NOT NULL,
 		  views smallint(5) NOT NULL,
+			deleted_at varchar(255) DEFAULT '' NULL,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		  UNIQUE KEY id (id)
