@@ -179,7 +179,7 @@ function cf_shortcode($atts) {
 		   echo(do_shortcode($obj->post_content));
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
-			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
+			 echo '<p> <br /><input type="submit" class="btn btn-danger" value="'.$paybtn.'" ></p>';
 		   echo '</form>';
 			 # code...
 		 }else{
@@ -405,7 +405,7 @@ function paystack_confirm_payment() {
 						$paystack_ref 	= $paystack_response->data->reference;
 
 						if ($amount == 0) {
-							$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1',amount='".$amount_paid."' WHERE txn_code='".$paystack_ref."'"));
+							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
@@ -415,7 +415,7 @@ function paystack_confirm_payment() {
 								$result = "failed";
 							}else{
 
-								$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1' WHERE txn_code='".$paystack_ref."'"));
+								$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 								$message = $thankyou;
 								$result = "success";
