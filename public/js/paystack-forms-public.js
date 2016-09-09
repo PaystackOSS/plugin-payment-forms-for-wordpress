@@ -47,18 +47,28 @@
 				  return re.test(email);
 				}
 		 	$('.paystack-form').on('submit', function(e) {
-				$.blockUI({ message: 'Please wait...' });
-				if (validateEmail(email)) {
-			    $("#result").text(email + " is valid :)");
-			    $("#result").css("color", "green");
-			  } else {
-			    $("#result").text(email + " is not valid :(");
-			    $("#result").css("color", "red");
-			  }
-	 		 	var self = $( this );
+				$(this).find("input, select, textarea").each(function() {
+						$(this).css({ "border-color":"#d1d1d1" });
+				});
+				var email = $(this).find("#pf-email").val();
+				if (!validateEmail(email)) {
+			    $(this).find("#pf-email").css({ "border-color":"red" });
+					stop = true;
+				}
+				var stop = false;
+					$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
+              $(this).css({ "border-color":"red" });
+							stop = true;
+          });
+				if (stop) {
+					return false;
+				}
+
+	 		 	var self = $(this);
 				var $form = $(this);
 				e.preventDefault();
 
+				$.blockUI({ message: 'Please wait...' });
 				$.post($form.attr('action'), $form.serialize(), function(data) {
 					 $.unblockUI();
 					 if (data.result == 'success'){

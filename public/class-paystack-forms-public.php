@@ -139,6 +139,12 @@ function deliver_mail() {
 }
 function cf_shortcode($atts) {
     ob_start();
+		if ( is_user_logged_in() ) {
+	    $user_id = $current_user_id= get_current_user_id();
+		}else{
+			$user_id = 0;
+		}
+
     extract(shortcode_atts(array(
       'id' => 0,
    ), $atts));
@@ -152,9 +158,10 @@ function cf_shortcode($atts) {
 			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
 		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
+			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 		 	 echo '<p>';
-		   echo 'Your Email (required) <br />';
-		   echo '<input type="email" name="pf-pemail" id="pf-email" required/>';
+		   echo 'Email(required)<br />';
+		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
 		   echo 'Amount <br />';
@@ -184,12 +191,12 @@ function text_shortcode($atts) {
 		'name' => 'Title',
     'required' => '0',
  	), $atts));
-	$text = '<label> '.$name.'<input type="text" name="'.$name.'"';
+	$code = '<label> '.$name.'<input  class="form-control"  type="text" name="'.$name.'"';
 	if ($required == 'required') {
-		 $text.= ' required="reduired" ';
+		 $code.= ' required="reduired" ';
 	}
-	$text.= '" /></label><br />';
-  return $text;
+	$code.= '" /></label><br />';
+  return $code;
 }
 add_shortcode('text', 'text_shortcode');
 function email_shortcode($atts) {
@@ -201,17 +208,18 @@ function email_shortcode($atts) {
 }
 add_shortcode('email', 'email_shortcode');
 function textarea_shortcode() {
-
-    extract(shortcode_atts(array(
-      'name' => 'Email',
-   ), $atts));
-   return '<textarea name="'.$name.'"></textarea><br />';
+	extract(shortcode_atts(array(
+      'name' => 'Title',
+			'required' => '0',
+	 ), $atts));
+	 $code = '<label> '.$name.'<textarea class="form-control"  rows="3" name="'.$name.'"';
+ 	if ($required == 'required') {
+ 		 $code.= ' required="reduired" ';
+ 	}
+ 	$code.= '" ></textarea></label><br />';
+   return $code;
 }
 add_shortcode('textarea', 'textarea_shortcode');
-function radio_shortcode() {
-  return '<textarea></textarea><br />';
-}
-add_shortcode('radio', 'radio_shortcode');
 
 function to_slug($text){
     $text = preg_replace('~[^\pL\d]+~u', '-', $text);
@@ -291,6 +299,7 @@ function paystack_submit_action() {
 	unset($metadata['pf-id']);
 	unset($metadata['pf-pemail']);
 	unset($metadata['pf-amount']);
+	unset($metadata['pf-user_id']);
 	$insert =  array(
         'post_id' => strip_tags($_POST["pf-id"], ""),
 				'email' => strip_tags($_POST["pf-pemail"], ""),
@@ -305,7 +314,7 @@ function paystack_submit_action() {
   $exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
 			AND post_id = '".$insert['post_id']."'
 			AND email = '".$insert['email']."'
-			AND user_id = '".$insert['user_id']."'
+			AND user_id = '".$insert['pf-user_id']."'
 			AND amount = '".$insert['amount']."'
 			AND ip = '".$insert['ip']."'
 			AND paid = '0'
