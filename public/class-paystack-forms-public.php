@@ -140,7 +140,7 @@ function deliver_mail() {
 function cf_shortcode($atts) {
     ob_start();
 		if ( is_user_logged_in() ) {
-	    $user_id = $current_user_id= get_current_user_id();
+	    $user_id = get_current_user_id();
 		}else{
 			$user_id = 0;
 		}
@@ -150,10 +150,15 @@ function cf_shortcode($atts) {
    ), $atts));
   if ($id != 0) {
      $obj = get_post($id);
-     if ($obj->post_type == 'paystack_form') {
+		 echo '<pre>';
+		 if ($obj->post_type == 'paystack_form') {
 			 $amount = get_post_meta($id,'_amount',true);
 			 $thankyou = get_post_meta($id,'_successmsg',true);
 			 $paybtn = get_post_meta($id,'_paybtn',true);
+			 $loggedin = get_post_meta($id,'_loggedin',true);
+			 $txncharge = get_post_meta($id,'_txncharge',true);
+			 print_r($loggedin);
+			 if ($loggedin == 'no') {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
 			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
 		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
@@ -166,7 +171,7 @@ function cf_shortcode($atts) {
 		 	 echo '<p>';
 		   echo 'Amount <br />';
 			 if ($amount == 0) {
-				 echo '<input type="number" name="pf-amount" class="form-control pf-number" required/>';
+				 echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
 			 }else{
 				 echo '<input type="number" name="pf-amount" value="'.$amount.'" readonly required/>';
 			 }
@@ -174,6 +179,11 @@ function cf_shortcode($atts) {
 		   print_r(do_shortcode($obj->post_content));
 			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
 		   echo '</form>';
+			 # code...
+		 }else{
+			 echo "<h5>You must be logged in to make payment</h5>";
+		 }
+
     }
    }
 
@@ -199,15 +209,21 @@ function text_shortcode($atts) {
   return $code;
 }
 add_shortcode('text', 'text_shortcode');
-function email_shortcode($atts) {
-  extract(shortcode_atts(array(
-    'name' => 'Email',
- ), $atts));
- $text = '<label>'.$name.'<input type="email" name="'.$name.'" /></label><br />';
-  return $text;
+function select_shortcode($atts) {
+	extract(shortcode_atts(array(
+		'name' => 'Title',
+		'options' => '',
+    'required' => '0',
+ 	), $atts));
+	$code = '<label> '.$name.'<input  class="form-control"  type="text" name="'.$name.'"';
+	if ($required == 'required') {
+		 $code.= ' required="reduired" ';
+	}
+	$code.= '" /></label><br />';
+  return $code;
 }
-add_shortcode('email', 'email_shortcode');
-function textarea_shortcode() {
+add_shortcode('select', 'select_shortcode');
+function textarea_shortcode($atts) {
 	extract(shortcode_atts(array(
       'name' => 'Title',
 			'required' => '0',
@@ -289,7 +305,6 @@ function paystack_submit_action() {
   	// Exit here, for not processing further because of the error
   	exit(json_encode($response));
   }
-  // print_r($_POST);
   global $wpdb;
 	$code = generate_code();
 

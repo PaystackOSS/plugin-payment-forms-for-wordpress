@@ -47,15 +47,21 @@
 				  return re.test(email);
 				}
 		 	$('.paystack-form').on('submit', function(e) {
+				var stop = false;
 				$(this).find("input, select, textarea").each(function() {
 						$(this).css({ "border-color":"#d1d1d1" });
 				});
 				var email = $(this).find("#pf-email").val();
+				var amount = $(this).find("#pf-amount").val();
+				if (Number(amount) > 0) {
+				}else{
+					$(this).find("#pf-amount").css({ "border-color":"red" });
+					stop = true;
+				}
 				if (!validateEmail(email)) {
 			    $(this).find("#pf-email").css({ "border-color":"red" });
 					stop = true;
 				}
-				var stop = false;
 					$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
               $(this).css({ "border-color":"red" });
 							stop = true;
@@ -84,6 +90,10 @@
 											if (data.result == 'success'){
 												$('.paystack-form')[0].reset();
 												self.before('<pre>'+data.message+'</pre>');
+												$(this).find("input, select, textarea").each(function() {
+														$(this).css({ "border-color":"#d1d1d1" });
+												});
+												
 												$.unblockUI();
 											}else{
 												self.before('<pre>'+data.message+'</pre>');

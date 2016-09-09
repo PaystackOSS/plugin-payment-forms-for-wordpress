@@ -216,14 +216,45 @@ class Paystack_Forms_Admin {
 		    return $content;
 		}
 		/////
-		add_action( 'add_meta_boxes', 'add_events_metaboxes' );
-	  function add_events_metaboxes() {
+		function help_metabox( $post ) {
 
-	      add_meta_box('wpt_events_location', 'Extra Form Description', 'wpt_events_location', 'paystack_form', 'normal', 'default');
+		    do_meta_boxes( null, 'custom-metabox-holder', $post );
+		}
+		add_action( 'edit_form_after_title', 'help_metabox' );
+		function add_help_metabox() {
+
+				add_meta_box(
+					'awesome_metabox_id',
+					'Help Section',
+					'help_metabox_details',
+					'paystack_form',
+					'custom-metabox-holder'	//Look what we have here, a new context
+				);
+
+		}
+		add_action( 'add_meta_boxes', 'add_help_metabox' );
+
+		function help_metabox_details( $post ) {
+			echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+			?>
+			<div class="awesome-meta-admin">
+				To make an input compulsory add <code>required="required"</code> to the shortcode <br />
+
+			</div>
+
+		<?php
+		}
+
+		add_action( 'add_meta_boxes', 'add_extra_metaboxes' );
+	  function add_extra_metaboxes() {
+
+			add_meta_box('wpt_form_data', 'Extra Form Description', 'wpt_form_data', 'paystack_form', 'normal', 'default');
 
 	  }
 
-	  function wpt_events_location() {
+	  function wpt_form_data() {
 	  	global $post;
 
 	  	// Noncename needed to verify where the data originated
@@ -233,8 +264,18 @@ class Paystack_Forms_Admin {
 	  	// Get the location data if its already been entered
 			$amount = get_post_meta($post->ID, '_amount', true);
 	  	$paybtn = get_post_meta($post->ID, '_paybtn', true);
-	    $successmsg = get_post_meta($post->ID, '_successmsg', true);
+			$successmsg = get_post_meta($post->ID, '_successmsg', true);
+			$txncharge = get_post_meta($post->ID, '_txncharge', true);
+	    $loggedin = get_post_meta($post->ID, '_loggedin', true);
+			function txncheck($name,$txncharge){
 
+				if ($name == $txncharge) {
+					$result = "selected";
+				}else{
+					$result = "";
+				}
+				return $result;
+			}
 			if ($amount == "") {$amount = 0;}
 			if ($paybtn == "") {$paybtn = 'Pay';}
 			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
@@ -243,12 +284,22 @@ class Paystack_Forms_Admin {
 	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 			echo '<p>Pay button Description:</p>';
 	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
-	    echo '<p>Success Message after Payment</p>';
+			echo '<p>Transaction Charges:</p>';
+			echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
+							<option value="merchant"'.txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
+							<option value="customer" '.txncheck('customer',$txncharge).'>Client Pays(Extra Fee added)</option>
+						</select>';
+			echo '<p>User logged In:</p>';
+			echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
+							<option value="no" '.txncheck('no',$loggedin).'>User must not be logged in</option>
+							<option value="yes"'.txncheck('yes',$loggedin).'>User must be logged In</option>
+						</select>';
+	  	echo '<p>Success Message after Payment</p>';
 	    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
 
 	  }
 
-		function wpt_save_events_meta($post_id, $post) {
+		function wpt_form_data_meta($post_id, $post) {
 
 			// verify this came from the our screen and with proper authorization,
 			// because save_post can be triggered at other times
@@ -266,6 +317,8 @@ class Paystack_Forms_Admin {
 		  $events_meta['_amount'] = $_POST['_amount'];
 			$events_meta['_paybtn'] = $_POST['_paybtn'];
 			$events_meta['_successmsg'] = $_POST['_successmsg'];
+			$events_meta['_txncharge'] = $_POST['_txncharge'];
+			$events_meta['_loggedin'] = $_POST['_loggedin'];
 
 			// Add values of $events_meta as custom fields
 
@@ -282,7 +335,7 @@ class Paystack_Forms_Admin {
 
 		}
 
-		add_action('save_post', 'wpt_save_events_meta', 1, 2); // save the custom fields
+		add_action('save_post', 'wpt_form_data_meta', 1, 2); // save the custom fields
 
 	}
 

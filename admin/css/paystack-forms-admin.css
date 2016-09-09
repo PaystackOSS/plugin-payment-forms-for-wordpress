@@ -401,3 +401,6 @@ ul.config-error li a.external {
 .paystack_setting_page   input{
 	width: 50%;
 }
+#custom-metabox-holder-sortables{
+	margin-top:30px;
+}
