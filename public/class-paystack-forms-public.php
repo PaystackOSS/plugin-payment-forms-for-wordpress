@@ -157,8 +157,8 @@ function cf_shortcode($atts) {
 		   echo '</p>';
 		 	 echo '<p>';
 		   echo 'Amount <br />';
-			 if ($amount === 0) {
-				 echo '<input type="number" name="pf-amount"  required/>';
+			 if ($amount == 0) {
+				 echo '<input type="number" name="pf-amount" class="form-control pf-number" required/>';
 			 }else{
 				 echo '<input type="number" name="pf-amount" value="'.$amount.'" readonly required/>';
 			 }
@@ -366,57 +366,67 @@ function paystack_submit_action() {
 add_action( 'wp_ajax_paystack_confirm_payment', 'paystack_confirm_payment' );
 add_action( 'wp_ajax_nopriv_paystack_confirm_payment', 'paystack_confirm_payment' );
 function paystack_confirm_payment() {
-  if (trim($_POST['pf-pemail']) == '') {
+  if (trim($_POST['code']) == '') {
     $response['error'] = true;
-  	$response['error_message'] = 'Email is required';
+  	$response['error_message'] = "Did you make a payment?";
 
-  	// Exit here, for not processing further because of the error
   	exit(json_encode($response));
   }
-  // print_r($_POST);
   global $wpdb;
-	$code = generate_code();
+	$table = $wpdb->prefix."paystack_forms_payments";
+	$code = $_POST['code'];
+	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+	if (array_key_exists("0", $record)) {
 
-  $table = $wpdb->prefix."paystack_forms_payments";
-	$metadata = $_POST;
-	unset($metadata['action']);
-	unset($metadata['pf-id']);
-	unset($metadata['pf-pemail']);
-	unset($metadata['pf-amount']);
-	$insert =  array(
-        'post_id' => strip_tags($_POST["pf-id"], ""),
-				'email' => strip_tags($_POST["pf-pemail"], ""),
-        'user_id' => strip_tags($_POST["pf-user_id"], ""),
-        'amount' => strip_tags($_POST["pf-amount"], ""),
-				'ip' => get_the_user_ip(),
-				'txn_code' => $code,
-				'metadata' => json_encode($metadata)
-      );
+		$payment_array = $record[0];
 
-	print_r($insert_array);
-  $exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
-			AND post_id = '".$insert['post_id']."'
-			AND email = '".$insert['email']."'
-			AND user_id = '".$insert['user_id']."'
-			AND amount = '".$insert['amount']."'
-			AND ip = '".$insert['ip']."'
-			AND paid = '0'
-			AND metadata = '". $insert['metadata'] ."')");
-	 if (count($exist) > 0) {
-		 $insert['txn_code'] = $exist[0]->txn_code;
+		$mode =  esc_attr( get_option('mode') );
+		if ($mode == 'test') {
+			$key = esc_attr( get_option('tsk') );
+		}else{
+			$key = esc_attr( get_option('lsk') );
+		}
+		$paystack_url = 'https://api.paystack.co/transaction/verify/' . $code;
+		$headers = array(
+			'Authorization' => 'Bearer ' . $key
+		);
+		$args = array(
+			'headers'	=> $headers,
+			'timeout'	=> 60
+		);
+		$request = wp_remote_get( $paystack_url, $args );
+		if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
+			$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
+			if ( 'success' == $paystack_response->data->status ) {
+						$amount_paid	= $paystack_response->data->amount / 100;
+						$paystack_ref 	= $paystack_response->data->reference;
+						if( $payment_array->amount !=  $amount_paid ) {
+							$message = "Invalid amount Paid";
+							$result = "failed";
+							//Invalid Amount
+						}else{
+								$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1' WHERE txn_code='".$paystack_ref."'"));
+								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+				 			 	$message = $thankyou;
+								$result = "success";
+						}
+			}else {
+				$message = "Transaction Failed/Invalid Code";
+				$result = "failed";
+			}
 
-   } else {
-		 $wpdb->insert(
-	        $table,
-	        $insert
-	    );
-   }
+		}
+	}else{
+		$message = "Try Submitting Form again";
+		$result = "failed";
+
+	}
+
+
 
 	 $response = array(
-     'result' => 'success',
-     'code' => $insert['txn_code'],
-     'email' => $insert['email'],
-   	 'total' => $insert['amount']*100,
+     'result' => $result,
+     'message' => $message,
    );
   echo json_encode($response);
 

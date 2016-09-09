@@ -29,7 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 	 $(document).ready(function($) {
-			 $('[type|="number"]').keydown(function(event) {
+			 $('.pf-number').keydown(function(event) {
 		       if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9
 		           || event.keyCode == 27 || event.keyCode == 13
 		           || (event.keyCode == 65 && event.ctrlKey === true)
@@ -65,10 +65,13 @@
                         'code':response.trxref
                       }
                   }).success(function(data){
-                      if (data.result == 'success'){
+											$.unblockUI();
+									 		if (data.result == 'success'){
+													$(this).closest('form')[0].reset();
+													alert(data.message);
+                      }else{
 
-													alert('Done');
-                      }
+											}
                   });
 									alert('Paid');
               },

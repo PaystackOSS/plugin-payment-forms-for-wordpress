@@ -230,7 +230,7 @@ class Paystack_Forms_Admin {
 
 	  	// Echo out the field
 	    echo '<p>Amount to be paid(Set 0 for customer input):</p>';
-	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat" />';
+	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 			echo '<p>Pay button Description:</p>';
 	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
 	    echo '<p>Success Message after Payment</p>';
