@@ -338,7 +338,8 @@ class Paystack_Forms_Admin {
 			if ($currency == "") {$currency = 'NGN';}
 	  	// Echo out the field
 			echo '<p>Currency:</p>';
-	  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />';
+	  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
+			<small>We currently support only payments in Naira(NGN).</small>';
 			echo '<p>Amount to be paid(Set 0 for customer input):</p>';
 	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 			echo '<p>Pay button Description:</p>';

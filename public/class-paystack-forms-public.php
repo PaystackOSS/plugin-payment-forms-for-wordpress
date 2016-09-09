@@ -165,11 +165,11 @@ function cf_shortcode($atts) {
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 		 	 echo '<p>';
-		   echo 'Email(required)<br />';
+		   echo 'Email (required)<br />';
 		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
-		   echo 'Amount <br />';
+		   echo 'Amount ('.$currency.') <br />';
 			 if ($amount == 0) {
 				 echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
 			 }else{
