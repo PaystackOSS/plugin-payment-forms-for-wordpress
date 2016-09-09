@@ -150,7 +150,6 @@ function cf_shortcode($atts) {
    ), $atts));
   if ($id != 0) {
      $obj = get_post($id);
-		//  echo '<pre>';
 		 if ($obj->post_type == 'paystack_form') {
 			 $amount = get_post_meta($id,'_amount',true);
 			 $thankyou = get_post_meta($id,'_successmsg',true);
@@ -178,7 +177,7 @@ function cf_shortcode($atts) {
 			 }
 			  echo '</p>';
 		   echo(do_shortcode($obj->post_content));
-			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
+			 echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
 		   echo '</form>';
@@ -328,9 +327,7 @@ function paystack_submit_action() {
 				'metadata' => json_encode($metadata)
       );
 
-	print_r($insert_array);
-  $exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
-			AND post_id = '".$insert['post_id']."'
+	$exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
 			AND email = '".$insert['email']."'
 			AND user_id = '".$insert['pf-user_id']."'
 			AND amount = '".$insert['amount']."'
