@@ -154,7 +154,7 @@ function cf_shortcode($atts) {
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 		 	 echo '<p>';
 		   echo 'Your Email (required) <br />';
-		   echo '<input type="email" name="pf-pemail"  required/>';
+		   echo '<input type="email" name="pf-pemail" id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
 		   echo 'Amount <br />';

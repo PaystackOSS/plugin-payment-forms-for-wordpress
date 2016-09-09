@@ -121,7 +121,7 @@ class Paystack_Forms_Admin {
 		        'labels' => $labels,
 		        'hierarchical' => true,
 		        'description' => 'Paystack Forms filterable by genre',
-		        'supports' => array( 'title', 'editor',  'thumbnail'),
+		        'supports' => array( 'title', 'editor'),
 		        'public' => true,
 		        'show_ui' => true,
 		        'show_in_menu' => true,
@@ -156,8 +156,7 @@ class Paystack_Forms_Admin {
 				remove_action( 'media_buttons', 'media_buttons' );
 				remove_meta_box( 'postimagediv','post','side' );
 				add_filter('quicktags_settings', 'wpa_47010');
-				 unset( $_wp_theme_features['post-thumbnails']);
-	    };
+			}
 
 	    return $default;
 	  }
