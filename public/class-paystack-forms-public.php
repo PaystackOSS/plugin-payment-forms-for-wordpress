@@ -150,13 +150,14 @@ function cf_shortcode($atts) {
    ), $atts));
   if ($id != 0) {
      $obj = get_post($id);
-		 echo '<pre>';
+		//  echo '<pre>';
 		 if ($obj->post_type == 'paystack_form') {
 			 $amount = get_post_meta($id,'_amount',true);
 			 $thankyou = get_post_meta($id,'_successmsg',true);
 			 $paybtn = get_post_meta($id,'_paybtn',true);
 			 $loggedin = get_post_meta($id,'_loggedin',true);
 			 $txncharge = get_post_meta($id,'_txncharge',true);
+			 $currency = get_post_meta($id,'_currency',true);
 			 print_r($loggedin);
 			 if ($loggedin == 'no') {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
@@ -176,7 +177,9 @@ function cf_shortcode($atts) {
 				 echo '<input type="number" name="pf-amount" value="'.$amount.'" readonly required/>';
 			 }
 			  echo '</p>';
-		   print_r(do_shortcode($obj->post_content));
+		   echo(do_shortcode($obj->post_content));
+			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
+			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
 		   echo '</form>';
 			 # code...
