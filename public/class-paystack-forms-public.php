@@ -205,7 +205,7 @@ function text_shortcode($atts) {
  	), $atts));
 	$code = '<label> '.$name.'<input  class="form-control"  type="text" name="'.$name.'"';
 	if ($required == 'required') {
-		 $code.= ' required="reduired" ';
+		 $code.= ' required="required" ';
 	}
 	$code.= '" /></label><br />';
   return $code;
@@ -220,7 +220,7 @@ function select_shortcode($atts) {
 	$code = '<label> '.$name.'<br /><select class="form-control" name="'.$name.'"';
 
 	if ($required == 'required') {
-		 $code.= ' required="reduired" ';
+		 $code.= ' required="required" ';
 	}
 	$code.=" style='width:100%;'>";
 	$soptions = explode(',', $options);
@@ -240,7 +240,7 @@ function textarea_shortcode($atts) {
 	 ), $atts));
 	 $code = '<label> '.$name.'<textarea class="form-control"  rows="3" name="'.$name.'"';
  	if ($required == 'required') {
- 		 $code.= ' required="reduired" ';
+ 		 $code.= ' required="required" ';
  	}
  	$code.= '" ></textarea></label><br />';
    return $code;
