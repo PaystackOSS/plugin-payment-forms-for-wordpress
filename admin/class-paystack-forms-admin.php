@@ -58,11 +58,11 @@ class Paystack_Forms_Admin {
 								<tr valign="top">
 								<th scope="row">Mode</th>
 
-								<td><select class="form-control" name="mode" id="parent_id">
-								<option value="live" <?php echo txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
-								<option value="test" <?php echo txncheck('test',esc_attr( get_option('mode') )) ?>>Test Mode</option>
-							</select>
-							<!-- <input type="text" name="mode" value="<?php echo esc_attr( get_option('mode') ); ?>" /></td> -->
+								<td>
+									<select class="form-control" name="mode" id="parent_id">
+										<option value="live" <?php echo txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
+										<option value="test" <?php echo txncheck('test',esc_attr( get_option('mode') )) ?>>Test Mode</option>
+									</select>
 								</tr>
 								<tr valign="top">
 				        <th scope="row">Test Secret Key</th>
@@ -82,7 +82,7 @@ class Paystack_Forms_Admin {
 				        </tr>
 								<tr valign="top">
 				        <th scope="row">Live Public Key</th>
-				        <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
+				        <td><input type="text" name="lpk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
 				        </tr>
 				    </table>
 
@@ -375,6 +375,7 @@ class Paystack_Forms_Admin {
 
 		  $events_meta['_amount'] = $_POST['_amount'];
 			$events_meta['_paybtn'] = $_POST['_paybtn'];
+			$events_meta['_currency'] = $_POST['_currency'];
 			$events_meta['_successmsg'] = $_POST['_successmsg'];
 			$events_meta['_txncharge'] = $_POST['_txncharge'];
 			$events_meta['_loggedin'] = $_POST['_loggedin'];
@@ -514,7 +515,7 @@ class Payments_List_Table extends WP_List_Table{
 				$data[] = array(
 							'id'  => $newkey,
 							'email' => $dbdata->email,
-		          'amount' => $currency.number_format($dbdata->amount),
+		          'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
 		          'txn_code' => $dbdata->txn_code,
 		          'metadata' => format_data($dbdata->metadata),
 		          'date'  => $dbdata->created_at

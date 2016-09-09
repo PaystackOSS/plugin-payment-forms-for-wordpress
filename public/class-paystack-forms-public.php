@@ -379,6 +379,9 @@ function paystack_confirm_payment() {
 	if (array_key_exists("0", $record)) {
 
 		$payment_array = $record[0];
+		$amount = get_post_meta($payment_array->post_id,'_amount',true);
+		$currency = get_post_meta($payment_array->post_id,'_currency',true);
+
 
 		$mode =  esc_attr( get_option('mode') );
 		if ($mode == 'test') {
@@ -400,15 +403,23 @@ function paystack_confirm_payment() {
 			if ( 'success' == $paystack_response->data->status ) {
 						$amount_paid	= $paystack_response->data->amount / 100;
 						$paystack_ref 	= $paystack_response->data->reference;
-						if( $payment_array->amount !=  $amount_paid ) {
-							$message = "Invalid amount Paid";
-							$result = "failed";
-							//Invalid Amount
+
+						if ($amount == 0) {
+							$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1',amount='".$amount_paid."' WHERE txn_code='".$paystack_ref."'"));
+							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+							$message = $thankyou;
+							$result = "success";
 						}else{
+							if( $amount !=  $amount_paid ) {
+								$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
+								$result = "failed";
+							}else{
+
 								$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1' WHERE txn_code='".$paystack_ref."'"));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
-				 			 	$message = $thankyou;
+								$message = $thankyou;
 								$result = "success";
+							}
 						}
 			}else {
 				$message = "Transaction Failed/Invalid Code";
