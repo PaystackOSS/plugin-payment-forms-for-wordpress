@@ -1,4 +1,4 @@
-=== Paystack Recurrent Billing ===
+=== Paystack Forms ===
 Contributors: kendysond
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target
@@ -8,13 +8,12 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Paystack Recurrent Billing allows you to accept online instalmental and recurrent payments from local and international customers
-
+Paystack forms allows you create forms that will be used to bill clients for goods and services.
 
 
 == Description ==
 
-This is a Paystack plugin that provides Recurrent Billing.
+This is a Paystack plugin that provides Payment forms for Wordpress.
 
 Paystack is on a mission to deliver a safe and convenient payment experience for customers and merchants. Paystack provide Nigerian merchants with the tools and services needed to accept online payments from local and international customers using MasterCard, Visa and Verve Cards.
 
