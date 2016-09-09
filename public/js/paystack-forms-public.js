@@ -29,42 +29,47 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 	 $(document).ready(function($) {
+			 $('[type|="number"]').keydown(function(event) {
+		       if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9
+		           || event.keyCode == 27 || event.keyCode == 13
+		           || (event.keyCode == 65 && event.ctrlKey === true)
+		           || (event.keyCode >= 35 && event.keyCode <= 39)){
+		               return;
+		       }else{
+		           if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+		               event.preventDefault();
+		           }
+		       }
+		   });
 		 	$('.paystack-form').on('submit', function(e) {
-				var self = $( this );
+				$.blockUI({ message: 'Please wait...' });
+	 		 	var self = $( this );
 				var $form = $(this);
-
-			 var loaderContainer = $( '<span/>', {
-					 'class': 'loader-image-container'
-			 }).insertAfter( self );
-			 var adminurl = $form.attr('url');
-			 var loader = $( '<img/>', {
-					 src: adminurl+'/images/loading.gif',
-					 'class': 'loader-image'
-			 }).appendTo( loaderContainer );
 				e.preventDefault();
 
 				$.post($form.attr('action'), $form.serialize(), function(data) {
-					 loaderContainer.remove();
+					 $.unblockUI();
 					 if (data.result == 'success'){
-				         var handler = PaystackPop.setup({
+				    var handler = PaystackPop.setup({
               key: settings.key,
               email: data.email,
               amount: data.total,
               ref: data.code,
               callback: function(response){
-                  // $.ajax({
-                  //     method:'post',
-                  //     url: '/registry/confirm_online_payment',
-                  //     data: {
-                  //         '_token':$('meta[name="csrf_token"]').attr('content'),
-                  //         'code':response.trxref
-                  //     }
-                  // }).success(function(data){
-                  //     if (data.result == 'success'){
-                  //         $scope.cart.items = [];
-                  //         window.location.href = data.link;
-                  //     }
-                  // });
+								$.blockUI({ message: 'Please wait...' });
+							 $.ajax({
+                      method:'post',
+                      url: $form.attr('action'),
+                      data: {
+												'action':'paystack_confirm_payment',
+                        'code':response.trxref
+                      }
+                  }).success(function(data){
+                      if (data.result == 'success'){
+
+													alert('Done');
+                      }
+                  });
 									alert('Paid');
               },
               onClose: function(){

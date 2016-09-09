@@ -102,6 +102,7 @@ class Paystack_Forms_Public {
 		}else{
 			$key = esc_attr( get_option('lpk') );
 		}
+		wp_enqueue_script( 'blockUI', plugin_dir_url( __FILE__ ) . 'js/jquery.blockUI.min.js', array( 'jquery' ), $this->version, false );
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
 		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
@@ -141,25 +142,33 @@ function cf_shortcode($atts) {
     extract(shortcode_atts(array(
       'id' => 0,
    ), $atts));
-  echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
-  echo '<input type="hidden" name="action" value="paystack_submit_action">';
-
-  echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
-	echo '<p>';
-  echo 'Your Email (required) <br />';
-  echo '<input type="email" name="pf-pemail"  required/>';
-  echo '</p>';
-	echo '<p>';
-  echo 'Amount <br />';
-  echo '<input type="number" name="pf-amount"  required/>';
-  echo '</p>';
   if ($id != 0) {
      $obj = get_post($id);
      if ($obj->post_type == 'paystack_form') {
-       print_r(do_shortcode($obj->post_content));
+			 $amount = get_post_meta($id,'_amount',true);
+			 $thankyou = get_post_meta($id,'_successmsg',true);
+			 $paybtn = get_post_meta($id,'_paybtn',true);
+			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
+		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
+			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
+		 	 echo '<p>';
+		   echo 'Your Email (required) <br />';
+		   echo '<input type="email" name="pf-pemail"  required/>';
+		   echo '</p>';
+		 	 echo '<p>';
+		   echo 'Amount <br />';
+			 if ($amount === 0) {
+				 echo '<input type="number" name="pf-amount"  required/>';
+			 }else{
+				 echo '<input type="number" name="pf-amount" value="'.$amount.'" readonly required/>';
+			 }
+			  echo '</p>';
+		   print_r(do_shortcode($obj->post_content));
+			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
+		   echo '</form>';
     }
    }
-  echo '</form>';
+
 
 
     return ob_get_clean();
@@ -250,10 +259,6 @@ function to_slug($text){
 
 
 // Save the Metabox Data
-
-
-add_action( 'wp_ajax_paystack_submit_action', 'paystack_submit_action' );
-add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
 function generate_new_code($length = 10){
   // $characters = 'RSTUVW01234ABCDEFGHIJ56789KLMNOPQXYZ';
   $characters = '06EFGHI9KL'.time().'MNOPJRSUVW01YZ923234'.time().'ABCD5678QXT';
@@ -265,15 +270,15 @@ function generate_new_code($length = 10){
   return time()."_".$randomString;
 }
 function check_code($code){
-global $wpdb;
-$table = $wpdb->prefix."paystack_forms_payments";
-$o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '".$code."'");
+	global $wpdb;
+	$table = $wpdb->prefix."paystack_forms_payments";
+	$o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '".$code."'");
 
-  if (count($o_exist) > 0) {
-      $result = true;
-  } else {
-      $result = false;
-  }
+	  if (count($o_exist) > 0) {
+	      $result = true;
+	  } else {
+	      $result = false;
+	  }
 
   return $result;
 }
@@ -288,17 +293,79 @@ function generate_code(){
   return $code;
 }
 function get_the_user_ip() {
-if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-	$ip = $_SERVER['HTTP_CLIENT_IP'];
-} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-	$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-} else {
-	$ip = $_SERVER['REMOTE_ADDR'];
-}
-return $ip;
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} else {
+		$ip = $_SERVER['REMOTE_ADDR'];
+	}
+	return $ip;
 }
 
+add_action( 'wp_ajax_paystack_submit_action', 'paystack_submit_action' );
+add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
 function paystack_submit_action() {
+  if (trim($_POST['pf-pemail']) == '') {
+    $response['error'] = true;
+  	$response['error_message'] = 'Email is required';
+
+  	// Exit here, for not processing further because of the error
+  	exit(json_encode($response));
+  }
+  // print_r($_POST);
+  global $wpdb;
+	$code = generate_code();
+
+  $table = $wpdb->prefix."paystack_forms_payments";
+	$metadata = $_POST;
+	unset($metadata['action']);
+	unset($metadata['pf-id']);
+	unset($metadata['pf-pemail']);
+	unset($metadata['pf-amount']);
+	$insert =  array(
+        'post_id' => strip_tags($_POST["pf-id"], ""),
+				'email' => strip_tags($_POST["pf-pemail"], ""),
+        'user_id' => strip_tags($_POST["pf-user_id"], ""),
+        'amount' => strip_tags($_POST["pf-amount"], ""),
+				'ip' => get_the_user_ip(),
+				'txn_code' => $code,
+				'metadata' => json_encode($metadata)
+      );
+
+	print_r($insert_array);
+  $exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
+			AND post_id = '".$insert['post_id']."'
+			AND email = '".$insert['email']."'
+			AND user_id = '".$insert['user_id']."'
+			AND amount = '".$insert['amount']."'
+			AND ip = '".$insert['ip']."'
+			AND paid = '0'
+			AND metadata = '". $insert['metadata'] ."')");
+	 if (count($exist) > 0) {
+		 $insert['txn_code'] = $exist[0]->txn_code;
+
+   } else {
+		 $wpdb->insert(
+	        $table,
+	        $insert
+	    );
+   }
+
+	 $response = array(
+     'result' => 'success',
+     'code' => $insert['txn_code'],
+     'email' => $insert['email'],
+   	 'total' => $insert['amount']*100,
+   );
+  echo json_encode($response);
+
+  die();
+}
+
+add_action( 'wp_ajax_paystack_confirm_payment', 'paystack_confirm_payment' );
+add_action( 'wp_ajax_nopriv_paystack_confirm_payment', 'paystack_confirm_payment' );
+function paystack_confirm_payment() {
   if (trim($_POST['pf-pemail']) == '') {
     $response['error'] = true;
   	$response['error_message'] = 'Email is required';

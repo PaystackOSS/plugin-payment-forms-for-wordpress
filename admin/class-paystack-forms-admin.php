@@ -193,11 +193,26 @@ class Paystack_Forms_Admin {
 					break;
 			}
 		}
+		add_filter( 'default_content', 'my_editor_content', 10, 2 );
+
+		function my_editor_content( $content, $post ) {
+
+		    switch( $post->post_type ) {
+		        case 'paystack_form':
+		            $content = '[text name="Full Name"]';
+		        break;
+		        default:
+		            $content = '';
+		        break;
+		    }
+
+		    return $content;
+		}
 		/////
 		add_action( 'add_meta_boxes', 'add_events_metaboxes' );
 	  function add_events_metaboxes() {
 
-	      add_meta_box('wpt_events_location', 'Event Location', 'wpt_events_location', 'paystack_form', 'side', 'default');
+	      add_meta_box('wpt_events_location', 'Extra Form Description', 'wpt_events_location', 'paystack_form', 'normal', 'default');
 
 	  }
 
@@ -209,14 +224,17 @@ class Paystack_Forms_Admin {
 	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
 
 	  	// Get the location data if its already been entered
-	  	$location = get_post_meta($post->ID, '_location', true);
-	          $dresscode = get_post_meta($post->ID, '_dresscode', true);
+			$amount = get_post_meta($post->ID, '_amount', true);
+	  	$paybtn = get_post_meta($post->ID, '_paybtn', true);
+	    $successmsg = get_post_meta($post->ID, '_successmsg', true);
 
 	  	// Echo out the field
-	          echo '<p>Enter the location:</p>';
-	  	echo '<input type="text" name="_location" value="' . $location  . '" class="widefat" />';
-	          echo '<p>How Should People Dress?</p>';
-	          echo '<input type="text" name="_dresscode" value="' . $dresscode  . '" class="widefat" />';
+	    echo '<p>Amount to be paid(Set 0 for customer input):</p>';
+	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat" />';
+			echo '<p>Pay button Description:</p>';
+	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
+	    echo '<p>Success Message after Payment</p>';
+	    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
 
 	  }
 
@@ -235,8 +253,9 @@ class Paystack_Forms_Admin {
 			// OK, we're authenticated: we need to find and save the data
 			// We'll put it into an array to make it easier to loop though.
 
-		  $events_meta['_location'] = $_POST['_location'];
-			$events_meta['_dresscode'] = $_POST['_dresscode'];
+		  $events_meta['_amount'] = $_POST['_amount'];
+			$events_meta['_paybtn'] = $_POST['_paybtn'];
+			$events_meta['_successmsg'] = $_POST['_successmsg'];
 
 			// Add values of $events_meta as custom fields
 
