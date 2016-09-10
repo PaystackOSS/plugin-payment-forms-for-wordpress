@@ -85,6 +85,7 @@
               email: data.email,
               amount: data.total,
               ref: data.code,
+							metadata: {'custom_fields': data.custom_fields},
               callback: function(response){
 								$.blockUI({ message: 'Please wait...' });
 								$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {

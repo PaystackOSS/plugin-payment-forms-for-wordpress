@@ -340,10 +340,23 @@ function paystack_submit_action() {
      'code' => $insert['txn_code'],
      'email' => $insert['email'],
    	 'total' => $insert['amount']*100,
+		 'custom_fields' => paystack_meta_as_custom_fields($metadata)
    );
   echo json_encode($response);
 
   die();
+}
+
+function paystack_meta_as_custom_fields($metadata){
+	$custom_fields = [];
+	foreach ($metadata as $key => $value) {
+		$custom_fields[] = [
+			'display_name' => ucwords(str_replace("_", " ", $key)),
+      'variable_name' => $key,
+      'value' => $value
+		];
+	}
+	return $custom_fields;
 }
 
 add_action( 'wp_ajax_paystack_confirm_payment', 'paystack_confirm_payment' );
