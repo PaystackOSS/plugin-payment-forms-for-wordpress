@@ -161,6 +161,8 @@ function cf_shortcode($atts) {
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			 echo '<p> <br /><input type="submit" class="btn btn-danger" value="'.$paybtn.'" ></p>';
+
+			 echo '<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos" width="300" height="36" class="alignnone size-full wp-image-1096" />';
 		   echo '</form>';
 			 # code...
 		 }else{
