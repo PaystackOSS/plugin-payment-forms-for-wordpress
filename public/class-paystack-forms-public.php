@@ -1,25 +1,6 @@
 <?php
 
-/**
- * The public-facing functionality of the plugin.
- *
- * @link       kendyson.com
- * @since      1.0.0
- *
- * @package    Paystack_Forms
- * @subpackage Paystack_Forms/public
- */
 
-/**
- * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Paystack_Forms
- * @subpackage Paystack_Forms/public
- * @author     kendysond <kendyson@kendyson.com>
- */
 class Paystack_Forms_Public {
 
 	/**
@@ -165,11 +146,11 @@ function cf_shortcode($atts) {
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 		 	 echo '<p>';
-		   echo 'Email(required)<br />';
+		   echo 'Email (required)<br />';
 		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
-		   echo 'Amount <br />';
+		   echo 'Amount ('.$currency.') <br />';
 			 if ($amount == 0) {
 				 echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
 			 }else{
@@ -179,7 +160,7 @@ function cf_shortcode($atts) {
 		   echo(do_shortcode($obj->post_content));
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
-			 echo '<p> <br /><input type="submit" value="'.$paybtn.'"></p>';
+			 echo '<p> <br /><input type="submit" class="btn btn-danger" value="'.$paybtn.'" ></p>';
 		   echo '</form>';
 			 # code...
 		 }else{
@@ -350,7 +331,7 @@ function paystack_submit_action() {
 	        $table,
 	        $insert
 	    );
-   }
+	}
 
 	 $response = array(
      'result' => 'success',
@@ -405,7 +386,7 @@ function paystack_confirm_payment() {
 						$paystack_ref 	= $paystack_response->data->reference;
 
 						if ($amount == 0) {
-							$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1',amount='".$amount_paid."' WHERE txn_code='".$paystack_ref."'"));
+							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
@@ -415,7 +396,7 @@ function paystack_confirm_payment() {
 								$result = "failed";
 							}else{
 
-								$wpdb->query($wpdb->prepare("UPDATE $table SET paid='1' WHERE txn_code='".$paystack_ref."'"));
+								$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 								$message = $thankyou;
 								$result = "success";
@@ -428,7 +409,7 @@ function paystack_confirm_payment() {
 
 		}
 	}else{
-		$message = "Try Submitting Form again";
+		$message = "Payment Verification Failed.";
 		$result = "failed";
 
 	}

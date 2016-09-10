@@ -1,30 +1,15 @@
 <?php
 
-/**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
- * @link              kendyson.com
- * @since             1.0.0
- * @package           Paystack_Forms
- *
- * @wordpress-plugin
- *Plugin Name: Paystack Forms
- *Plugin URI: http://example.com
- *Description: Make Payment Forms for Paystack
- *Author: Douglas Kendyson
- *Author URI: http://kendyson.com
- * Version:           1.0.0
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       paystack-forms
- * Domain Path:       /languages
- */
-
+/*
+	Plugin Name:	Paystack Forms
+	Plugin URI: 	https://paystack.com
+	Description: 	Paystack forms allows you create forms that will be used to bill clients for goods and services.
+	Version: 		1.0.0
+	Author: 		Douglas Kendyson
+	Author URI: 	http://kendyson.com
+	License:        GPL-2.0+
+	License URI:    http://www.gnu.org/licenses/gpl-2.0.txt
+*/
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -75,6 +60,7 @@ function run_paystack_forms() {
 
 }
 run_paystack_forms();
+
 function shortcode_button_script(){
     if(wp_script_is("quicktags")){
         ?>
