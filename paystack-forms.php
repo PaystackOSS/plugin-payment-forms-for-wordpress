@@ -99,6 +99,14 @@ function shortcode_button_script(){
 								function insertSelect(){
                     QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 2"]');
                 }
+								QTags.addButton(
+										"s_shortcode",
+										"Insert File Upload",
+										insertInput
+								);
+								function insertInput(){
+										QTags.insertContent('[input name="File Name"]');
+								}
             </script>
         <?php
     }

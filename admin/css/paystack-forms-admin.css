@@ -404,3 +404,10 @@ ul.config-error li a.external {
 #custom-metabox-holder-sortables{
 	margin-top:30px;
 }
+
+.wp-list-table .column-id { width: 5%; }
+.wp-list-table .column-email { width: 20%; }
+.wp-list-table .column-metadata { width: 35%; }
+.wp-list-table .column-amount { width: 10%; }
+.wp-list-table .column-txn_code { width: 15%; }
+.wp-list-table .column-date { width: 10%; }

@@ -282,6 +282,7 @@ class Paystack_Forms_Admin {
 
 			?>
 			<div class="awesome-meta-admin">
+				Email field is added automatically, no need to include that.<br /><br />
 				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
 				It should look like this <code> [text name="Full Name" required="required" ]</code>
 
@@ -472,11 +473,24 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 function format_data($data){
 	$new = json_decode($data);
 	$text = '';
-	if (count($new) > 0) {
+	if (array_key_exists("0", $new)) {
 		foreach ($new as $key => $item) {
-			$text.= '<b>'.$key."</b> :".$item."<br />";
+			if ($item->type == 'text') {
+				$text.= '<b>'.$item->display_name."</b> :".$item->value."<br />";
+			}else{
+				$text.= '<b>'.$item->display_name."</b> : <a target='_blank' href='".$item->value."'>link</a><br />";
+			}
+
+		}
+	}else{
+		$text = '';
+		if (count($new) > 0) {
+			foreach ($new as $key => $item) {
+				$text.= '<b>'.$key."</b> :".$item."<br />";
+			}
 		}
 	}
+	//
 	return $text;
 }
 

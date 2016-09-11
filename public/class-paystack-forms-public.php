@@ -1,5 +1,8 @@
 <?php
 
+require_once(ABSPATH . "wp-admin" . '/includes/image.php');
+require_once(ABSPATH . "wp-admin" . '/includes/file.php');
+require_once(ABSPATH . "wp-admin" . '/includes/media.php');
 
 class Paystack_Forms_Public {
 
@@ -141,7 +144,7 @@ function cf_shortcode($atts) {
 			//  print_r($loggedin);
 			 if ($loggedin == 'no') {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
-			 echo '<form class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
+			 echo '<form enctype="multipart/form-data" class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
 		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
@@ -158,6 +161,7 @@ function cf_shortcode($atts) {
 			 }
 			  echo '</p>';
 		   echo(do_shortcode($obj->post_content));
+
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			 echo '<p> <br /><input type="submit" class="btn btn-danger" value="'.$paybtn.'" ></p>';
@@ -229,7 +233,19 @@ function textarea_shortcode($atts) {
    return $code;
 }
 add_shortcode('textarea', 'textarea_shortcode');
-
+function input_shortcode($atts) {
+  extract(shortcode_atts(array(
+		'name' => 'Title',
+    'required' => '0',
+ 	), $atts));
+	$code = '<label> '.$name.'<br /><input  class="form-control"  type="file" name="'.$name.'"';
+	if ($required == 'required') {
+		 $code.= ' required="required" ';
+	}
+	$code.= '" /></label><br />';
+  return $code;
+}
+add_shortcode('input', 'input_shortcode');
 function to_slug($text){
     $text = preg_replace('~[^\pL\d]+~u', '-', $text);
     $text = preg_replace('~[^-\w]+~', '', $text);
@@ -298,6 +314,7 @@ function paystack_submit_action() {
   	// Exit here, for not processing further because of the error
   	exit(json_encode($response));
   }
+
   global $wpdb;
 	$code = generate_code();
 
@@ -308,6 +325,35 @@ function paystack_submit_action() {
 	unset($metadata['pf-pemail']);
 	unset($metadata['pf-amount']);
 	unset($metadata['pf-user_id']);
+
+			// echo '<pre>';
+
+	$fixedmetadata = paystack_meta_as_custom_fields($metadata);
+
+	if(!empty($_FILES)){
+		foreach ($_FILES as $keyname => $value) {
+			if ($value['size'] > 0) {
+				$attachment_id = media_handle_upload($keyname, $_POST["pf-id"]);
+				$url = wp_get_attachment_url( $attachment_id);
+				// $metadata[$keyname] = $url;
+				$fixedmetadata[] = [
+					'display_name' => ucwords(str_replace("_", " ", $keyname)),
+					'variable_name' => $keyname,
+		      'type' => 'link',
+		      'value' => $url
+				];
+			}else{
+				$fixedmetadata[] = [
+					'display_name' => ucwords(str_replace("_", " ", $keyname)),
+					'variable_name' => $keyname,
+		      'type' => 'text',
+		      'value' => 'No file Uploaded'
+				];
+			}
+
+		}
+	}
+
 	$insert =  array(
         'post_id' => strip_tags($_POST["pf-id"], ""),
 				'email' => strip_tags($_POST["pf-pemail"], ""),
@@ -315,8 +361,11 @@ function paystack_submit_action() {
         'amount' => strip_tags($_POST["pf-amount"], ""),
 				'ip' => get_the_user_ip(),
 				'txn_code' => $code,
-				'metadata' => json_encode($metadata)
+				'metadata' => json_encode($fixedmetadata)
       );
+	// print_r($fixedmetadata);
+	// print_r($_FILES);
+	// die();
 
 	$exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
 			AND email = '".$insert['email']."'
@@ -340,7 +389,7 @@ function paystack_submit_action() {
      'code' => $insert['txn_code'],
      'email' => $insert['email'],
    	 'total' => $insert['amount']*100,
-		 'custom_fields' => paystack_meta_as_custom_fields($metadata)
+		 'custom_fields' => $fixedmetadata
    );
   echo json_encode($response);
 
@@ -352,7 +401,8 @@ function paystack_meta_as_custom_fields($metadata){
 	foreach ($metadata as $key => $value) {
 		$custom_fields[] = [
 			'display_name' => ucwords(str_replace("_", " ", $key)),
-      'variable_name' => $key,
+			'variable_name' => $key,
+      'type' => 'text',
       'value' => $value
 		];
 	}

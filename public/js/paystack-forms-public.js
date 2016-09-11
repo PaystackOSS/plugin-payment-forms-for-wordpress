@@ -77,45 +77,68 @@
 				e.preventDefault();
 
 				$.blockUI({ message: 'Please wait...' });
-				$.post($form.attr('action'), $form.serialize(), function(data) {
-					 $.unblockUI();
-					 if (data.result == 'success'){
-				    var handler = PaystackPop.setup({
-              key: settings.key,
-              email: data.email,
-              amount: data.total,
-              ref: data.code,
-							metadata: {'custom_fields': data.custom_fields},
-              callback: function(response){
-								$.blockUI({ message: 'Please wait...' });
-								$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
-											data = JSON.parse(newdata);
-											if (data.result == 'success'){
-												$('.paystack-form')[0].reset();
-												$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+	// 			$.ajax({
+	// 				 type: 'POST',
+	// 				 url: $form.attr('action'),
+	// 				 data: fd,
+	// 				 contentType: false,
+	// 				 processData: false,
+	// dataType: "json",
+	// 				 success: function(response){
+	//
+	//  $('#image_gallery').val(response['attachment_idss']);
+	//
+	// 				 }
+	// 		 });
+	var formdata = new FormData(this);
 
-												self.before('<pre>'+data.message+'</pre>');
-												$(this).find("input, select, textarea").each(function() {
-														$(this).css({ "border-color":"#d1d1d1" });
-												});
+	$.ajax({
+     url: $form.attr('action'),
+     type: "POST",
+     data: formdata,
+     mimeTypes:"multipart/form-data",
+     contentType: false,
+     cache: false,
+     processData: false,
+		 dataType:"JSON",
+     success: function(data){
+			$.unblockUI();
+		// console.log(data);
+ 			if (data.result == 'success'){
+	 				var handler = PaystackPop.setup({
+	 					key: settings.key,
+	 					email: data.email,
+	 					amount: data.total,
+	 					ref: data.code,
+	 					metadata: {'custom_fields': data.custom_fields},
+	 					callback: function(response){
+	 						$.blockUI({ message: 'Please wait...' });
+	 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
+	 									data = JSON.parse(newdata);
+	 									if (data.result == 'success'){
+	 										$('.paystack-form')[0].reset();
+	 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
 
-												$.unblockUI();
-											}else{
-												self.before('<pre>'+data.message+'</pre>');
-												$.unblockUI();
-											}
-                  });
-              },
-              onClose: function(){
+	 										self.before('<pre>'+data.message+'</pre>');
+	 										$(this).find("input, select, textarea").each(function() {
+	 												$(this).css({ "border-color":"#d1d1d1" });
+	 										});
 
-               }
-            });
-            handler.openIframe();
+	 										$.unblockUI();
+	 									}else{
+	 										self.before('<pre>'+data.message+'</pre>');
+	 										$.unblockUI();
+	 									}
+	 							});
+	 					},
+	 					onClose: function(){
 
-				}
-					// alert('This is data returned from the server ' + data);
-
-				}, 'json');
+	 					 }
+	 				});
+	 				handler.openIframe();
+	 			}
+			}
+     });
 			});
 
 		});

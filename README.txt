@@ -78,6 +78,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.1 =
+*   New input file shortcode. For frontend file upload. 
 
 = 1.0.0 =
 *   First release
