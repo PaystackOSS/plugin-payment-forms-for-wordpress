@@ -308,8 +308,8 @@ add_action( 'wp_ajax_paystack_submit_action', 'paystack_submit_action' );
 add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
 function paystack_submit_action() {
   if (trim($_POST['pf-pemail']) == '') {
-    $response['error'] = true;
-  	$response['error_message'] = 'Email is required';
+    $response['result'] = 'failed';
+  	$response['message'] = 'Email is required';
 
   	// Exit here, for not processing further because of the error
   	exit(json_encode($response));
@@ -330,18 +330,27 @@ function paystack_submit_action() {
 
 	$fixedmetadata = paystack_meta_as_custom_fields($metadata);
 
+	$filelimit = get_post_meta($_POST["pf-id"],'_filelimit',true);
+
+	$maxFileSize = $filelimit * 1024 * 1024;
+
 	if(!empty($_FILES)){
 		foreach ($_FILES as $keyname => $value) {
 			if ($value['size'] > 0) {
-				$attachment_id = media_handle_upload($keyname, $_POST["pf-id"]);
-				$url = wp_get_attachment_url( $attachment_id);
-				// $metadata[$keyname] = $url;
-				$fixedmetadata[] = [
-					'display_name' => ucwords(str_replace("_", " ", $keyname)),
-					'variable_name' => $keyname,
-		      'type' => 'link',
-		      'value' => $url
-				];
+				if ($value['size'] > $maxFileSize) {
+					$response['result'] = 'failed';
+			  	$response['message'] = 'Max upload size is '.$filelimit."MB";
+					exit(json_encode($response));
+				}else{
+					$attachment_id = media_handle_upload($keyname, $_POST["pf-id"]);
+					$url = wp_get_attachment_url( $attachment_id);
+					$fixedmetadata[] = [
+						'display_name' => ucwords(str_replace("_", " ", $keyname)),
+						'variable_name' => $keyname,
+			      'type' => 'link',
+			      'value' => $url
+					];
+				}
 			}else{
 				$fixedmetadata[] = [
 					'display_name' => ucwords(str_replace("_", " ", $keyname)),

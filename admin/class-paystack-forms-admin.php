@@ -284,7 +284,10 @@ class Paystack_Forms_Admin {
 			<div class="awesome-meta-admin">
 				Email field is added automatically, no need to include that.<br /><br />
 				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
-				It should look like this <code> [text name="Full Name" required="required" ]</code>
+				It should look like this <code> [text name="Full Name" required="required" ]</code><br /><br />
+
+				<b style="color:red;">Warning:</b> Using the file input field may cause data overload on your server.
+				 Be sure you have enough server space before using it. You also have the ability to set file upload limits.
 
 			</div>
 
@@ -311,9 +314,11 @@ class Paystack_Forms_Admin {
 			$successmsg = get_post_meta($post->ID, '_successmsg', true);
 			$txncharge = get_post_meta($post->ID, '_txncharge', true);
 			$loggedin = get_post_meta($post->ID, '_loggedin', true);
-	    $currency = get_post_meta($post->ID, '_currency', true);
+			$currency = get_post_meta($post->ID, '_currency', true);
+	    $filelimit = get_post_meta($post->ID, '_filelimit', true);
 
 			if ($amount == "") {$amount = 0;}
+			if ($filelimit == "") {$filelimit = 2;}
 			if ($paybtn == "") {$paybtn = 'Pay';}
 			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
 			if ($currency == "") {$currency = 'NGN';}
@@ -337,6 +342,8 @@ class Paystack_Forms_Admin {
 						</select>';
 	  	echo '<p>Success Message after Payment</p>';
 	    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
+			echo '<p>File Upload Limit(MB):</p>';
+	  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
 
 	  }
 
@@ -355,16 +362,17 @@ class Paystack_Forms_Admin {
 			// OK, we're authenticated: we need to find and save the data
 			// We'll put it into an array to make it easier to loop though.
 
-		  $events_meta['_amount'] = $_POST['_amount'];
-			$events_meta['_paybtn'] = $_POST['_paybtn'];
-			$events_meta['_currency'] = $_POST['_currency'];
-			$events_meta['_successmsg'] = $_POST['_successmsg'];
-			$events_meta['_txncharge'] = $_POST['_txncharge'];
-			$events_meta['_loggedin'] = $_POST['_loggedin'];
+		  $$form_meta['_amount'] = $_POST['_amount'];
+			$$form_meta['_paybtn'] = $_POST['_paybtn'];
+			$$form_meta['_currency'] = $_POST['_currency'];
+			$$form_meta['_successmsg'] = $_POST['_successmsg'];
+			$$form_meta['_txncharge'] = $_POST['_txncharge'];
+			$$form_meta['_loggedin'] = $_POST['_loggedin'];
+			$$form_meta['_filelimit'] = $_POST['_filelimit'];
 
-			// Add values of $events_meta as custom fields
+			// Add values of $$form_meta as custom fields
 
-			foreach ($events_meta as $key => $value) { // Cycle through the $events_meta array!
+			foreach ($$form_meta as $key => $value) { // Cycle through the $$form_meta array!
 				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
 				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
 				if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
