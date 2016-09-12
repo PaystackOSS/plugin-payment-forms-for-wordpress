@@ -362,17 +362,17 @@ class Paystack_Forms_Admin {
 			// OK, we're authenticated: we need to find and save the data
 			// We'll put it into an array to make it easier to loop though.
 
-		  $$form_meta['_amount'] = $_POST['_amount'];
-			$$form_meta['_paybtn'] = $_POST['_paybtn'];
-			$$form_meta['_currency'] = $_POST['_currency'];
-			$$form_meta['_successmsg'] = $_POST['_successmsg'];
-			$$form_meta['_txncharge'] = $_POST['_txncharge'];
-			$$form_meta['_loggedin'] = $_POST['_loggedin'];
-			$$form_meta['_filelimit'] = $_POST['_filelimit'];
+		  $form_meta['_amount'] = $_POST['_amount'];
+			$form_meta['_paybtn'] = $_POST['_paybtn'];
+			$form_meta['_currency'] = $_POST['_currency'];
+			$form_meta['_successmsg'] = $_POST['_successmsg'];
+			$form_meta['_txncharge'] = $_POST['_txncharge'];
+			$form_meta['_loggedin'] = $_POST['_loggedin'];
+			$form_meta['_filelimit'] = $_POST['_filelimit'];
 
-			// Add values of $$form_meta as custom fields
+			// Add values of $form_meta as custom fields
 
-			foreach ($form_meta as $key => $value) { // Cycle through the $$form_meta array!
+			foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!
 				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
 				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
 				if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
