@@ -372,7 +372,7 @@ class Paystack_Forms_Admin {
 
 			// Add values of $$form_meta as custom fields
 
-			foreach ($$form_meta as $key => $value) { // Cycle through the $$form_meta array!
+			foreach ($form_meta as $key => $value) { // Cycle through the $$form_meta array!
 				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
 				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
 				if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
