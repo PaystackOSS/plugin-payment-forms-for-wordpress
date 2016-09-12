@@ -413,12 +413,22 @@ function paystack_submit_action() {
 function paystack_meta_as_custom_fields($metadata){
 	$custom_fields = [];
 	foreach ($metadata as $key => $value) {
-		$custom_fields[] = [
-			'display_name' => ucwords(str_replace("_", " ", $key)),
-			'variable_name' => $key,
-      'type' => 'text',
-      'value' => $value
-		];
+		if ($key == 'pf-fname') {
+			$custom_fields[] = [
+				'display_name' => 'Full Name',
+				'variable_name' => 'Full_Name',
+	      'type' => 'text',
+	      'value' => $value
+			];
+		}else{
+			$custom_fields[] = [
+				'display_name' => ucwords(str_replace("_", " ", $key)),
+				'variable_name' => $key,
+	      'type' => 'text',
+	      'value' => $value
+			];
+		}
+
 	}
 	return $custom_fields;
 }
