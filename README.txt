@@ -1,14 +1,14 @@
-=== Paystack Forms ===
+=== Payment forms for Paystack ===
 Contributors: kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
 Tested up to: 4.6
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Paystack forms allows you create forms that will be used to bill clients for goods and services.
+Payment forms for Paystack allows you create forms that will be used to bill clients for goods and services using Paystack.
 
 
 == Description ==
@@ -19,13 +19,13 @@ Paystack is on a mission to deliver a safe and convenient payment experience for
 
 To signup for a Paystack Merchant account, visit [https://dashboard.paystack.co](https://dashboard.paystack.co).
 
-Paystack forms allows you to create payment forms for numerous purposes. You can see the form and payment data from your dashboard.
+Payment forms for Paystack  allows you to create payment forms for numerous purposes. You can see the form and payment data from your dashboard.
 
-With this Paystack Forms, you will be able to accept the following payment methods on a recurring basis:
+With this Payment forms for Paystack, you will be able to accept the following payment methods on a recurring basis:
 
 * __MasterCard__
 * __Visa__
-
+* __Verve__
 = Note =
 
 This plugin is meant to be used by merchants in Nigeria.
@@ -79,7 +79,7 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 == Changelog ==
 = 1.0.1 =
-*   New input file shortcode. For frontend file upload. 
+*   New input file shortcode. For frontend file upload.
 
 = 1.0.0 =
 *   First release
