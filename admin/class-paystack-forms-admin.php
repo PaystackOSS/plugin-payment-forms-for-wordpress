@@ -517,7 +517,7 @@ class Payments_List_Table extends WP_List_Table{
 				$newkey = $key+1;
 				$data[] = array(
 							'id'  => $newkey,
-							'email' => $dbdata->email,
+							'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
 		          'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
 		          'txn_code' => $dbdata->txn_code,
 		          'metadata' => format_data($dbdata->metadata),
