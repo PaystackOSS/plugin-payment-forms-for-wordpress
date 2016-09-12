@@ -248,7 +248,7 @@ class Paystack_Forms_Admin {
 
 		    switch( $post->post_type ) {
 		        case 'paystack_form':
-		            $content = '[text name="Full Name"]';
+		            $content = '[text name="Phone Number"]';
 		        break;
 		        default:
 		            $content = '';
@@ -282,7 +282,7 @@ class Paystack_Forms_Admin {
 
 			?>
 			<div class="awesome-meta-admin">
-				Email field is added automatically, no need to include that.<br /><br />
+				Email and Full Name field is added automatically, no need to include that.<br /><br />
 				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
 				It should look like this <code> [text name="Full Name" required="required" ]</code><br /><br />
 

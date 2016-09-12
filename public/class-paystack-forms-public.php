@@ -149,7 +149,10 @@ function cf_shortcode($atts) {
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 		 	 echo '<p>';
-		   echo 'Email (required)<br />';
+			 echo 'Full Name <br />';
+		   echo '<input type="text" name="pf-fname" class="form-control" required/>';
+			 echo '</p>';
+ 			echo 'Email (required)<br />';
 		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
@@ -320,6 +323,7 @@ function paystack_submit_action() {
 
   $table = $wpdb->prefix."paystack_forms_payments";
 	$metadata = $_POST;
+	$fullname = $_POST['pf-fname'];
 	unset($metadata['action']);
 	unset($metadata['pf-id']);
 	unset($metadata['pf-pemail']);
@@ -396,7 +400,8 @@ function paystack_submit_action() {
 	 $response = array(
      'result' => 'success',
      'code' => $insert['txn_code'],
-     'email' => $insert['email'],
+		 'email' => $insert['email'],
+     'name' => $fullname,
    	 'total' => $insert['amount']*100,
 		 'custom_fields' => $fixedmetadata
    );

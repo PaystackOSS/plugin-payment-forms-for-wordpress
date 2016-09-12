@@ -92,10 +92,16 @@
 			     success: function(data){
 							$.unblockUI();
 							if (data.result == 'success'){
+								var names = data.name.split(' ');
+								var firstName = names[0] || "";
+								var lastName = names[1] || "";
+								// console.log(firstName+ " - "+lastName);
 								var handler = PaystackPop.setup({
 				 					key: settings.key,
 				 					email: data.email,
 				 					amount: data.total,
+									firstname: firstName,
+	 								lastname: lastName,
 				 					ref: data.code,
 				 					metadata: {'custom_fields': data.custom_fields},
 				 					callback: function(response){
