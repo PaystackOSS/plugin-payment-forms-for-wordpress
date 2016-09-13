@@ -14,7 +14,39 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
+// fix some badly enqueued scripts with no sense of HTTPS
+add_action('wp_print_scripts', 'enqueueScriptsFix', 100);
+add_action('wp_print_styles', 'enqueueStylesFix', 100);
 
+/**
+* force plugins to load scripts with SSL if page is SSL
+*/
+function enqueueScriptsFix() {
+    if (!is_admin()) {
+        if (!empty($_SERVER['HTTPS'])) {
+            global $wp_scripts;
+            foreach ((array) $wp_scripts->registered as $script) {
+                if (stripos($script->src, 'http://', 0) !== FALSE)
+                    $script->src = str_replace('http://', 'https://', $script->src);
+            }
+        }
+    }
+}
+
+/**
+* force plugins to load styles with SSL if page is SSL
+*/
+function enqueueStylesFix() {
+    if (!is_admin()) {
+        if (!empty($_SERVER['HTTPS'])) {
+            global $wp_styles;
+            foreach ((array) $wp_styles->registered as $script) {
+                if (stripos($script->src, 'http://', 0) !== FALSE)
+                    $script->src = str_replace('http://', 'https://', $script->src);
+            }
+        }
+    }
+}
 
 
 /**

@@ -2,3 +2,7 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+ .paystack-cardlogos {
+   width:300px !important;
+   height:36px !important;
+ }
