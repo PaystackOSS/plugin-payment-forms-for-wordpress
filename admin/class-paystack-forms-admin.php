@@ -130,49 +130,7 @@ class Paystack_Forms_Admin {
 		}
 		add_filter( 'page_row_actions', 'pform_add_action_button', 10, 2 );
 
-		add_action( 'admin_init', 'custom_export_function' );
 
-		function custom_export_function(){
-
-		  if ( isset( $_REQUEST['action'] ) && 'view_submissions' == $_REQUEST['action']  ) {
-		    $data = array(
-		      'hello' => 'world'
-		      );
-
-		  ?>
-			<h1>Paystack Forms API KEYS Settings!</h1>
-			<form method="post" action="options.php">
-		 <?php settings_fields( 'paystack-form-settings-group' ); do_settings_sections( 'paystack-form-settings-group' ); ?>
-		 <table class="form-table paystack_setting_page">
-				 <tr valign="top">
-				 <th scope="row">Mode</th>
-				 <td><input type="text" name="mode" value="<?php echo esc_attr( get_option('mode') ); ?>" /></td>
-				 </tr>
-				 <tr valign="top">
-				 <th scope="row">Test Secret Key</th>
-				 <td><input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
-				 </tr>
-
-				 <tr valign="top">
-				 <th scope="row">Test Public Key</th>
-				 <td><input type="text" name="tpk" value="<?php echo esc_attr( get_option('tpk') ); ?>" /></td>
-				 </tr>
-
-				 <tr valign="top">
-				 <th scope="row">Live Secret Key</th>
-				 <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lsk') ); ?>" /></td>
-				 </tr>
-				 <tr valign="top">
-				 <th scope="row">Live Public Key</th>
-				 <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
-				 </tr>
-		 </table>
-
-				<?php
-		  }
-
-			// exit;
-		}
 		function wpa_47010( $qtInit ) {
 				$qtInit['buttons'] = 'fullscreen';
 				return $qtInit;
@@ -301,6 +259,7 @@ class Paystack_Forms_Admin {
 
 	  }
 
+
 	  function wpt_form_data() {
 	  	global $post;
 
@@ -349,18 +308,14 @@ class Paystack_Forms_Admin {
 
 		function wpt_form_data_meta($post_id, $post) {
 
-			// verify this came from the our screen and with proper authorization,
-			// because save_post can be triggered at other times
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
 			return $post->ID;
 			}
 
 			// Is the user allowed to edit the post or page?
-			if ( !current_user_can( 'edit_post', $post->ID ))
+			if ( !current_user_can( 'edit_post', $post->ID )){
 				return $post->ID;
-
-			// OK, we're authenticated: we need to find and save the data
-			// We'll put it into an array to make it easier to loop though.
+			}
 
 		  $form_meta['_amount'] = $_POST['_amount'];
 			$form_meta['_paybtn'] = $_POST['_paybtn'];
@@ -369,6 +324,11 @@ class Paystack_Forms_Admin {
 			$form_meta['_txncharge'] = $_POST['_txncharge'];
 			$form_meta['_loggedin'] = $_POST['_loggedin'];
 			$form_meta['_filelimit'] = $_POST['_filelimit'];
+			///
+			$form_meta['_subject'] = $_POST['_subject'];
+			$form_meta['_heading'] = $_POST['_heading'];
+			$form_meta['_message'] = $_POST['_message'];
+			$form_meta['_sendreceipt'] = $_POST['_sendreceipt'];
 
 			// Add values of $form_meta as custom fields
 
@@ -384,8 +344,47 @@ class Paystack_Forms_Admin {
 			}
 
 		}
+		add_action('save_post', 'wpt_form_data_meta', 1, 2);
 
-		add_action('save_post', 'wpt_form_data_meta', 1, 2); // save the custom fields
+		add_action( 'add_meta_boxes', 'add_email_metaboxes' );
+	  function add_email_metaboxes() {
+
+			add_meta_box('wpt_email_data', 'Email Receipt Settings', 'wpt_email_data', 'paystack_form', 'normal', 'default');
+
+	  }
+		function wpt_email_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$subject = get_post_meta($post->ID, '_subject', true);
+	  	$heading = get_post_meta($post->ID, '_heading', true);
+			$message = get_post_meta($post->ID, '_message', true);
+			$sendreceipt = get_post_meta($post->ID, '_sendreceipt', true);
+
+			if ($subject == "") {$subject = 'Thank you for your payment';}
+			if ($sendreceipt == "") {$sendreceipt = 'yes';}
+			if ($heading == "") {$heading = "We've received your payment";}
+			if ($message == "") {$message = 'Your payment was received and we appreciate it.';}
+	  	// Echo out the field
+			echo '<p>Send Email Receipt:</p>';
+			echo '<select class="form-control" name="_sendreceipt" id="parent_id" style="width:100%;">
+							<option value="no" '.txncheck('no',$sendreceipt).'>Don\'t send</option>
+							<option value="yes" '.txncheck('yes',$sendreceipt).'>Send</option>
+						</select>';
+			echo '<p>Email Subject:</p>';
+	  	echo '<input type="text" name="_subject" value="' . $subject  . '" class="widefat" />';
+			echo '<p>Email Heading:</p>';
+	  	echo '<input type="text" name="_heading" value="' . $heading  . '" class="widefat" />';
+			echo '<p>Email Body/Message:</p>';
+	    echo '<textarea rows="3"  name="_message"  class="widefat" >'.$message.'</textarea>';
+
+	  }
+
+	
 
 	}
 

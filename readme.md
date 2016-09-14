@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target
 Requires at least: 3.1
 Tested up to: 4.6
-Stable tag: 1.0.0
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,8 +78,12 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.3 =
+*   Invoice and Receipt Emails, with ability to disable them.
+= 1.0.2 =
+*   Added SSL suport for loading scripts.
 = 1.0.1 =
-*   New input file shortcode. For frontend file upload. 
+*   New input file shortcode. For frontend file upload.
 
 = 1.0.0 =
 *   First release
