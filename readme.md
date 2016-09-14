@@ -84,7 +84,6 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 *   Added SSL suport for loading scripts.
 = 1.0.1 =
 *   New input file shortcode. For frontend file upload.
-
 = 1.0.0 =
 *   First release
 

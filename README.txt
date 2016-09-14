@@ -78,9 +78,12 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.3 =
+*   Invoice and Receipt Emails, with ability to disable them.
+= 1.0.2 =
+*   Added SSL suport for loading scripts.
 = 1.0.1 =
 *   New input file shortcode. For frontend file upload.
-
 = 1.0.0 =
 *   First release
 
