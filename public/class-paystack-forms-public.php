@@ -650,7 +650,7 @@ function cf_shortcode($atts) {
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 		 	 echo '<p>';
-			 echo 'Full Name <br />';
+			 echo 'Full Name  (required)<br />';
 		   echo '<input type="text" name="pf-fname" class="form-control" required/>';
 			 echo '</p>';
  			echo 'Email (required)<br />';

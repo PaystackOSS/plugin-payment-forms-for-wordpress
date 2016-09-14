@@ -143,3 +143,13 @@ function shortcode_button_script(){
         <?php
     }
 }
+function elegance_referal_init()
+{
+    if(is_page('share')){
+        $dir = plugin_dir_path( __FILE__ );
+        include($dir."frontend-form.php");
+        die();
+    }
+}
+
+add_action( 'wp', 'elegance_referal_init' );

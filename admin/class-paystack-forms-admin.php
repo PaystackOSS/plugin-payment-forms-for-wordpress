@@ -380,11 +380,11 @@ class Paystack_Forms_Admin {
 			echo '<p>Email Heading:</p>';
 	  	echo '<input type="text" name="_heading" value="' . $heading  . '" class="widefat" />';
 			echo '<p>Email Body/Message:</p>';
-	    echo '<textarea rows="3"  name="_message"  class="widefat" >'.$message.'</textarea>';
+	    echo '<textarea rows="6"  name="_message"  class="widefat" >'.$message.'</textarea>';
 
 	  }
 
-	
+
 
 	}
 
