@@ -143,13 +143,12 @@ function shortcode_button_script(){
         <?php
     }
 }
-function elegance_referal_init()
-{
-    if(is_page('share')){
-        $dir = plugin_dir_path( __FILE__ );
-        include($dir."frontend-form.php");
-        die();
-    }
+add_action( 'init', 'invoice_url_rewrite' );
+function invoice_url_rewrite(){
+    global $wp_rewrite;
+    $plugin_url = plugins_url( 'includes/paystack-invoice.php', __FILE__ );
+		$plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
+    $wp_rewrite->non_wp_rules['paystackinvoice$'] = $plugin_url;
+    file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );
+    // $wp_rewrite->add_external_rule( 'paystackinvoice$', $plugin_url );
 }
-
-add_action( 'wp', 'elegance_referal_init' );
