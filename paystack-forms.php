@@ -1,5 +1,4 @@
 <?php
-
 /*
 	Plugin Name:	Payment forms for Paystack
 	Plugin URI: 	https://github.com/Kendysond/Wordpress-paystack-forms
@@ -49,19 +48,13 @@ function enqueueStylesFix() {
 }
 
 
-/**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-paystack-forms-activator.php
- */
+
 function activate_paystack_forms() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-activator.php';
 	Paystack_Forms_Activator::activate();
 }
 
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-paystack-forms-deactivator.php
- */
+
 function deactivate_paystack_forms() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-deactivator.php';
 	Paystack_Forms_Deactivator::deactivate();
@@ -70,21 +63,9 @@ function deactivate_paystack_forms() {
 register_activation_hook( __FILE__, 'activate_paystack_forms' );
 register_deactivation_hook( __FILE__, 'deactivate_paystack_forms' );
 
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
+
 require plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms.php';
 
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
 function run_paystack_forms() {
 
 	$plugin = new Paystack_Forms();
@@ -148,7 +129,7 @@ function invoice_url_rewrite(){
     global $wp_rewrite;
     $plugin_url = plugins_url( 'includes/paystack-invoice.php', __FILE__ );
 		$plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
-    $wp_rewrite->non_wp_rules['paystackinvoice$'] = $plugin_url;
+    $wp_rewrite->non_wp_rules['paystackinvoice.php$'] = $plugin_url;
     file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );
     // $wp_rewrite->add_external_rule( 'paystackinvoice$', $plugin_url );
 }

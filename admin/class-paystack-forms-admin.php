@@ -256,6 +256,8 @@ class Paystack_Forms_Admin {
 	  function add_extra_metaboxes() {
 
 			add_meta_box('wpt_form_data', 'Extra Form Description', 'wpt_form_data', 'paystack_form', 'normal', 'default');
+			add_meta_box('wpt_recur_data', 'Recurring Payment', 'wpt_recur_data', 'paystack_form', 'side', 'default');
+			add_meta_box('wpt_email_data', 'Email Receipt Settings', 'wpt_email_data', 'paystack_form', 'normal', 'default');
 
 	  }
 
@@ -289,11 +291,11 @@ class Paystack_Forms_Admin {
 	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 			echo '<p>Pay button Description:</p>';
 	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
-			// echo '<p>Transaction Charges:</p>';
-			// echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-			// 				<option value="merchant"'.txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-			// 				<option value="customer" '.txncheck('customer',$txncharge).'>Client Pays(Extra Fee added)</option>
-			// 			</select>';
+			echo '<p>Transaction Charges:</p>';
+			echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
+							<option value="merchant"'.txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
+							<option value="customer" '.txncheck('customer',$txncharge).'>Client Pays(Extra Fee added)</option>
+						</select>';
 			echo '<p>User logged In:</p>';
 			echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 							<option value="no" '.txncheck('no',$loggedin).'>User must not be logged in</option>
@@ -303,53 +305,6 @@ class Paystack_Forms_Admin {
 	    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
 			echo '<p>File Upload Limit(MB):</p>';
 	  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
-
-	  }
-
-		function wpt_form_data_meta($post_id, $post) {
-
-			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
-			return $post->ID;
-			}
-
-			// Is the user allowed to edit the post or page?
-			if ( !current_user_can( 'edit_post', $post->ID )){
-				return $post->ID;
-			}
-
-		  $form_meta['_amount'] = $_POST['_amount'];
-			$form_meta['_paybtn'] = $_POST['_paybtn'];
-			$form_meta['_currency'] = $_POST['_currency'];
-			$form_meta['_successmsg'] = $_POST['_successmsg'];
-			$form_meta['_txncharge'] = $_POST['_txncharge'];
-			$form_meta['_loggedin'] = $_POST['_loggedin'];
-			$form_meta['_filelimit'] = $_POST['_filelimit'];
-			///
-			$form_meta['_subject'] = $_POST['_subject'];
-			$form_meta['_heading'] = $_POST['_heading'];
-			$form_meta['_message'] = $_POST['_message'];
-			$form_meta['_sendreceipt'] = $_POST['_sendreceipt'];
-
-			// Add values of $form_meta as custom fields
-
-			foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!
-				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
-				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
-				if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
-					update_post_meta($post->ID, $key, $value);
-				} else { // If the custom field doesn't have a value
-					add_post_meta($post->ID, $key, $value);
-				}
-				if(!$value) delete_post_meta($post->ID, $key); // Delete if blank
-			}
-
-		}
-		add_action('save_post', 'wpt_form_data_meta', 1, 2);
-
-		add_action( 'add_meta_boxes', 'add_email_metaboxes' );
-	  function add_email_metaboxes() {
-
-			add_meta_box('wpt_email_data', 'Email Receipt Settings', 'wpt_email_data', 'paystack_form', 'normal', 'default');
 
 	  }
 		function wpt_email_data() {
@@ -383,6 +338,74 @@ class Paystack_Forms_Admin {
 	    echo '<textarea rows="6"  name="_message"  class="widefat" >'.$message.'</textarea>';
 
 	  }
+		function wpt_recur_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$recur = get_post_meta($post->ID, '_recur', true);
+	  	$recurplan = get_post_meta($post->ID, '_recurplan', true);
+
+			if ($recur == "") {$recur = 'no';}
+			if ($recurplan == "") {$recurplan = '';}
+			// Echo out the field
+			echo '<p>Reccuring Payment:</p>';
+			echo '<select class="form-control" name="_recur" id="parent_id" style="width:100%;">
+							<option value="no" '.txncheck('no',$recur).'>None</option>
+							<option value="custom" '.txncheck('yes',$recur).'>User Sets Interval</option>
+							<option value="plan" '.txncheck('yes',$recur).'>Paystack Plan</option>
+						</select>';
+			echo '<p>Paystack Recur Plan:</p>';
+	  	echo '<input type="text" name="_recurplan" value="' . $recurplan  . '" class="widefat" />
+				<small>Plan amount must match amount on extra form description.</small>';
+
+	  }
+		function wpt_form_data_meta($post_id, $post) {
+
+			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
+			return $post->ID;
+			}
+
+			// Is the user allowed to edit the post or page?
+			if ( !current_user_can( 'edit_post', $post->ID )){
+				return $post->ID;
+			}
+
+		  $form_meta['_amount'] = $_POST['_amount'];
+			$form_meta['_paybtn'] = $_POST['_paybtn'];
+			$form_meta['_currency'] = $_POST['_currency'];
+			$form_meta['_successmsg'] = $_POST['_successmsg'];
+			$form_meta['_txncharge'] = $_POST['_txncharge'];
+			$form_meta['_loggedin'] = $_POST['_loggedin'];
+			$form_meta['_filelimit'] = $_POST['_filelimit'];
+			///
+			$form_meta['_subject'] = $_POST['_subject'];
+			$form_meta['_heading'] = $_POST['_heading'];
+			$form_meta['_message'] = $_POST['_message'];
+			$form_meta['_sendreceipt'] = $_POST['_sendreceipt'];
+			///
+			$form_meta['_recur'] = $_POST['_recur'];
+			$form_meta['_recurplan'] = $_POST['_recurplan'];
+
+			// Add values of $form_meta as custom fields
+
+			foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!
+				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
+				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
+				if(get_post_meta($post->ID, $key, FALSE)) { // If the custom field already has a value
+					update_post_meta($post->ID, $key, $value);
+				} else { // If the custom field doesn't have a value
+					add_post_meta($post->ID, $key, $value);
+				}
+				if(!$value) delete_post_meta($post->ID, $key); // Delete if blank
+			}
+
+		}
+		add_action('save_post', 'wpt_form_data_meta', 1, 2);
+
 
 
 
