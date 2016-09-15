@@ -642,6 +642,8 @@ function cf_shortcode($atts) {
 			 $loggedin = get_post_meta($id,'_loggedin',true);
 			 $txncharge = get_post_meta($id,'_txncharge',true);
 			 $currency = get_post_meta($id,'_currency',true);
+			 $recur = get_post_meta($id,'_recur',true);
+			 $recurplan = get_post_meta($id,'_recurplan',true);
 			//  print_r($loggedin);
 			 if ($loggedin == 'no') {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
@@ -649,11 +651,12 @@ function cf_shortcode($atts) {
 		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
+			 echo '<input type="hidden" name="pf-recur" value="' . $recur. '" />';
 		 	 echo '<p>';
-			 echo 'Full Name  (required)<br />';
+			 echo 'Full Name (required)<br />';
 		   echo '<input type="text" name="pf-fname" class="form-control" required/>';
 			 echo '</p>';
- 			echo 'Email (required)<br />';
+ 			 echo 'Email (required)<br />';
 		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
 		   echo '</p>';
 		 	 echo '<p>';
@@ -664,6 +667,26 @@ function cf_shortcode($atts) {
 				 echo '<input type="number" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
 			 }
 			  echo '</p>';
+				if ($recur != 'no') {
+					if ($recur == 'optional') {
+						echo '<p>Reccuring Payment<br />';
+						echo '<select class="form-control" name="pf-interval" style="width:100%;">
+										<option value="no">None</option>
+										<option value="hourly">Hourly</option>
+										<option value="daily">Daily</option>
+										<option value="weekly">Weekly</option>
+										<option value="monthly">Monthly</option>
+										<option value="annually">Annually</option>
+									</select>';
+						echo '</p>';
+
+					}else{
+						echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
+		 		 	 // echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
+						echo '<p> Weekly Recuring Payment</p>';
+					}
+
+ 			}
 		   echo(do_shortcode($obj->post_content));
 
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
@@ -825,7 +848,9 @@ function paystack_submit_action() {
   $table = $wpdb->prefix."paystack_forms_payments";
 	$metadata = $_POST;
 	$fullname = $_POST['pf-fname'];
+	$recur = $_POST['pf-recur'];
 	unset($metadata['action']);
+	unset($metadata['pf-recur']);
 	unset($metadata['pf-id']);
 	unset($metadata['pf-pemail']);
 	unset($metadata['pf-amount']);
@@ -868,16 +893,65 @@ function paystack_submit_action() {
 
 		}
 	}
+	$plancode = 'none';
+	if($recur != 'no'){
+		if ($recur == 'optional') {
+			$interval = $_POST['pf-interval'];
+			if ($interval != 'no') {
+					unset($metadata['pf-interval']);
+					$mode =  esc_attr( get_option('mode') );
+					if ($mode == 'test') {
+						$key = esc_attr( get_option('tsk') );
+					}else{
+						$key = esc_attr( get_option('lsk') );
+					}
+					//Create Plan
+					$paystack_url = 'https://api.paystack.co/plan';
+					$headers = array(
+						'Content-Type'	=> 'application/json',
+						'Authorization' => 'Bearer ' . $key
+					);
+					$body = array(
+						'name'						=> $fullname.'_'.$code,
+						'amount'					=> $_POST["pf-amount"],
+						'interval'		=> $interval
+					);
 
+					$args = array(
+						'body'		=> json_encode( $body ),
+						'headers'	=> $headers,
+						'timeout'	=> 60
+					);
+
+					$request = wp_remote_post( $paystack_url, $args );
+					if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
+						$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
+						if ( 'Plan created' == $paystack_response->message ) {
+							$plancode	= $paystack_response->data->plan_code;
+							// $paystack_ref 	= $paystack_response->data->reference;
+						}
+
+					}
+					# code...
+				}
+
+			// $plancode = 'optionalcode';
+		}else{
+			//Use Plan Code
+			$plancode = $_POST['pf-plancode'];
+			unset($metadata['pf-plancode']);
+		}
+	}
 	$insert =  array(
-        'post_id' => strip_tags($_POST["pf-id"], ""),
-				'email' => strip_tags($_POST["pf-pemail"], ""),
-        'user_id' => strip_tags($_POST["pf-user_id"], ""),
-        'amount' => strip_tags($_POST["pf-amount"], ""),
-				'ip' => get_the_user_ip(),
-				'txn_code' => $code,
-				'metadata' => json_encode($fixedmetadata)
-      );
+    'post_id' => strip_tags($_POST["pf-id"], ""),
+		'email' => strip_tags($_POST["pf-pemail"], ""),
+    'user_id' => strip_tags($_POST["pf-user_id"], ""),
+		'amount' => strip_tags($_POST["pf-amount"], ""),
+	  'plan' => strip_tags($plancode, ""),
+		'ip' => get_the_user_ip(),
+		'txn_code' => $code,
+		'metadata' => json_encode($fixedmetadata)
+  );
 	// print_r($fixedmetadata);
 	// print_r($_FILES);
 	// die();
@@ -886,6 +960,7 @@ function paystack_submit_action() {
 			AND email = '".$insert['email']."'
 			AND user_id = '".$insert['pf-user_id']."'
 			AND amount = '".$insert['amount']."'
+			AND plan = '".$insert['plan']."'
 			AND ip = '".$insert['ip']."'
 			AND paid = '0'
 			AND metadata = '". $insert['metadata'] ."')");
@@ -902,7 +977,8 @@ function paystack_submit_action() {
 
 	 $response = array(
      'result' => 'success',
-     'code' => $insert['txn_code'],
+		 'code' => $insert['txn_code'],
+     'plan' => $insert['plan'],
 		 'email' => $insert['email'],
      'name' => $fullname,
    	 'total' => $insert['amount']*100,

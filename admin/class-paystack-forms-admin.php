@@ -353,12 +353,12 @@ class Paystack_Forms_Admin {
 			if ($recurplan == "") {$recurplan = '';}
 			// Echo out the field
 			echo '<p>Reccuring Payment:</p>';
-			echo '<select class="form-control" name="_recur" id="parent_id" style="width:100%;">
+			echo '<select class="form-control" name="_recur" style="width:100%;">
 							<option value="no" '.txncheck('no',$recur).'>None</option>
-							<option value="custom" '.txncheck('yes',$recur).'>User Sets Interval</option>
-							<option value="plan" '.txncheck('yes',$recur).'>Paystack Plan</option>
+							<option value="optional" '.txncheck('optional',$recur).'>Optional Recurring</option>
+							<option value="plan" '.txncheck('plan',$recur).'>Paystack Plan</option>
 						</select>';
-			echo '<p>Paystack Recur Plan:</p>';
+			echo '<p>Paystack Recur Plan code:</p>';
 	  	echo '<input type="text" name="_recurplan" value="' . $recurplan  . '" class="widefat" />
 				<small>Plan amount must match amount on extra form description.</small>';
 
