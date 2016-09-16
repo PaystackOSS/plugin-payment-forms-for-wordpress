@@ -43,7 +43,7 @@ class Paystack_Forms {
 	public function __construct() {
 
 		$this->plugin_name = 'paystack-forms';
-		$this->version = '1.0.1';
+		$this->version = '1.0.4';
 
 		$this->load_dependencies();
 		$this->set_locale();

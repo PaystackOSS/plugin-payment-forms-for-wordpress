@@ -107,13 +107,13 @@ function shortcode_button_script(){
 								QTags.addButton(
                     "s_shortcode",
                     "Insert Select Dropdown",
-                    insertSelect
+                    insertSelectb
                 );
-								function insertSelect(){
+								function insertSelectb(){
                     QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 2"]');
                 }
 								QTags.addButton(
-										"s_shortcode",
+										"i_shortcode",
 										"Insert File Upload",
 										insertInput
 								);

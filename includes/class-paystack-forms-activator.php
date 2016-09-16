@@ -2,13 +2,6 @@
 
 class Paystack_Forms_Activator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
 	public static function activate() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'paystack_forms_payments';

@@ -1,33 +1,7 @@
 (function( $ ) {
 	'use strict';
 
-	/**
-	 * All of the code for your public-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+
 	 $(document).ready(function($) {
 
 			 $('.pf-number').keydown(function(event) {
@@ -96,38 +70,75 @@
 								var firstName = names[0] || "";
 								var lastName = names[1] || "";
 								// console.log(firstName+ " - "+lastName);
-								var handler = PaystackPop.setup({
-				 					key: settings.key,
-				 					email: data.email,
-				 					amount: data.total,
-									firstname: firstName,
-	 								lastname: lastName,
-				 					ref: data.code,
-				 					metadata: {'custom_fields': data.custom_fields},
-				 					callback: function(response){
-				 						$.blockUI({ message: 'Please wait...' });
-				 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
-				 									data = JSON.parse(newdata);
-				 									if (data.result == 'success'){
-				 										$('.paystack-form')[0].reset();
-				 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+								if (data.plan == 'none') {
+									var handler = PaystackPop.setup({
+					 					key: settings.key,
+					 					email: data.email,
+					 					amount: data.total,
+										firstname: firstName,
+		 								lastname: lastName,
+					 					ref: data.code,
+					 					metadata: {'custom_fields': data.custom_fields},
+					 					callback: function(response){
+					 						$.blockUI({ message: 'Please wait...' });
+					 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
+					 									data = JSON.parse(newdata);
+					 									if (data.result == 'success'){
+					 										$('.paystack-form')[0].reset();
+					 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
 
-				 										self.before('<pre>'+data.message+'</pre>');
-				 										$(this).find("input, select, textarea").each(function() {
-				 												$(this).css({ "border-color":"#d1d1d1" });
-				 										});
+					 										self.before('<pre>'+data.message+'</pre>');
+					 										$(this).find("input, select, textarea").each(function() {
+					 												$(this).css({ "border-color":"#d1d1d1" });
+					 										});
 
-				 										$.unblockUI();
-				 									}else{
-				 										self.before('<pre>'+data.message+'</pre>');
-				 										$.unblockUI();
-				 									}
-				 							});
-				 					},
-				 					onClose: function(){
+					 										$.unblockUI();
+					 									}else{
+					 										self.before('<pre>'+data.message+'</pre>');
+					 										$.unblockUI();
+					 									}
+					 							});
+					 					},
+					 					onClose: function(){
 
-				 					 }
-				 				});
+					 					 }
+					 				});
+
+								}else{
+									var handler = PaystackPop.setup({
+					 					key: settings.key,
+					 					email: data.email,
+					 					plan: data.plan,
+										firstname: firstName,
+		 								lastname: lastName,
+					 					ref: data.code,
+					 					metadata: {'custom_fields': data.custom_fields},
+					 					callback: function(response){
+					 						$.blockUI({ message: 'Please wait...' });
+					 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
+					 									data = JSON.parse(newdata);
+					 									if (data.result == 'success'){
+					 										$('.paystack-form')[0].reset();
+					 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+
+					 										self.before('<pre>'+data.message+'</pre>');
+					 										$(this).find("input, select, textarea").each(function() {
+					 												$(this).css({ "border-color":"#d1d1d1" });
+					 										});
+
+					 										$.unblockUI();
+					 									}else{
+					 										self.before('<pre>'+data.message+'</pre>');
+					 										$.unblockUI();
+					 									}
+					 							});
+					 					},
+					 					onClose: function(){
+
+					 					 }
+					 				});
+								}
+
 				 				handler.openIframe();
 				 			}else{
 									alert(data.message);

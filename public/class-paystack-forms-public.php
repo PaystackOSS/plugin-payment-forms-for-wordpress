@@ -622,6 +622,28 @@ function send_receipt($id,$currency,$amount,$name,$email,$code,$metadata){
 	wp_mail($user_email, $email_subject, $message,$headers);
 
 }
+function fetch_plan($code){
+	$mode =  esc_attr( get_option('mode') );
+	if ($mode == 'test') {
+		$key = esc_attr( get_option('tsk') );
+	}else{
+		$key = esc_attr( get_option('lsk') );
+	}
+	$paystack_url = 'https://api.paystack.co/plan/' . $code;
+	$headers = array(
+		'Authorization' => 'Bearer ' . $key
+	);
+	$args = array(
+		'headers'	=> $headers,
+		'timeout'	=> 60
+	);
+	$request = wp_remote_get( $paystack_url, $args );
+	if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
+		$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
+
+	}
+	return $paystack_response;
+}
 function cf_shortcode($atts) {
     ob_start();
 		if ( is_user_logged_in() ) {
@@ -642,7 +664,7 @@ function cf_shortcode($atts) {
 			 $loggedin = get_post_meta($id,'_loggedin',true);
 			 $txncharge = get_post_meta($id,'_txncharge',true);
 			 $currency = get_post_meta($id,'_currency',true);
-			 $recur = get_post_meta($id,'_recur',true);
+				$recur = get_post_meta($id,'_recur',true);
 			 $recurplan = get_post_meta($id,'_recurplan',true);
 			//  print_r($loggedin);
 			 if ($loggedin == 'no') {
@@ -669,7 +691,7 @@ function cf_shortcode($atts) {
 			  echo '</p>';
 				if ($recur != 'no') {
 					if ($recur == 'optional') {
-						echo '<p>Reccuring Payment<br />';
+						echo '<p>Recuring Payment<br />';
 						echo '<select class="form-control" name="pf-interval" style="width:100%;">
 										<option value="no">None</option>
 										<option value="hourly">Hourly</option>
@@ -681,9 +703,11 @@ function cf_shortcode($atts) {
 						echo '</p>';
 
 					}else{
+					$plan=	fetch_plan($recurplan);
+					$planamount = $plan->data->amount/100;
 						echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
 		 		 	 // echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
-						echo '<p> Weekly Recuring Payment</p>';
+						echo '<p>'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.number_format($planamount).'</p>';
 					}
 
  			}
@@ -898,7 +922,7 @@ function paystack_submit_action() {
 		if ($recur == 'optional') {
 			$interval = $_POST['pf-interval'];
 			if ($interval != 'no') {
-					unset($metadata['pf-interval']);
+				unset($metadata['pf-interval']);
 					$mode =  esc_attr( get_option('mode') );
 					if ($mode == 'test') {
 						$key = esc_attr( get_option('tsk') );
@@ -911,9 +935,11 @@ function paystack_submit_action() {
 						'Content-Type'	=> 'application/json',
 						'Authorization' => 'Bearer ' . $key
 					);
+					$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
+					$koboamount = $amount*100;
 					$body = array(
 						'name'						=> $fullname.'_'.$code,
-						'amount'					=> $_POST["pf-amount"],
+						'amount'					=> $koboamount,
 						'interval'		=> $interval
 					);
 
@@ -922,14 +948,18 @@ function paystack_submit_action() {
 						'headers'	=> $headers,
 						'timeout'	=> 60
 					);
+					// print_r($args);
+
 
 					$request = wp_remote_post( $paystack_url, $args );
-					if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
-						$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
-						if ( 'Plan created' == $paystack_response->message ) {
-							$plancode	= $paystack_response->data->plan_code;
-							// $paystack_ref 	= $paystack_response->data->reference;
-						}
+					// print_r($request);
+
+					if( ! is_wp_error( $request )) {
+						// echo "string";
+						$paystack_response = json_decode(wp_remote_retrieve_body($request));
+						// print_r($paystack_response);
+						$plancode	= $paystack_response->data->plan_code;
+						// echo $plancod;
 
 					}
 					# code...
@@ -952,10 +982,6 @@ function paystack_submit_action() {
 		'txn_code' => $code,
 		'metadata' => json_encode($fixedmetadata)
   );
-	// print_r($fixedmetadata);
-	// print_r($_FILES);
-	// die();
-
 	$exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
 			AND email = '".$insert['email']."'
 			AND user_id = '".$insert['pf-user_id']."'
@@ -1014,6 +1040,7 @@ function paystack_meta_as_custom_fields($metadata){
 
 add_action( 'wp_ajax_paystack_confirm_payment', 'paystack_confirm_payment' );
 add_action( 'wp_ajax_nopriv_paystack_confirm_payment', 'paystack_confirm_payment' );
+
 function paystack_confirm_payment() {
   if (trim($_POST['code']) == '') {
     $response['error'] = true;
