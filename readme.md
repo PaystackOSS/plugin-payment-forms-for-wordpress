@@ -1,3 +1,3 @@
-Payment forms for Paystack
+# Payment forms for Paystack
 
-Still in development. Kindly download the latest stable version from the releases tab. 
+The plugn is still in development. Kindly download the latest stable version from the releases tab.
