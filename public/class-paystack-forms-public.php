@@ -4,82 +4,27 @@ require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 require_once(ABSPATH . "wp-admin" . '/includes/file.php');
 require_once(ABSPATH . "wp-admin" . '/includes/media.php');
 
-class Paystack_Forms_Public {
+class Kkd_Pff_Paystack_Public {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
 	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
 	}
-
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Paystack_Forms_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Paystack_Forms_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/paystack-forms-public.css', array(), $this->version, 'all' );
+		 wp_enqueue_style( $this->plugin_name.'1', plugin_dir_url( __FILE__ ) . 'css/pff-paystack-style.css', array(), $this->version, 'all' );
+		 wp_enqueue_style( $this->plugin_name.'2', plugin_dir_url( __FILE__ ) . 'css/font-awesome.min.css', array(), $this->version, 'all' );
 
 	}
 
-	/**
-	 * Register the JavaScript for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Paystack_Forms_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Paystack_Forms_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-		// settings_fields( 'paystack-form-settings-group' ); do_settings_sections( 'paystack-form-settings-group' );
 		$mode =  esc_attr( get_option('mode') );
 		if ($mode == 'test') {
 			$key = esc_attr( get_option('tpk') );
@@ -95,44 +40,18 @@ class Paystack_Forms_Public {
 	}
 
 }
-function deliver_mail() {
-
-    // if the submit button is clicked, send the email
-    if ( isset( $_POST['cf-submitted'] ) ) {
-
-        // sanitize form values
-        $name    = sanitize_text_field( $_POST["cf-name"] );
-        $email   = sanitize_email( $_POST["cf-email"] );
-        $subject = sanitize_text_field( $_POST["cf-subject"] );
-        $message = esc_textarea( $_POST["cf-message"] );
-
-        // get the blog administrator's email address
-        $to = get_option( 'admin_email' );
-
-        $headers = "From: $name <$email>" . "\r\n";
-
-        // If email has been process for sending, display a success message
-        if ( wp_mail( $to, $subject, $message, $headers ) ) {
-            echo '<div>';
-            echo '<p>Thanks for contacting me, expect a response soon.</p>';
-            echo '</div>';
-        } else {
-            echo 'An unexpected error occurred';
-        }
-    }
-}
-add_filter ("wp_mail_content_type", "my_awesome_mail_content_type");
-function my_awesome_mail_content_type() {
+add_filter ("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
+function kkd_pff_paystack_mail_content_type() {
 	return "text/html";
 }
-add_filter ("wp_mail_from_name", "my_awesome_mail_from_name");
-function my_awesome_email_from_name() {
+add_filter ("wp_mail_from_name", "kkd_pff_paystack_mail_from_name");
+function kkd_pff_paystack_email_from_name() {
 	$name = get_option( 'blogname' );
 	return $name;
 }
 
 
-function send_invoice($currency,$amount,$name,$email,$code){
+function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code){
 	//  echo date('F j,Y');
 	$user_email = stripslashes($email);
 
@@ -314,9 +233,7 @@ function send_invoice($currency,$amount,$name,$email,$code){
 	wp_mail($user_email, $email_subject, $message,$headers);
 
 }
-// send_receipt($currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
-
-function send_receipt($id,$currency,$amount,$name,$email,$code,$metadata){
+function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,$metadata){
 	//  echo date('F j,Y');
 	$user_email = stripslashes($email);
 	$subject = get_post_meta($id, '_subject', true);
@@ -622,7 +539,7 @@ function send_receipt($id,$currency,$amount,$name,$email,$code,$metadata){
 	wp_mail($user_email, $email_subject, $message,$headers);
 
 }
-function fetch_plan($code){
+function kkd_pff_paystack_fetch_plan($code){
 	$mode =  esc_attr( get_option('mode') );
 	if ($mode == 'test') {
 		$key = esc_attr( get_option('tsk') );
@@ -644,7 +561,7 @@ function fetch_plan($code){
 	}
 	return $paystack_response;
 }
-function cf_shortcode($atts) {
+function kkd_pff_paystack_form_shortcode($atts) {
     ob_start();
 		if ( is_user_logged_in() ) {
 	    $user_id = get_current_user_id();
@@ -658,68 +575,97 @@ function cf_shortcode($atts) {
   if ($id != 0) {
      $obj = get_post($id);
 		 if ($obj->post_type == 'paystack_form') {
-			 $amount = get_post_meta($id,'_amount',true);
-			 $thankyou = get_post_meta($id,'_successmsg',true);
-			 $paybtn = get_post_meta($id,'_paybtn',true);
-			 $loggedin = get_post_meta($id,'_loggedin',true);
-			 $txncharge = get_post_meta($id,'_txncharge',true);
-			 $currency = get_post_meta($id,'_currency',true);
-				$recur = get_post_meta($id,'_recur',true);
-			 $recurplan = get_post_meta($id,'_recurplan',true);
+			  $amount = get_post_meta($id,'_amount',true);
+			  $thankyou = get_post_meta($id,'_successmsg',true);
+			  $paybtn = get_post_meta($id,'_paybtn',true);
+			  $loggedin = get_post_meta($id,'_loggedin',true);
+			  $txncharge = get_post_meta($id,'_txncharge',true);
+			  $currency = get_post_meta($id,'_currency',true);
+			  $recur = get_post_meta($id,'_recur',true);
+			  $recurplan = get_post_meta($id,'_recurplan',true);
+			  if ($recur == 'plan') {
+				  $plan=	kkd_pff_paystack_fetch_plan($recurplan);
+				  $planamount = $plan->data->amount/100;
+			  }
 			//  print_r($loggedin);
 			 if ($loggedin == 'no') {
+
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
-			 echo '<form enctype="multipart/form-data" class="paystack-form" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post">';
-		   echo '<input type="hidden" name="action" value="paystack_submit_action">';
+			 echo '<form  enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
+				 <div class="j-row">';
+			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
 			 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
 			 echo '<input type="hidden" name="pf-recur" value="' . $recur. '" />';
-		 	 echo '<p>';
-			 echo 'Full Name (required)<br />';
-		   echo '<input type="text" name="pf-fname" class="form-control" required/>';
-			 echo '</p>';
- 			 echo 'Email (required)<br />';
-		   echo '<input type="email" name="pf-pemail" class="form-control"  id="pf-email" required/>';
-		   echo '</p>';
-		 	 echo '<p>';
-		   echo 'Amount ('.$currency.') <br />';
-			 if ($amount == 0) {
-				 echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
-			 }else{
-				 echo '<input type="number" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
-			 }
-			  echo '</p>';
-				if ($recur != 'no') {
-					if ($recur == 'optional') {
-						echo '<p>Recuring Payment<br />';
-						echo '<select class="form-control" name="pf-interval" style="width:100%;">
-										<option value="no">None</option>
-										<option value="hourly">Hourly</option>
-										<option value="daily">Daily</option>
-										<option value="weekly">Weekly</option>
-										<option value="monthly">Monthly</option>
-										<option value="annually">Annually</option>
-									</select>';
-						echo '</p>';
+			 echo '<div class="span12 unit">
+				 <label class="label">Full Name <span>*</span></label>
+				 <div class="input">
+					 <input type="text" name="pf-fname" placeholder="First & Last Name" required>
+				 </div>
+			 </div>';
+			 echo '<div class="span12 unit">
+				 <label class="label">Email <span>*</span></label>
+				 <div class="input">
+					 <input type="email" name="pf-pemail" placeholder="Email Address"  id="pf-email" required>
+				 </div>
+			 </div>';
+			 echo '<div class="span12 unit">
+				 <label class="label">Amount ('.$currency.') <span>*</span></label>
+				 <div class="input">';
+				 if ($recur == 'plan') {
+					 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
+				 }else{
+					 	if ($amount == 0) {
+						 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" required/>';
+					 	}else{
+							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
+						}
+				 }
 
+			// echo '<input type="email" name="pf-pemail" placeholder="Email Address"  id="pf-email" required>';
+
+			echo '</div>
+			 </div>';
+
+			if ($recur != 'no') {
+					if ($recur == 'optional') {
+						echo '<div class="span12 unit">
+					 				 <label class="label">Recuring Payment</label>
+					 				 <div class="select">
+					 					 <select class="form-control" name="pf-interval" >
+					 						 <option value="no">None</option>
+					 						 <option value="hourly">Hourly</option>
+					 						 <option value="daily">Daily</option>
+					 						 <option value="weekly">Weekly</option>
+					 						 <option value="monthly">Monthly</option>
+					 						 <option value="annually">Annually</option>
+					 					 </select>
+					 					 <i></i>
+					 				 </div>
+					 			 </div>';
 					}else{
-					$plan=	fetch_plan($recurplan);
-					$planamount = $plan->data->amount/100;
 						echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
-		 		 	 // echo '<input type="number" name="pf-amount" class="form-control pf-number" id="pf-amount" required/>';
-						echo '<p>'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.number_format($planamount).'</p>';
+						echo '<div class="span12 unit">
+						 				<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
+									</div>';
 					}
 
  			}
-		   echo(do_shortcode($obj->post_content));
+		  echo(do_shortcode($obj->post_content));
 
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
-			 echo '<p> <br /><input type="submit" class="btn btn-danger" value="'.$paybtn.'" ></p>';
 
-			 echo '<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />';
-		   echo '</form>';
-			 # code...
+		  //  echo '</form>';
+			echo '<div class="span12 unit">
+						<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
+							<button type="reset" class="secondary-btn">Reset</button>
+							<button type="submit" class="primary-btn">'.$paybtn.'</button>
+						</div>';
+						echo '';
+
+			 echo '</div>
+			</form>';
 		 }else{
 			 echo "<h5>You must be logged in to make payment</h5>";
 		 }
@@ -731,88 +677,105 @@ function cf_shortcode($atts) {
 
     return ob_get_clean();
 }
-add_shortcode( 'paystack_form', 'cf_shortcode' );
+add_shortcode( 'pff-paystack', 'kkd_pff_paystack_form_shortcode' );
 
-
-//////
-
-function text_shortcode($atts) {
+function kkd_pff_paystack_text_shortcode($atts) {
   extract(shortcode_atts(array(
 		'name' => 'Title',
     'required' => '0',
  	), $atts));
-	$code = '<label> '.$name.'<input  class="form-control"  type="text" name="'.$name.'"';
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="input">
+			<input type="text" name="'.$name.'" placeholder="Enter '.$name.'"';
 	if ($required == 'required') {
 		 $code.= ' required="required" ';
 	}
-	$code.= '" /></label><br />';
+	$code.= '" /></div></div>';
   return $code;
 }
-add_shortcode('text', 'text_shortcode');
-function select_shortcode($atts) {
+add_shortcode('text', 'kkd_pff_paystack_text_shortcode');
+function kkd_pff_paystack_select_shortcode($atts) {
 	extract(shortcode_atts(array(
 		'name' => 'Title',
 		'options' => '',
     'required' => '0',
  	), $atts));
-	$code = '<label> '.$name.'<br /><select class="form-control" name="'.$name.'"';
-
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="input">
+			<select class="form-control"  name="'.$name.'"';
 	if ($required == 'required') {
 		 $code.= ' required="required" ';
 	}
-	$code.=" style='width:100%;'>";
+	$code.=">";
+
 	$soptions = explode(',', $options);
 	if (count($soptions) > 0) {
 		foreach ($soptions as $key => $option) {
 			$code.= '<option  value="'.$option.'" >'.$option.'</option>';
 		}
 	}
-	$code.= '" </select></label><br />';
+	$code.= '" </select><i></i></div></div>';
   return $code;
 }
-add_shortcode('select', 'select_shortcode');
-function textarea_shortcode($atts) {
+add_shortcode('select', 'kkd_pff_paystack_select_shortcode');
+function kkd_pff_paystack_textarea_shortcode($atts) {
 	extract(shortcode_atts(array(
       'name' => 'Title',
 			'required' => '0',
 	 ), $atts));
-	 $code = '<label> '.$name.'<textarea class="form-control"  rows="3" name="'.$name.'"';
- 	if ($required == 'required') {
- 		 $code.= ' required="required" ';
- 	}
- 	$code.= '" ></textarea></label><br />';
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="input">
+			<textarea type="text" name="'.$name.'" rows="3" placeholder="Enter '.$name.'"';
+	if ($required == 'required') {
+		 $code.= ' required="required" ';
+	}
+	$code.= '" ></textarea></div></div>';
    return $code;
 }
-add_shortcode('textarea', 'textarea_shortcode');
-function input_shortcode($atts) {
+add_shortcode('textarea', 'kkd_pff_paystack_textarea_shortcode');
+function kkd_pff_paystack_input_shortcode($atts) {
   extract(shortcode_atts(array(
 		'name' => 'Title',
     'required' => '0',
  	), $atts));
-	$code = '<label> '.$name.'<br /><input  class="form-control"  type="file" name="'.$name.'"';
+
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="input  append-small-btn">
+		<div class="file-button">
+			Browse
+			<input type="file" name="'.$name.'" onchange="document.getElementById(\'append-small-btn\').value = this.value;"';
 	if ($required == 'required') {
 		 $code.= ' required="required" ';
 	}
-	$code.= '" /></label><br />';
+	$code.= '" /></div>
+		<input type="text" id="append-small-btn" readonly="" placeholder="no file selected">
+	</div></div>';
   return $code;
 }
-add_shortcode('input', 'input_shortcode');
-function to_slug($text){
-    $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-    $text = preg_replace('~[^-\w]+~', '', $text);
-    $text = trim($text, '-');
-    $text = preg_replace('~-+~', '-', $text);
-    $text = strtolower($text);
-    if (empty($text)) {
-        return 'n-a';
-    }
-    return $text;
-}
-
+add_shortcode('input', 'kkd_pff_paystack_input_shortcode');
 
 // Save the Metabox Data
-function generate_new_code($length = 10){
-  // $characters = 'RSTUVW01234ABCDEFGHIJ56789KLMNOPQXYZ';
+function kkd_pff_paystack_generate_new_code($length = 10){
   $characters = '06EFGHI9KL'.time().'MNOPJRSUVW01YZ923234'.time().'ABCD5678QXT';
   $charactersLength = strlen($characters);
   $randomString = '';
@@ -821,7 +784,7 @@ function generate_new_code($length = 10){
   }
   return time()."_".$randomString;
 }
-function check_code($code){
+function kkd_pff_paystack_check_code($code){
 	global $wpdb;
 	$table = $wpdb->prefix."paystack_forms_payments";
 	$o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '".$code."'");
@@ -834,17 +797,17 @@ function check_code($code){
 
   return $result;
 }
-function generate_code(){
+function kkd_pff_paystack_generate_code(){
   $code = 0;
   $check = true;
   while ($check) {
-      $code = generate_new_code();
-      $check = check_code($code);
+      $code = kkd_pff_paystack_generate_new_code();
+      $check = kkd_pff_paystack_check_code($code);
   }
 
   return $code;
 }
-function get_the_user_ip() {
+function kkd_pff_paystack_get_the_user_ip() {
 	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
 		$ip = $_SERVER['HTTP_CLIENT_IP'];
 	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
@@ -855,9 +818,9 @@ function get_the_user_ip() {
 	return $ip;
 }
 
-add_action( 'wp_ajax_paystack_submit_action', 'paystack_submit_action' );
-add_action( 'wp_ajax_nopriv_paystack_submit_action', 'paystack_submit_action' );
-function paystack_submit_action() {
+add_action( 'wp_ajax_kkd_pff_paystack_submit_action', 'kkd_pff_paystack_submit_action' );
+add_action( 'wp_ajax_nopriv_kkd_pff_paystack_submit_action', 'kkd_pff_paystack_submit_action' );
+function kkd_pff_paystack_submit_action() {
   if (trim($_POST['pf-pemail']) == '') {
     $response['result'] = 'failed';
   	$response['message'] = 'Email is required';
@@ -867,7 +830,7 @@ function paystack_submit_action() {
   }
 
   global $wpdb;
-	$code = generate_code();
+	$code = kkd_pff_paystack_generate_code();
 
   $table = $wpdb->prefix."paystack_forms_payments";
 	$metadata = $_POST;
@@ -882,7 +845,7 @@ function paystack_submit_action() {
 
 			// echo '<pre>';
 
-	$fixedmetadata = paystack_meta_as_custom_fields($metadata);
+	$fixedmetadata = kkd_pff_paystack_meta_as_custom_fields($metadata);
 
 	$filelimit = get_post_meta($_POST["pf-id"],'_filelimit',true);
 	$currency = get_post_meta($_POST["pf-id"],'_currency',true);
@@ -978,7 +941,7 @@ function paystack_submit_action() {
     'user_id' => strip_tags($_POST["pf-user_id"], ""),
 		'amount' => strip_tags($_POST["pf-amount"], ""),
 	  'plan' => strip_tags($plancode, ""),
-		'ip' => get_the_user_ip(),
+		'ip' => kkd_pff_paystack_get_the_user_ip(),
 		'txn_code' => $code,
 		'metadata' => json_encode($fixedmetadata)
   );
@@ -998,7 +961,7 @@ function paystack_submit_action() {
 	        $table,
 	        $insert
 	    );
-			send_invoice($currency,$insert['amount'],$fullname,$insert['email'],$code);
+			kkd_pff_paystack_send_invoice($currency,$insert['amount'],$fullname,$insert['email'],$code);
 	}
 
 	 $response = array(
@@ -1015,7 +978,7 @@ function paystack_submit_action() {
   die();
 }
 
-function paystack_meta_as_custom_fields($metadata){
+function kkd_pff_paystack_meta_as_custom_fields($metadata){
 	$custom_fields = [];
 	foreach ($metadata as $key => $value) {
 		if ($key == 'pf-fname') {
@@ -1038,10 +1001,10 @@ function paystack_meta_as_custom_fields($metadata){
 	return $custom_fields;
 }
 
-add_action( 'wp_ajax_paystack_confirm_payment', 'paystack_confirm_payment' );
-add_action( 'wp_ajax_nopriv_paystack_confirm_payment', 'paystack_confirm_payment' );
+add_action( 'wp_ajax_kkd_pff_paystack_confirm_payment', 'kkd_pff_paystack_confirm_payment' );
+add_action( 'wp_ajax_nopriv_kkd_pff_paystack_confirm_payment', 'kkd_pff_paystack_confirm_payment' );
 
-function paystack_confirm_payment() {
+function kkd_pff_paystack_confirm_payment() {
   if (trim($_POST['code']) == '') {
     $response['error'] = true;
   	$response['error_message'] = "Did you make a payment?";
@@ -1085,7 +1048,7 @@ function paystack_confirm_payment() {
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
-							// send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+							// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
 						}else{
 							if( $amount !=  $amount_paid ) {
 								$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
@@ -1115,7 +1078,7 @@ function paystack_confirm_payment() {
 		if($sendreceipt == 'yes'){
 			$decoded = json_decode($payment_array->metadata);
 			$fullname = $decoded[0]->value;
-			send_receipt($payment_array->post_id,$currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
+			kkd_pff_paystack_send_receipt($payment_array->post_id,$currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
 
 		}
 

@@ -1,6 +1,6 @@
 <?php
 
-class Paystack_Forms_Activator {
+class Kkd_Pff_Paystack_Activator {
 
 	public static function activate() {
 		global $wpdb;

@@ -1,6 +1,6 @@
 <?php
 
-class Paystack_Forms_Admin {
+class Kkd_Pff_Paystack_Admin {
 
 	private $plugin_name;
 	private $version;
@@ -141,7 +141,7 @@ class Paystack_Forms_Admin {
 
 	    if ($post_type == 'paystack_form') {
 	        echo "<style>#edit-slug-box,#message p > a{display:none;}</style>";
-	      add_action("admin_print_footer_scripts", "shortcode_button_script");
+	      add_action("admin_print_footer_scripts", "kkd_pff_paystack_shortcode_button_script");
 	      add_filter( 'user_can_richedit' , '__return_false', 50 );
 	      add_action( 'wp_dashboard_setup', 'remove_dashboard_widgets' );
 				remove_action( 'media_buttons', 'media_buttons' );
@@ -449,7 +449,6 @@ class Paystack_Forms_Admin {
 }
 
 add_action( 'admin_menu', 'register_newpage' );
-
 function register_newpage(){
 		add_menu_page('paystack', 'paystack', 'administrator','submissions', 'payment_submissions');
 		remove_menu_page('submissions');
@@ -476,7 +475,6 @@ function payment_submissions(){
 
 	}
 }
-
 class Paystack_Wp_List_Table{
     public function __construct(){
         add_action( 'admin_menu', array($this, 'add_menu_example_list_table_page' ));
@@ -636,6 +634,5 @@ class Payments_List_Table extends WP_List_Table{
        return -$result;
    }
 }
-
 
 ?>

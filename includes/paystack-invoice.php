@@ -1,6 +1,10 @@
 
 <title>Paystack Invoice</title>
 <?php
+define('WP_USE_THEMES', true);
+
+/** Loads the WordPress Environment and Template */
+require(get_template_directory() . '/wp-blog-header.php' );
 //call the wp head so  you can get most of your wordpress
 get_header();
 ?>

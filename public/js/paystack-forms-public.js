@@ -31,19 +31,21 @@
 				}else{
 					$(this).find("#pf-amount").css({ "border-color":"red" });
 					stop = true;
-
-
 				}
 				if (!validateEmail(email)) {
 			    $(this).find("#pf-email").css({ "border-color":"red" });
 					stop = true;
 				}
-					$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
-              $(this).css({ "border-color":"red" });
-							stop = true;
-					});
+				$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
+            $(this).css({ "border-color":"red" });
+						stop = true;
+
+				});
 				if (stop) {
 					return false;
+					alert('sc');
+					$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+
 				}
 
 	 		 	var self = $(this);
@@ -81,7 +83,7 @@
 					 					metadata: {'custom_fields': data.custom_fields},
 					 					callback: function(response){
 					 						$.blockUI({ message: 'Please wait...' });
-					 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
+					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function(newdata) {
 					 									data = JSON.parse(newdata);
 					 									if (data.result == 'success'){
 					 										$('.paystack-form')[0].reset();
@@ -115,7 +117,7 @@
 					 					metadata: {'custom_fields': data.custom_fields},
 					 					callback: function(response){
 					 						$.blockUI({ message: 'Please wait...' });
-					 						$.post($form.attr('action'), {'action':'paystack_confirm_payment','code':response.trxref}, function(newdata) {
+					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function(newdata) {
 					 									data = JSON.parse(newdata);
 					 									if (data.result == 'success'){
 					 										$('.paystack-form')[0].reset();

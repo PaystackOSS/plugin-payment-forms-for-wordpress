@@ -1,7 +1,7 @@
 <?php
 
 
-class Paystack_Forms_Loader {
+class Kkd_Pff_Paystack_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
