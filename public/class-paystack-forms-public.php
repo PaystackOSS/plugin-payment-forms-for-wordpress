@@ -635,8 +635,6 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 				 <div class="select">
 			 					 <select class="form-control" name="pf-interval" >
 			 						 <option value="no">None</option>
-			 						 <option value="hourly">Hourly</option>
-			 						 <option value="daily">Daily</option>
 			 						 <option value="weekly">Weekly</option>
 			 						 <option value="monthly">Monthly</option>
 			 						 <option value="annually">Annually</option>
