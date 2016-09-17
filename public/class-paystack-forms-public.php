@@ -658,7 +658,9 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 		  //  echo '</form>';
 			echo '<div class="span12 unit">
+			<small><span style="color: red;">*</span> are compulsory</small><br />
 						<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
+
 							<button type="reset" class="secondary-btn">Reset</button>
 							<button type="submit" class="primary-btn">'.$paybtn.'</button>
 						</div>';

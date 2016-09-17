@@ -78,6 +78,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.4 =
+*   Added Recurring Payments and new design.
 = 1.0.3 =
 *   Invoice and Receipt Emails, with ability to disable them.
 = 1.0.2 =

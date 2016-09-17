@@ -22,7 +22,7 @@
 				}
 		 	$('.paystack-form').on('submit', function(e) {
 				var stop = false;
-				$(this).find("input, textarea").each(function() {
+				$(this).find("input,select, textarea").each(function() {
 						$(this).css({ "border-color":"#d1d1d1" });
 				});
 				var email = $(this).find("#pf-email").val();
@@ -42,9 +42,8 @@
 
 				});
 				if (stop) {
-					return false;
-					alert('sc');
 					$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
+					return false;
 
 				}
 
