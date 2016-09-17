@@ -1,12 +1,11 @@
 <?php
-
 class Kkd_Pff_Paystack_Activator {
 
 	public static function activate() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'paystack_forms_payments';
 
-		$sql = "CREATE TABLE IF NOT EXISTS `".$table_name."` (
+		$sql = "CREATE TABLE `".$table_name."` (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			post_id int(11) NOT NULL,
 		  user_id int(11) NOT NULL,
@@ -24,6 +23,7 @@ class Kkd_Pff_Paystack_Activator {
 		);";
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta($sql);
+
 	}
 
 

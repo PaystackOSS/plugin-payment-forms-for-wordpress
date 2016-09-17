@@ -15,6 +15,9 @@ if ( ! defined( 'WPINC' ) ) {
 }
 define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url( __FILE__ ) );
 define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
+define( 'KKD_PFF_PAYSTACK_VERSION', '1.0.4' );
+
+
 // fix some badly enqueued scripts with no sense of HTTPS
 add_action('wp_print_scripts', 'kkd_pff_paystack_enqueueScriptsFix', 100);
 add_action('wp_print_styles', 'kkd_pff_paystack_enqueueStylesFix', 100);
@@ -53,7 +56,7 @@ function kkd_pff_paystack_enqueueStylesFix() {
 
 function kkd_pff_paystack_activate_paystack_forms() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-activator.php';
-	Paystack_Forms_Activator::activate();
+	Kkd_Pff_Paystack_Activator::activate();
 }
 
 register_activation_hook( __FILE__, 'kkd_pff_paystack_activate_paystack_forms' );

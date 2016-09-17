@@ -614,6 +614,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 <div class="input">';
 				 if ($recur == 'plan') {
 					 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
+				 }elseif($recur == 'optional'){
+					 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" required/>';
 				 }else{
 					 	if ($amount == 0) {
 						 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" required/>';
@@ -627,30 +629,29 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			echo '</div>
 			 </div>';
 
-			if ($recur != 'no') {
-					if ($recur == 'optional') {
-						echo '<div class="span12 unit">
-					 				 <label class="label">Recuring Payment</label>
-					 				 <div class="select">
-					 					 <select class="form-control" name="pf-interval" >
-					 						 <option value="no">None</option>
-					 						 <option value="hourly">Hourly</option>
-					 						 <option value="daily">Daily</option>
-					 						 <option value="weekly">Weekly</option>
-					 						 <option value="monthly">Monthly</option>
-					 						 <option value="annually">Annually</option>
-					 					 </select>
-					 					 <i></i>
-					 				 </div>
-					 			 </div>';
-					}else{
-						echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
-						echo '<div class="span12 unit">
-						 				<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
-									</div>';
-					}
+			if ($recur == 'optional') {
+				echo '<div class="span12 unit">
+			 				 <label class="label">Recuring Payment</label>
+			 				 <div class="select">
+			 					 <select class="form-control" name="pf-interval" >
+			 						 <option value="no">None</option>
+			 						 <option value="hourly">Hourly</option>
+			 						 <option value="daily">Daily</option>
+			 						 <option value="weekly">Weekly</option>
+			 						 <option value="monthly">Monthly</option>
+			 						 <option value="annually">Annually</option>
+			 					 </select>
+			 					 <i></i>
+			 				 </div>
+			 			 </div>';
+			}elseif($recur == 'plan'){
+				echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
+				echo '<div class="span12 unit">
+				 				<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
+							</div>';
+			}
 
- 			}
+
 		  echo(do_shortcode($obj->post_content));
 
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
@@ -1021,6 +1022,7 @@ function kkd_pff_paystack_confirm_payment() {
 
 		$payment_array = $record[0];
 		$amount = get_post_meta($payment_array->post_id,'_amount',true);
+		$recur = get_post_meta($payment_array->post_id,'_recur',true);
 		$currency = get_post_meta($payment_array->post_id,'_currency',true);
 
 
@@ -1044,25 +1046,33 @@ function kkd_pff_paystack_confirm_payment() {
 			if ( 'success' == $paystack_response->data->status ) {
 						$amount_paid	= $paystack_response->data->amount / 100;
 						$paystack_ref 	= $paystack_response->data->reference;
-
-						if ($amount == 0) {
+						if ($recur == 'optional' || $recur == 'plan') {
 							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
-							// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
 						}else{
-							if( $amount !=  $amount_paid ) {
-								$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
-								$result = "failed";
-							}else{
 
-								$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
+							if ($amount == 0) {
+								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 								$message = $thankyou;
 								$result = "success";
+								// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+							}else{
+								if( $amount !=  $amount_paid ) {
+									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
+									$result = "failed";
+								}else{
+
+									$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
+									$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+									$message = $thankyou;
+									$result = "success";
+								}
 							}
 						}
+
 			}else {
 				$message = "Transaction Failed/Invalid Code";
 				$result = "failed";
