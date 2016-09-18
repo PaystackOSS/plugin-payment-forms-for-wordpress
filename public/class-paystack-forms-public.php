@@ -956,6 +956,7 @@ function kkd_pff_paystack_submit_action() {
 			AND metadata = '". $insert['metadata'] ."')");
 	 if (count($exist) > 0) {
 		 $insert['txn_code'] = $exist[0]->txn_code;
+		 $insert['plan'] = $exist[0]->plan;
 
    } else {
 		 $wpdb->insert(
