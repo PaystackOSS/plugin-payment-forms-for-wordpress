@@ -588,7 +588,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				  $planamount = $plan->data->amount/100;
 			  }
 			//  print_r($loggedin);
-			 if ($loggedin == 'no') {
+			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
 
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
 			 echo '<form  enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
