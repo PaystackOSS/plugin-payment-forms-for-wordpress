@@ -78,6 +78,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.9 =
+*  Updated to use Paystack plans filter before plan creation.
 = 1.0.8 =
 *  Fixed DB Schema on Update.
 = 1.0.7 =
