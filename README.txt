@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
 Tested up to: 4.6
-Stable tag: 1.0.3
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,8 +78,16 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.0.8 =
+*  Fixed DB Schema on Update.
+= 1.0.7 =
+*   Added Transfer of transaction charges to the customer.
+= 1.0.6 =
+*   Fixed optional plans.
+= 1.0.5 =
+*   Bug Fixes to processes.
 = 1.0.4 =
-*   Added Recurring Payments and new design.
+*   Recurring Payment Added with Design overhaul.
 = 1.0.3 =
 *   Invoice and Receipt Emails, with ability to disable them.
 = 1.0.2 =
