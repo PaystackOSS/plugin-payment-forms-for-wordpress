@@ -900,7 +900,7 @@ function kkd_pff_paystack_submit_action() {
 
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
 	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
-
+	$originalamount = $amount;
 	if(($recur == 'no') && ($formamount != 0)){
 		$amount = (int)str_replace(' ', '', $formamount);
 	}
@@ -960,47 +960,62 @@ function kkd_pff_paystack_submit_action() {
 					}else{
 						$key = esc_attr( get_option('lsk') );
 					}
+					$koboamount = $amount*100;
 					//Create Plan
 					$paystack_url = 'https://api.paystack.co/plan';
+					$check_url = 'https://api.paystack.co/plan?amount='.$koboamount.'&interval='.$interval;
 					$headers = array(
 						'Content-Type'	=> 'application/json',
 						'Authorization' => 'Bearer ' . $key
 					);
-					$koboamount = $amount*100;
-					$body = array(
-						'name'						=> $fullname.'_'.$code,
-						'amount'					=> $koboamount,
-						'interval'		=> $interval
-					);
 
-					$args = array(
-						'body'		=> json_encode( $body ),
+					$checkargs = array(
 						'headers'	=> $headers,
 						'timeout'	=> 60
 					);
-					// print_r($args);
+					// Check if plan exist
+					$checkrequest = wp_remote_get( $check_url, $checkargs );
+					if(!is_wp_error($checkrequest)) {
+						$response = json_decode(wp_remote_retrieve_body($checkrequest));
+						if ($response->meta->total >= 1) {
+							$plan = $response->data[0];
+							$plancode = $plan->plan_code;
+							$fixedmetadata[] = [
+								'display_name' => 'Plan Interval',
+								'variable_name' => 'Plan Interval',
+								'type' => 'text',
+								'value' => $plan->interval
+							];
+						}else{
+							//Create Plan
+							$body = array(
+								'name'						=> $currency.$originalamount.' ['.$currency.$amount.'] - '.$interval,
+								'amount'					=> $koboamount,
+								'interval'		=> $interval
+							);
+							$args = array(
+								'body'		=> json_encode( $body ),
+								'headers'	=> $headers,
+								'timeout'	=> 60
+							);
 
+							$request = wp_remote_post( $paystack_url, $args );
+							if( ! is_wp_error( $request )) {
+								$paystack_response = json_decode(wp_remote_retrieve_body($request));
+								$plancode	= $paystack_response->data->plan_code;
+								$fixedmetadata[] = [
+									'display_name' => 'Plan Interval',
+									'variable_name' => 'Plan Interval',
+									'type' => 'text',
+									'value' => $paystack_response->data->interval
+								];
 
-					$request = wp_remote_post( $paystack_url, $args );
-					// print_r($request);
-
-					if( ! is_wp_error( $request )) {
-						// echo "string";
-						$paystack_response = json_decode(wp_remote_retrieve_body($request));
-						// print_r($paystack_response);
-						$plancode	= $paystack_response->data->plan_code;
-						$fixedmetadata[] = [
-							'display_name' => 'Plan Interval',
-							'variable_name' => 'Plan Interval',
-							'type' => 'text',
-							'value' => $paystack_response->data->interval
-						];
+							}
+						}
 
 					}
-					# code...
-				}
 
-			// $plancode = 'optionalcode';
+				}
 		}else{
 			//Use Plan Code
 			$plancode = $_POST['pf-plancode'];
