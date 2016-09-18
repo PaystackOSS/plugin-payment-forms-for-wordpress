@@ -283,6 +283,7 @@ class Kkd_Pff_Paystack_Admin {
 			if ($paybtn == "") {$paybtn = 'Pay';}
 			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
 			if ($currency == "") {$currency = 'NGN';}
+			if ($txncharge == "") {$txncharge = 'merchant';}
 	  	// Echo out the field
 			echo '<p>Currency:</p>';
 	  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
@@ -292,10 +293,10 @@ class Kkd_Pff_Paystack_Admin {
 			echo '<p>Pay button Description:</p>';
 	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
 			echo '<p>Transaction Charges:</p>';
-			// echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-			// 				<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-			// 				<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added)</option>
-			// 			</select>';
+			echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
+							<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
+							<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added) - 1.55%+ NGN100 if above NGN2,500 </option>
+						</select>';
 			echo '<p>User logged In:</p>';
 			echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no',$loggedin).'>User must not be logged in</option>

@@ -868,7 +868,29 @@ function kkd_pff_paystack_submit_action() {
 
 	$filelimit = get_post_meta($_POST["pf-id"],'_filelimit',true);
 	$currency = get_post_meta($_POST["pf-id"],'_currency',true);
+	$formamount = get_post_meta($_POST["pf-id"],'_amount',true);
+	$recur = get_post_meta($_POST["pf-id"],'_recur',true);
 
+	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
+	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
+
+	if(($recur == 'no') && ($formamount != 0)){
+		$amount = (int)str_replace(' ', '', $formamount);
+	}
+	if ($txncharge == 'customer') {
+		$percent = (1.55/100)*$amount;
+		if ($percent > 2000) {
+			$newamount =  $amount + 2000;
+		}else{
+			if ($amount > 2500) {
+				$newamount =  $amount + $percent+100;
+			}else{
+				$newamount =  $amount + $percent;
+			}
+		}
+
+		$amount = $newamount;
+	}
 	$maxFileSize = $filelimit * 1024 * 1024;
 
 	if(!empty($_FILES)){
@@ -917,7 +939,6 @@ function kkd_pff_paystack_submit_action() {
 						'Content-Type'	=> 'application/json',
 						'Authorization' => 'Bearer ' . $key
 					);
-					$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
 					$koboamount = $amount*100;
 					$body = array(
 						'name'						=> $fullname.'_'.$code,
@@ -958,7 +979,7 @@ function kkd_pff_paystack_submit_action() {
     'post_id' => strip_tags($_POST["pf-id"], ""),
 		'email' => strip_tags($_POST["pf-pemail"], ""),
     'user_id' => strip_tags($_POST["pf-user_id"], ""),
-		'amount' => strip_tags($_POST["pf-amount"], ""),
+		'amount' => strip_tags($amount, ""),
 	  'plan' => strip_tags($plancode, ""),
 		'ip' => kkd_pff_paystack_get_the_user_ip(),
 		'txn_code' => $code,
@@ -1041,6 +1062,7 @@ function kkd_pff_paystack_confirm_payment() {
 		$amount = get_post_meta($payment_array->post_id,'_amount',true);
 		$recur = get_post_meta($payment_array->post_id,'_recur',true);
 		$currency = get_post_meta($payment_array->post_id,'_currency',true);
+		$txncharge = get_post_meta($payment_array->post_id,'_txncharge',true);
 
 
 		$mode =  esc_attr( get_option('mode') );
@@ -1077,6 +1099,20 @@ function kkd_pff_paystack_confirm_payment() {
 								$result = "success";
 								// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
 							}else{
+								if ($txncharge == 'customer') {
+									$percent = (1.55/100)*$amount;
+									if ($percent > 2000) {
+										$newamount =  $amount + 2000;
+									}else{
+										if ($amount > 2500) {
+											$newamount =  $amount + $percent+100;
+										}else{
+											$newamount =  $amount + $percent;
+										}
+									}
+
+									$amount = $newamount;
+								}
 								if( $amount !=  $amount_paid ) {
 									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
 									$result = "failed";
