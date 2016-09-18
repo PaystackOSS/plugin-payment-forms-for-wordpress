@@ -180,7 +180,7 @@ class Kkd_Pff_Paystack_Admin {
 
 		function kkd_pff_paystack_dashboard_table_data( $column, $post_id ) {
 			global $post,$wpdb;
-			$table = $wpdb->prefix . 'paystack_forms_payments';
+			$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 
 			switch( $column ) {
 				case 'shortcode' :
@@ -506,7 +506,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
 
 			global $wpdb;
 
-		  $table = $wpdb->prefix."paystack_forms_payments";
+		  $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 			$data = array();
 			$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')");
 

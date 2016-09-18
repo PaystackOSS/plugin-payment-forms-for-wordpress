@@ -831,7 +831,7 @@ function kkd_pff_paystack_generate_new_code($length = 10){
 }
 function kkd_pff_paystack_check_code($code){
 	global $wpdb;
-	$table = $wpdb->prefix."paystack_forms_payments";
+	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 	$o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '".$code."'");
 
 	  if (count($o_exist) > 0) {
@@ -877,7 +877,7 @@ function kkd_pff_paystack_submit_action() {
   global $wpdb;
 	$code = kkd_pff_paystack_generate_code();
 
-  $table = $wpdb->prefix."paystack_forms_payments";
+  $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 	$metadata = $_POST;
 	$fullname = $_POST['pf-fname'];
 	$recur = $_POST['pf-recur'];
@@ -1108,7 +1108,7 @@ function kkd_pff_paystack_confirm_payment() {
   	exit(json_encode($response));
   }
   global $wpdb;
-	$table = $wpdb->prefix."paystack_forms_payments";
+	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 	$code = $_POST['code'];
 	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
 	if (array_key_exists("0", $record)) {
