@@ -426,6 +426,7 @@
 .j-forms .input textarea:focus + .tooltip-right-bottom,
 .j-forms .select select:focus + .tooltip-right-bottom { left:auto; right:0; }
 
+
 .j-forms .tooltip-right-side { margin-left:8px; top:8px; white-space:nowrap; }
 
 .j-forms .tooltip-right-side:before {
@@ -1774,3 +1775,6 @@
 
 .j-forms .checkbox-block input:checked ~ .block-content .block-image-title,
 .j-forms .radio-block input:checked ~ .block-content .block-image-title { background:rgba(0,0,0,.77); }
+.j-forms .input input[readonly] {
+     cursor:not-allowed;
+}

@@ -563,13 +563,19 @@ function kkd_pff_paystack_fetch_plan($code){
 }
 function kkd_pff_paystack_form_shortcode($atts) {
     ob_start();
-		if ( is_user_logged_in() ) {
-	    $user_id = get_current_user_id();
-		}else{
-			$user_id = 0;
-		}
 
-    extract(shortcode_atts(array(
+		global $current_user;
+		// wp_get_current_user();
+		$user_id = $current_user->ID;
+		$email = $current_user->user_email;
+		$fname = $current_user->user_firstname;
+		$lname = $current_user->user_lastname;
+		if ($fname == '' && $lname == '') {
+			$fullname = '';
+		}else{
+			$fullname = $fname.' '.$lname;
+    }
+		extract(shortcode_atts(array(
       'id' => 0,
    ), $atts));
   if ($id != 0) {
@@ -600,13 +606,25 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 echo '<div class="span12 unit">
 				 <label class="label">Full Name <span>*</span></label>
 				 <div class="input">
-					 <input type="text" name="pf-fname" placeholder="First & Last Name" required>
+					 <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . $fullname. '"
+					 ';
+					 if($loggedin == 'yes'){
+						 echo 'readonly ';
+					 }
+
+			echo' required>
 				 </div>
 			 </div>';
 			 echo '<div class="span12 unit">
 				 <label class="label">Email <span>*</span></label>
 				 <div class="input">
-					 <input type="email" name="pf-pemail" placeholder="Email Address"  id="pf-email" required>
+					 <input type="email" name="pf-pemail" placeholder="Enter Email Address"  id="pf-email" value="' . $email. '"
+					 ';
+					 if($loggedin == 'yes'){
+						 echo 'readonly ';
+					 }
+
+			echo' required>
 				 </div>
 			 </div>';
 			 echo '<div class="span12 unit">
