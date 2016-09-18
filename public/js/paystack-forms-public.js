@@ -55,7 +55,8 @@
 								 if (transaction_amount > 2500) {extrafee = 100};
 							 }
 							 var total = transaction_amount + fees + extrafee;
-	             if (transaction_amount == '' || transaction_amount == 0) {
+							 console.log(transaction_amount);
+	             if (transaction_amount == '' || transaction_amount == 0 || transaction_amount.length == 0 || transaction_amount == null || isNaN (transaction_amount)) {
 								 var total = 0;
 								 var fees = 0;
 							 }
