@@ -555,7 +555,7 @@ function kkd_pff_paystack_fetch_plan($code){
 		'timeout'	=> 60
 	);
 	$request = wp_remote_get( $paystack_url, $args );
-	if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
+	if( ! is_wp_error( $request )) {
 		$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
 
 	}
@@ -588,10 +588,24 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			  $txncharge = get_post_meta($id,'_txncharge',true);
 			  $currency = get_post_meta($id,'_currency',true);
 			  $recur = get_post_meta($id,'_recur',true);
-			  $recurplan = get_post_meta($id,'_recurplan',true);
+				$recurplan = get_post_meta($id,'_recurplan',true);
+				$showbtn = true;
+				$planerrorcode = 'Input Correct Recurring Plan Code';
 			  if ($recur == 'plan') {
-				  $plan=	kkd_pff_paystack_fetch_plan($recurplan);
-				  $planamount = $plan->data->amount/100;
+					if ($recurplan == '' || $recurplan == null) {
+						$showbtn = false;
+					}else{
+						$plan =	kkd_pff_paystack_fetch_plan($recurplan);
+						if (isset($plan->data->amount)) {
+							$planamount = $plan->data->amount/100;
+						}else{
+							$showbtn = false;
+						}
+
+
+
+					}
+
 			  }
 			//  print_r($loggedin);
 			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
@@ -631,8 +645,14 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 <label class="label">Amount ('.$currency.') <span>*</span></label>
 				 <div class="input">';
 				 if ($recur == 'plan') {
-					 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
-				 }elseif($recur == 'optional'){
+					 if ($showbtn) {
+						 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
+	 				 }else{
+						 echo '<div class="span12 unit">
+	 									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$planerrorcode.'</label>
+	 								</div>';
+					 }
+				}elseif($recur == 'optional'){
 					 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
 				 }else{
 					 	if ($amount == 0) {
@@ -662,10 +682,17 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 				 </div>
 			 			 </div>';
 			}elseif($recur == 'plan'){
-				echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
-				echo '<div class="span12 unit">
-				 				<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
-							</div>';
+				if ($showbtn) {
+					echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
+					echo '<div class="span12 unit">
+									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
+								</div>';
+				}else{
+					echo '<div class="span12 unit">
+								 <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$planerrorcode.'</label>
+							 </div>';
+				}
+
 			}
 
 
@@ -679,10 +706,11 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			<small><span style="color: red;">*</span> are compulsory</small><br />
 						<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
 
-							<button type="reset" class="secondary-btn">Reset</button>
-							<button type="submit" class="primary-btn">'.$paybtn.'</button>
-						</div>';
-						echo '';
+							<button type="reset" class="secondary-btn">Reset</button>';
+							if ($showbtn){
+								echo '<button type="submit" class="primary-btn">'.$paybtn.'</button>';
+							}
+			echo '</div>';
 
 			 echo '</div>
 			</form>';
