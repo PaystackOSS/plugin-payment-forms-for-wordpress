@@ -601,9 +601,6 @@ function kkd_pff_paystack_form_shortcode($atts) {
 						}else{
 							$showbtn = false;
 						}
-
-
-
 					}
 
 			  }
@@ -890,6 +887,7 @@ function kkd_pff_paystack_submit_action() {
 	unset($metadata['pf-pemail']);
 	unset($metadata['pf-amount']);
 	unset($metadata['pf-user_id']);
+	unset($metadata['pf-interval']);
 
 			// echo '<pre>';
 
@@ -991,7 +989,12 @@ function kkd_pff_paystack_submit_action() {
 						$paystack_response = json_decode(wp_remote_retrieve_body($request));
 						// print_r($paystack_response);
 						$plancode	= $paystack_response->data->plan_code;
-						// echo $plancod;
+						$fixedmetadata[] = [
+							'display_name' => 'Plan Interval',
+							'variable_name' => 'Plan Interval',
+							'type' => 'text',
+							'value' => $paystack_response->data->interval
+						];
 
 					}
 					# code...
@@ -1004,6 +1007,15 @@ function kkd_pff_paystack_submit_action() {
 			unset($metadata['pf-plancode']);
 		}
 	}
+	if($plancode != 'none'){
+		$fixedmetadata[] = [
+			'display_name' => 'Plan',
+			'variable_name' => 'Plan',
+			'type' => 'text',
+			'value' => $plancode
+		];
+	}
+
 	$insert =  array(
     'post_id' => strip_tags($_POST["pf-id"], ""),
 		'email' => strip_tags($_POST["pf-pemail"], ""),
@@ -1055,6 +1067,20 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata){
 			$custom_fields[] = [
 				'display_name' => 'Full Name',
 				'variable_name' => 'Full_Name',
+	      'type' => 'text',
+	      'value' => $value
+			];
+		}elseif ($key == 'pf-plancode') {
+			$custom_fields[] = [
+				'display_name' => 'Plan',
+				'variable_name' => 'Plan',
+	      'type' => 'text',
+	      'value' => $value
+			];
+		}elseif ($key == 'pf-interval') {
+			$custom_fields[] = [
+				'display_name' => 'Plan Interval',
+				'variable_name' => 'Plan Interval',
 	      'type' => 'text',
 	      'value' => $value
 			];
