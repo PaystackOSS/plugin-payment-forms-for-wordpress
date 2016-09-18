@@ -633,16 +633,17 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 if ($recur == 'plan') {
 					 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
 				 }elseif($recur == 'optional'){
-					 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" required/>';
+					 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
 				 }else{
 					 	if ($amount == 0) {
-						 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" required/>';
+						 echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
 					 	}else{
 							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
 						}
 				 }
-
-			// echo '<input type="email" name="pf-pemail" placeholder="Email Address"  id="pf-email" required>';
+			 if ($txncharge != 'merchant' && $recur != 'plan') {
+					 echo '<small>Transaction Charge: <b class="pf-txncharge">NGN1000</b>, Total:<b  class="pf-txntotal">NGN1000</b></small>';
+				 }
 
 			echo '</div>
 			 </div>';

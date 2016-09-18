@@ -1778,3 +1778,11 @@
 .j-forms .input input[readonly] {
      cursor:not-allowed;
 }
+.j-forms .input small b {
+     color: #3676c8  !important;
+		 font-size:14px !important;
+}
+.j-forms .input .rerror {
+     border-color: red  !important;
+}
+/*#3676c8*/
