@@ -3,32 +3,30 @@ Contributors: kendysond
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
-Tested up to: 4.6
-Stable tag: 1.0.8
+Tested up to: 4.6.1
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Payment forms for Paystack allows you create forms that will be used to bill clients for goods and services using Paystack.
-
+Create forms with multiple input fields and have your users pay before submission. Form submission results are available on your dashaboard.
 
 == Description ==
 
-This is a Paystack plugin that provides Payment forms for Wordpress.
+With this plugin you can create forms with multiple input fields and have your users pay before submission. It also works with recurring payments.
 
-Paystack is on a mission to deliver a safe and convenient payment experience for customers and merchants. Paystack provide Nigerian merchants with the tools and services needed to accept online payments from local and international customers using MasterCard, Visa and Verve Cards.
+= Forms with recurring payments =
 
-To signup for a Paystack Merchant account, visit [https://dashboard.paystack.co](https://dashboard.paystack.co).
+To create a form so your users can make recurring payments for a standard fee.
 
-Payment forms for Paystack  allows you to create payment forms for numerous purposes. You can see the form and payment data from your dashboard.
+*  Create your plan on the [official paystack dashboard](https://dashboard.paystack.com)
+*  Copy the plan code and paste it on the form plan code settings
 
-With this Payment forms for Paystack, you will be able to accept the following payment methods on a recurring basis:
+= For Churches and NGO's =
 
-* __MasterCard__
-* __Visa__
-* __Verve__
-= Note =
+Setting the form payment amount to '0' allows the user to make a custom payment of any amount.
 
-This plugin is meant to be used by merchants in Nigeria.
+When you set the 'recur' option to 'optional' on the form settings, your donors/members will have the option of making a one-time payment or weekly,monthly or annually recurring payment.
+This can come in handy for weekly/monthly offerings & tithes or recurring donor donations.
 
 = Plugin Features =
 
@@ -49,12 +47,12 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 = Automatic Installation =
 *    Login to your WordPress Admin area
 *    Go to "Plugins > Add New" from the left hand menu
-*    In the search box type __Paystack Forms__
-*    From the search result you will see __Paystack Forms__ click on __Install Now__ to install the plugin
+*    In the search box type __Payment forms for Paystack__
+*    From the search result you will see __Payment forms for Paystack__ click on __Install Now__ to install the plugin
 *    A popup window will ask you to confirm your wish to install the Plugin.
 *    After installation, activate the plugin.
 *    Open the settings page for Paystack Forms
-*    Configure your __Paystack Forms__ settings as instructed on the page.
+*    Configure your __Paystack Forms__ api key settings as instructed on the page.
 
 = Manual Installation =
 1.  Download the plugin zip file
