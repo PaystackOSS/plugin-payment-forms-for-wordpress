@@ -989,7 +989,7 @@ function kkd_pff_paystack_submit_action() {
 						}else{
 							//Create Plan
 							$body = array(
-								'name'						=> $currency.$originalamount.' ['.$currency.$amount.'] - '.$interval,
+								'name'						=> $currency.number_format($originalamount).' ['.$currency.number_format($amount).'] - '.$interval,
 								'amount'					=> $koboamount,
 								'interval'		=> $interval
 							);
