@@ -8,7 +8,7 @@ Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create forms with multiple input fields and have your users pay before submission. Form submission results are available on your dashaboard.
+Create forms with multiple input fields and have your users pay before submission. Form submission results are available on your dashboard.
 
 == Description ==
 
@@ -26,6 +26,7 @@ To create a form so your users can make recurring payments for a standard fee.
 Setting the form payment amount to '0' allows the user to make a custom payment of any amount.
 
 When you set the 'recur' option to 'optional' on the form settings, your donors/members will have the option of making a one-time payment or weekly,monthly or annually recurring payment.
+
 This can come in handy for weekly/monthly offerings & tithes or recurring donor donations.
 
 = Plugin Features =
