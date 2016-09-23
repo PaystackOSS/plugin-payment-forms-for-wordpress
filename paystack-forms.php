@@ -119,6 +119,24 @@ function kkd_pff_paystack_shortcode_button_script(){
 					function insertInput(){
 							QTags.insertContent('[input name="File Name"]');
 					}
+          QTags.addButton(
+              "ngs_shortcode",
+              "Insert Nigerian States",
+              insertSelectStates
+          );
+          function insertSelectStates(){
+              QTags.insertContent('[select name="State" options="Abia,Adamawa,Akwa Ibom,Anambra,Bauchi,Bayelsa,Benue,Borno,Cross River,Delta,Ebonyi,Edo,Ekiti,Enugu,FCT,Gombe,Imo,Jigawa,Kaduna,Kano,Katsina,Kebbi,Kogi,Kwara,Lagos,Nasarawa,Niger,Ogun,Ondo,Osun,Oyo,Plateau,Rivers,Sokoto,Taraba,Yobe,Zamfara"]');
+          }
+          QTags.addButton(
+              "ctys_shortcode",
+              "Insert All Countries",
+              insertSelectCountries
+          );
+          function insertSelectCountries(){
+              QTags.insertContent('[select  name="country" options="Algeria,Angola,Benin,Botswana,Burkina Faso,Burundi,Cabo Verde,Cameroon,Central African Republic (CAR),Chad,Comoros,Democratic Republic of the Congo,Republic of the Congo,Cote d\'Ivoire,Djibouti,Egypt,Equatorial Guinea,Eritrea,Ethiopia,Gabon,Gambia,Ghana,Guinea,Guinea-Bissau,Kenya,  Lesotho,Liberia,Libya,Madagascar,Malawi,Mali,Mauritania,Mauritius,Morocco,Mozambique,Namibia,Niger,Nigeria,   Rwanda,Sao Tome and Principe,Senegal,Seychelles,Sierra Leone,Somalia,South Africa,South Sudan,Sudan,   Swaziland,Tanzania,Togo,Tunisia,Uganda,Zambia,Zimbabwe"] ');
+          }
+          
+          //
       </script>
   <?php
     }
