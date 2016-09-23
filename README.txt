@@ -77,6 +77,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.1.0 =
+*  Added quantity option for minimal selling of items in quantity.
 = 1.0.9 =
 *  Updated to use Paystack plans filter before plan creation.
 = 1.0.8 =

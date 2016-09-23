@@ -666,20 +666,20 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			echo '</div>
 			 </div>';
-			 if ($usequantity == 'yes') {
+			 if ($recur == 'no' && $usequantity == 'yes') {
 				echo '<div class="span12 unit">
-			 				 <label class="label">Quantity</label>
-			 				 <div class="select">
-			 				 	<input type="hidden" value="'.$amount.'" id="pf-qamount"/>
-			 					 <select class="form-control" id="pf-quantity" name="pf-quantity" >';
-			 					 $max = $quantity+1;
-			 					 for ($i=1; $i < $max; $i++) { 
-			 					 	echo  ' <option value="'.$i.'">'.$i.'</ption>';
-			 					 }
-			 					echo  '</select>
-			 					 <i></i>
-			 				 </div>
-			 			 </div>';
+ 				 <label class="label">Quantity</label>
+ 				 <div class="select">
+ 				 	<input type="hidden" value="'.$amount.'" id="pf-qamount"/>
+ 					 <select class="form-control" id="pf-quantity" name="pf-quantity" >';
+ 					 $max = $quantity+1;
+ 					 for ($i=1; $i < $max; $i++) { 
+ 					 	echo  ' <option value="'.$i.'">'.$i.'</ption>';
+ 					 }
+ 					echo  '</select>
+ 					 <i></i>
+ 				 </div>
+ 			 </div>';
 			}
 
 			if ($recur == 'optional') {
@@ -924,6 +924,12 @@ function kkd_pff_paystack_submit_action() {
 		if ($usequantity == 'no') {
 			$amount = (int)str_replace(' ', '', $formamount);
 		}else{
+			$fixedmetadata[] = [
+				'display_name' => 'Unit Price',
+				'variable_name' => 'Unit_Price',
+				'type' => 'text',
+				'value' => $currency.number_format($formamount)
+			];
 			$quantity = $_POST["pf-quantity"];
 			$unitamount = (int)str_replace(' ', '', $formamount);
 			$amount = $quantity*$unitamount;
@@ -1210,7 +1216,7 @@ function kkd_pff_paystack_confirm_payment() {
 									$unitamount = (int)str_replace(' ', '', $amount);
 									$amount = $quantity*$unitamount;
 								}
-								
+
 
 								if ($txncharge == 'customer') {
 									$percent = (1.55/100)*$amount;
