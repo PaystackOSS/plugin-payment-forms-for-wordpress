@@ -581,16 +581,18 @@ function kkd_pff_paystack_form_shortcode($atts) {
   if ($id != 0) {
      $obj = get_post($id);
 		 if ($obj->post_type == 'paystack_form') {
-			  $amount = get_post_meta($id,'_amount',true);
-			  $thankyou = get_post_meta($id,'_successmsg',true);
+			$amount = get_post_meta($id,'_amount',true);
+		    $thankyou = get_post_meta($id,'_successmsg',true);
 			  $paybtn = get_post_meta($id,'_paybtn',true);
 			  $loggedin = get_post_meta($id,'_loggedin',true);
 			  $txncharge = get_post_meta($id,'_txncharge',true);
 			  $currency = get_post_meta($id,'_currency',true);
-			  $recur = get_post_meta($id,'_recur',true);
-				$recurplan = get_post_meta($id,'_recurplan',true);
-				$showbtn = true;
-				$planerrorcode = 'Input Correct Recurring Plan Code';
+			$recur = get_post_meta($id,'_recur',true);
+			$recurplan = get_post_meta($id,'_recurplan',true);
+			$usequantity = get_post_meta($id,'_usequantity',true);
+			$quantity = get_post_meta($id,'_quantity',true);
+			$showbtn = true;
+			$planerrorcode = 'Input Correct Recurring Plan Code';
 			  if ($recur == 'plan') {
 					if ($recurplan == '' || $recurplan == null) {
 						$showbtn = false;
@@ -664,6 +666,21 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			echo '</div>
 			 </div>';
+			 if ($usequantity == 'yes') {
+				echo '<div class="span12 unit">
+			 				 <label class="label">Quantity</label>
+			 				 <div class="select">
+			 				 	<input type="hidden" value="'.$amount.'" id="pf-qamount"/>
+			 					 <select class="form-control" id="pf-quantity" name="pf-quantity" >';
+			 					 $max = $quantity+1;
+			 					 for ($i=1; $i < $max; $i++) { 
+			 					 	echo  ' <option value="'.$i.'">'.$i.'</ption>';
+			 					 }
+			 					echo  '</select>
+			 					 <i></i>
+			 				 </div>
+			 			 </div>';
+			}
 
 			if ($recur == 'optional') {
 				echo '<div class="span12 unit">
@@ -901,8 +918,16 @@ function kkd_pff_paystack_submit_action() {
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
 	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
 	$originalamount = $amount;
+	$quantity = 1;
+	$usequantity = get_post_meta($_POST["pf-id"],'_usequantity',true);
 	if(($recur == 'no') && ($formamount != 0)){
-		$amount = (int)str_replace(' ', '', $formamount);
+		if ($usequantity == 'no') {
+			$amount = (int)str_replace(' ', '', $formamount);
+		}else{
+			$quantity = $_POST["pf-quantity"];
+			$unitamount = (int)str_replace(' ', '', $formamount);
+			$amount = $quantity*$unitamount;
+		}
 	}
 	if ($txncharge == 'customer') {
 		$percent = (1.55/100)*$amount;
@@ -1065,6 +1090,7 @@ function kkd_pff_paystack_submit_action() {
      'result' => 'success',
 		 'code' => $insert['txn_code'],
      'plan' => $insert['plan'],
+     'quantity' => $quantity,
 		 'email' => $insert['email'],
      'name' => $fullname,
    	 'total' => $insert['amount']*100,
@@ -1096,6 +1122,13 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata){
 			$custom_fields[] = [
 				'display_name' => 'Plan Interval',
 				'variable_name' => 'Plan Interval',
+	      'type' => 'text',
+	      'value' => $value
+			];
+		}elseif ($key == 'pf-quantity') {
+			$custom_fields[] = [
+				'display_name' => 'Plan Quantity',
+				'variable_name' => 'Plan Quantity',
 	      'type' => 'text',
 	      'value' => $value
 			];
@@ -1169,6 +1202,16 @@ function kkd_pff_paystack_confirm_payment() {
 								$result = "success";
 								// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
 							}else{
+								$usequantity = get_post_meta($payment_array->post_id,'_usequantity',true);
+								if ($usequantity == 'no') {
+									$amount = (int)str_replace(' ', '', $amount);
+								}else{
+									$quantity = $_POST["quantity"];
+									$unitamount = (int)str_replace(' ', '', $amount);
+									$amount = $quantity*$unitamount;
+								}
+								
+
 								if ($txncharge == 'customer') {
 									$percent = (1.55/100)*$amount;
 									if ($percent > 2000) {

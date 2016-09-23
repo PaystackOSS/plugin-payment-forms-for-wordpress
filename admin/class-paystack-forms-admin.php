@@ -258,57 +258,58 @@ class Kkd_Pff_Paystack_Admin {
 			add_meta_box('kkd_pff_paystack_editor_add_form_data', 'Extra Form Description', 'kkd_pff_paystack_editor_add_form_data', 'paystack_form', 'normal', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_recur_data', 'Recurring Payment', 'kkd_pff_paystack_editor_add_recur_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_email_data', 'Email Receipt Settings', 'kkd_pff_paystack_editor_add_email_data', 'paystack_form', 'normal', 'default');
-
+			add_meta_box('kkd_pff_paystack_editor_add_quantity_data', 'Quantity Payment', 'kkd_pff_paystack_editor_add_quantity_data', 'paystack_form', 'side', 'default');
+			
 	  }
 
 
 	  function kkd_pff_paystack_editor_add_form_data() {
-	  	global $post;
+		  	global $post;
 
-	  	// Noncename needed to verify where the data originated
-	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
-	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+		  	// Noncename needed to verify where the data originated
+		  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+		  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
 
-	  	// Get the location data if its already been entered
-			$amount = get_post_meta($post->ID, '_amount', true);
-	  	$paybtn = get_post_meta($post->ID, '_paybtn', true);
-			$successmsg = get_post_meta($post->ID, '_successmsg', true);
-			$txncharge = get_post_meta($post->ID, '_txncharge', true);
-			$loggedin = get_post_meta($post->ID, '_loggedin', true);
-			$currency = get_post_meta($post->ID, '_currency', true);
-	    $filelimit = get_post_meta($post->ID, '_filelimit', true);
+		  	// Get the location data if its already been entered
+				$amount = get_post_meta($post->ID, '_amount', true);
+		  	$paybtn = get_post_meta($post->ID, '_paybtn', true);
+				$successmsg = get_post_meta($post->ID, '_successmsg', true);
+				$txncharge = get_post_meta($post->ID, '_txncharge', true);
+				$loggedin = get_post_meta($post->ID, '_loggedin', true);
+				$currency = get_post_meta($post->ID, '_currency', true);
+		    $filelimit = get_post_meta($post->ID, '_filelimit', true);
 
-			if ($amount == "") {$amount = 0;}
-			if ($filelimit == "") {$filelimit = 2;}
-			if ($paybtn == "") {$paybtn = 'Pay';}
-			if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
-			if ($currency == "") {$currency = 'NGN';}
-			if ($txncharge == "") {$txncharge = 'merchant';}
-	  	// Echo out the field
-			echo '<p>Currency:</p>';
-	  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
-			<small>We currently support only payments in Naira(NGN).</small>';
-			echo '<p>Amount to be paid(Set 0 for customer input):</p>';
-	  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
-			echo '<p>Pay button Description:</p>';
-	  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
-			echo '<p>Transaction Charges:</p>';
-			echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-							<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-							<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added) - 1.55%+ NGN100 if above NGN2,500 </option>
-						</select>';
-			echo '<p>User logged In:</p>';
-			echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
-							<option value="no" '.kkd_pff_paystack_txncheck('no',$loggedin).'>User must not be logged in</option>
-							<option value="yes"'.kkd_pff_paystack_txncheck('yes',$loggedin).'>User must be logged In</option>
-						</select>';
-	  	echo '<p>Success Message after Payment</p>';
-	    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
-			echo '<p>File Upload Limit(MB):</p>';
-	  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
+				if ($amount == "") {$amount = 0;}
+				if ($filelimit == "") {$filelimit = 2;}
+				if ($paybtn == "") {$paybtn = 'Pay';}
+				if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
+				if ($currency == "") {$currency = 'NGN';}
+				if ($txncharge == "") {$txncharge = 'merchant';}
+		  	// Echo out the field
+				echo '<p>Currency:</p>';
+		  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
+				<small>We currently support only payments in Naira(NGN).</small>';
+				echo '<p>Amount to be paid(Set 0 for customer input):</p>';
+		  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
+				echo '<p>Pay button Description:</p>';
+		  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
+				echo '<p>Transaction Charges:</p>';
+				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
+								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
+								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added) - 1.55%+ NGN100 if above NGN2,500 </option>
+							</select>';
+				echo '<p>User logged In:</p>';
+				echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
+								<option value="no" '.kkd_pff_paystack_txncheck('no',$loggedin).'>User must not be logged in</option>
+								<option value="yes"'.kkd_pff_paystack_txncheck('yes',$loggedin).'>User must be logged In</option>
+							</select>';
+		  	echo '<p>Success Message after Payment</p>';
+		    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
+				echo '<p>File Upload Limit(MB):</p>';
+		  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
 
 	  }
-		function kkd_pff_paystack_editor_add_email_data() {
+	function kkd_pff_paystack_editor_add_email_data() {
 	  	global $post;
 
 	  	// Noncename needed to verify where the data originated
@@ -339,7 +340,7 @@ class Kkd_Pff_Paystack_Admin {
 	    echo '<textarea rows="6"  name="_message"  class="widefat" >'.$message.'</textarea>';
 
 	  }
-		function kkd_pff_paystack_editor_add_recur_data() {
+	function kkd_pff_paystack_editor_add_recur_data() {
 	  	global $post;
 
 	  	// Noncename needed to verify where the data originated
@@ -363,8 +364,32 @@ class Kkd_Pff_Paystack_Admin {
 	  	echo '<input type="text" name="_recurplan" value="' . $recurplan  . '" class="widefat" />
 				<small>Plan amount must match amount on extra form description.</small>';
 
-	  }
-		function kkd_pff_paystack_save_data($post_id, $post) {
+	}
+	function kkd_pff_paystack_editor_add_quantity_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$usequantity = get_post_meta($post->ID, '_usequantity', true);
+	  	$quantity = get_post_meta($post->ID, '_quantity', true);
+
+			if ($usequantity == "") {$usequantity = 'no';}
+			if ($quantity == "") {$quantity = '10';}
+			// Echo out the field
+			echo '<small>Allow your users pay in multiple quantity</small><p>Quantity Payment:</p>';
+			echo '<select class="form-control" name="_usequantity" style="width:100%;">
+							<option value="no" '.kkd_pff_paystack_txncheck('no',$usequantity).'>No</option>
+							<option value="yes" '.kkd_pff_paystack_txncheck('yes',$usequantity).'>Yes</option>
+						</select>';
+			echo '<p>Paystack Recur Plan code:</p>';
+	  	echo '<input type="text" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
+				<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
+
+	}
+	function kkd_pff_paystack_save_data($post_id, $post) {
 
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
 			return $post->ID;
@@ -390,6 +415,8 @@ class Kkd_Pff_Paystack_Admin {
 			///
 			$form_meta['_recur'] = $_POST['_recur'];
 			$form_meta['_recurplan'] = $_POST['_recurplan'];
+			$form_meta['_usequantity'] = $_POST['_usequantity'];
+			$form_meta['_quantity'] = $_POST['_quantity'];
 
 			// Add values of $form_meta as custom fields
 

@@ -79,6 +79,15 @@
 		           }
 		       }
 		   });
+			 $('#pf-quantity').on('change', function() {
+			 	var unit = $('#pf-qamount').val();
+			 	var quant = this.value;
+			 	var newvalue = unit*quant;
+			 	$('#pf-amount').val(newvalue);
+			 	calculateFees();
+
+			  // alert( this.value ); // or $(this).val()
+			});
 			 	function validateEmail(email) {
 				  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 				  return re.test(email);
@@ -133,6 +142,7 @@
 								var names = data.name.split(' ');
 								var firstName = names[0] || "";
 								var lastName = names[1] || "";
+								var quantity =data.quantity;
 								// console.log(firstName+ " - "+lastName);
 								if (data.plan == 'none') {
 									var handler = PaystackPop.setup({
@@ -145,7 +155,7 @@
 					 					metadata: {'custom_fields': data.custom_fields},
 					 					callback: function(response){
 					 						$.blockUI({ message: 'Please wait...' });
-					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function(newdata) {
+					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref,'quantity':quantity}, function(newdata) {
 					 									data = JSON.parse(newdata);
 					 									if (data.result == 'success'){
 					 										$('.paystack-form')[0].reset();
