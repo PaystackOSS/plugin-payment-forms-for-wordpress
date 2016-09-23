@@ -379,13 +379,13 @@ class Kkd_Pff_Paystack_Admin {
 			if ($usequantity == "") {$usequantity = 'no';}
 			if ($quantity == "") {$quantity = '10';}
 			// Echo out the field
-			echo '<small>Allow your users pay in multiple quantity</small><p>Quantity Payment:</p>';
+			echo '<small>Allow your users pay in multiple quantity</small><p>Quantified Payment:</p>';
 			echo '<select class="form-control" name="_usequantity" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no',$usequantity).'>No</option>
 							<option value="yes" '.kkd_pff_paystack_txncheck('yes',$usequantity).'>Yes</option>
 						</select>';
-			echo '<p>Paystack Recur Plan code:</p>';
-	  	echo '<input type="text" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
+			echo '<p>Max payable quantity:</p>';
+	  	echo '<input type="number" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
 				<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
 
 	}
