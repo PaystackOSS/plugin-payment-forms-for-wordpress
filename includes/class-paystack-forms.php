@@ -1,7 +1,7 @@
 <?php
 
 
-class Paystack_Forms {
+class Kkd_Pff_Paystack {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -42,8 +42,8 @@ class Paystack_Forms {
 	 */
 	public function __construct() {
 
-		$this->plugin_name = 'paystack-forms';
-		$this->version = '1.0.0';
+		$this->plugin_name = 'pff-paystack';
+		$this->version = '1.0.4';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -145,7 +145,7 @@ function add_tinymce_toolbar_button( $buttons ) {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-paystack-forms-public.php';
 
-		$this->loader = new Paystack_Forms_Loader();
+		$this->loader = new Kkd_Pff_Paystack_Loader();
 
 	}
 
@@ -160,7 +160,7 @@ function add_tinymce_toolbar_button( $buttons ) {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Paystack_Forms_i18n();
+		$plugin_i18n = new Kkd_Pff_Paystack_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -175,7 +175,7 @@ function add_tinymce_toolbar_button( $buttons ) {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Paystack_Forms_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Kkd_Pff_Paystack_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -191,7 +191,7 @@ function add_tinymce_toolbar_button( $buttons ) {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Paystack_Forms_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Kkd_Pff_Paystack_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );

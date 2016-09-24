@@ -1,7 +1,7 @@
 <?php
 
 
-class Paystack_Forms_Deactivator {
+class Kkd_Pff_Paystack_Deactivator {
 
 	/**
 	 * Short Description. (use period)

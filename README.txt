@@ -1,34 +1,33 @@
-=== Paystack Forms ===
+=== Payment forms for Paystack ===
 Contributors: kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
-Tested up to: 4.6
-Stable tag: 1.0.0
+Tested up to: 4.6.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Paystack forms allows you create forms that will be used to bill clients for goods and services.
-
+Create forms with multiple input fields and have your users pay before submission. Form submission results are available on your dashboard.
 
 == Description ==
 
-This is a Paystack plugin that provides Payment forms for Wordpress.
+With this plugin you can create forms with multiple input fields and have your users pay before submission. It also works with recurring payments.
 
-Paystack is on a mission to deliver a safe and convenient payment experience for customers and merchants. Paystack provide Nigerian merchants with the tools and services needed to accept online payments from local and international customers using MasterCard, Visa and Verve Cards.
+= Forms with recurring payments =
 
-To signup for a Paystack Merchant account, visit [https://dashboard.paystack.co](https://dashboard.paystack.co).
+To create a form so your users can make recurring payments for a standard fee.
 
-Paystack forms allows you to create payment forms for numerous purposes. You can see the form and payment data from your dashboard.
+*  Create your plan on the [official paystack dashboard](https://dashboard.paystack.com)
+*  Copy the plan code and paste it on the form plan code settings
 
-With this Paystack Forms, you will be able to accept the following payment methods on a recurring basis:
+= For Churches and NGO's =
 
-* __MasterCard__
-* __Visa__
+Setting the form payment amount to '0' allows the user to make a custom payment of any amount.
 
-= Note =
+When you set the 'recur' option to 'optional' on the form settings, your donors/members will have the option of making a one-time payment or weekly,monthly or annually recurring payment.
 
-This plugin is meant to be used by merchants in Nigeria.
+This can come in handy for weekly/monthly offerings & tithes or recurring donor donations.
 
 = Plugin Features =
 
@@ -49,12 +48,12 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 = Automatic Installation =
 *    Login to your WordPress Admin area
 *    Go to "Plugins > Add New" from the left hand menu
-*    In the search box type __Paystack Forms__
-*    From the search result you will see __Paystack Forms__ click on __Install Now__ to install the plugin
+*    In the search box type __Payment forms for Paystack__
+*    From the search result you will see __Payment forms for Paystack__ click on __Install Now__ to install the plugin
 *    A popup window will ask you to confirm your wish to install the Plugin.
 *    After installation, activate the plugin.
 *    Open the settings page for Paystack Forms
-*    Configure your __Paystack Forms__ settings as instructed on the page.
+*    Configure your __Paystack Forms__ api key settings as instructed on the page.
 
 = Manual Installation =
 1.  Download the plugin zip file
@@ -78,7 +77,28 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
-
+= 1.1.1 =
+*  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
+= 1.1.0 =
+*  Added quantity option for minimal selling of items in quantity.
+= 1.0.9 =
+*  Updated to use Paystack plans filter before plan creation.
+= 1.0.8 =
+*  Fixed DB Schema on Update.
+= 1.0.7 =
+*   Added Transfer of transaction charges to the customer.
+= 1.0.6 =
+*   Fixed optional plans.
+= 1.0.5 =
+*   Bug Fixes to processes.
+= 1.0.4 =
+*   Recurring Payment Added with Design overhaul.
+= 1.0.3 =
+*   Invoice and Receipt Emails, with ability to disable them.
+= 1.0.2 =
+*   Added SSL suport for loading scripts.
+= 1.0.1 =
+*   New input file shortcode. For frontend file upload.
 = 1.0.0 =
 *   First release
 
