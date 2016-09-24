@@ -591,6 +591,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			$recurplan = get_post_meta($id,'_recurplan',true);
 			$usequantity = get_post_meta($id,'_usequantity',true);
 			$quantity = get_post_meta($id,'_quantity',true);
+			$useagreement = get_post_meta($id,'_useagreement',true);
+			$agreementlink = get_post_meta($id,'_agreementlink',true);
 			$showbtn = true;
 			$planerrorcode = 'Input Correct Recurring Plan Code';
 			  if ($recur == 'plan') {
@@ -714,10 +716,17 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
 			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
-
-		  //  echo '</form>';
+			if ($useagreement == 'yes'){
+				echo '<div class="span12 unit">
+						<label class="checkbox">
+							<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
+							<i id="pf-agreementicon" ></i>
+							Accept terms <a target="_blank" href="'.$agreementlink.'">Link </a>
+						</label>
+					</div><br>';
+			}
 			echo '<div class="span12 unit">
-			<small><span style="color: red;">*</span> are compulsory</small><br />
+						<small><span style="color: red;">*</span> are compulsory</small><br />
 						<img src="'. plugins_url( '../images/logos@2x.png' , __FILE__ ) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
 
 							<button type="reset" class="secondary-btn">Reset</button>';
@@ -790,6 +799,48 @@ function kkd_pff_paystack_select_shortcode($atts) {
   return $code;
 }
 add_shortcode('select', 'kkd_pff_paystack_select_shortcode');
+function kkd_pff_paystack_radio_shortcode($atts) {
+	extract(shortcode_atts(array(
+		'name' => 'Title',
+		'options' => '',
+    'required' => '0',
+ 	), $atts));
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="inline-group">
+		';
+	// if ($required == 'required') {
+	// 	 $code.= ' required="required" ';
+	// }
+	// $code.=">";
+
+	$soptions = explode(',', $options);
+	if (count($soptions) > 0) {
+		foreach ($soptions as $key => $option) {
+			// $code.= '<option  value="'.$option.'" >'.$option.'</option>';
+			$code.= '<label class="radio">
+				<input type="radio" name="'.$name.'" value="'.$option.'"';
+				if ($key == 0) {
+					$code.= ' checked';
+					if ($required == 'required') {
+				$code.= ' required="required"';
+			}
+				}
+			
+			$code.= '/>
+				<i></i>
+				'.$option.'
+			</label>';
+		}
+	}
+	$code.= '</div></div>';
+  return $code;
+}
+add_shortcode('radio', 'kkd_pff_paystack_radio_shortcode');
 function kkd_pff_paystack_textarea_shortcode($atts) {
 	extract(shortcode_atts(array(
       'name' => 'Title',

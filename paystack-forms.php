@@ -109,7 +109,15 @@ function kkd_pff_paystack_shortcode_button_script(){
               insertSelectb
           );
 					function insertSelectb(){
-              QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 2"]');
+              QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 3"]');
+          }
+          QTags.addButton(
+              "r_shortcode",
+              "Insert Radio Options",
+              insertRadiob
+          );
+          function insertRadiob(){
+              QTags.insertContent('[radio name="Text Title" options="option 1,option 2,option 3"]');
           }
 					QTags.addButton(
 							"i_shortcode",

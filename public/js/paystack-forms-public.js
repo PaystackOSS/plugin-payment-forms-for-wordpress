@@ -94,6 +94,8 @@
 				}
 		 	$('.paystack-form').on('submit', function(e) {
 				var stop = false;
+				$("#pf-agreementicon").removeClass('rerror');
+					
 				$(this).find("input,select, textarea").each(function() {
 						$(this).removeClass('rerror');//.css({ "border-color":"#d1d1d1" });
 				});
@@ -109,10 +111,14 @@
 					stop = true;
 				}
 				$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
-            $(this).addClass('rerror');///.css({ "border-color":"red" });
-						stop = true;
-
+            		$(this).addClass('rerror');
+            		
+					stop = true;
 				});
+				if($("#pf-agreement").prop('checked') == false){
+					$("#pf-agreementicon").addClass('rerror');
+					stop = true;
+				}
 				if (stop) {
 					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
 					return false;

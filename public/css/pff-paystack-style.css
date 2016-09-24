@@ -1785,4 +1785,7 @@
 .j-forms .input .rerror {
      border-color: red  !important;
 }
+.j-forms i.rerror {
+     border-color: red  !important;
+}
 /*#3676c8*/

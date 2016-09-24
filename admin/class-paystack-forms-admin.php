@@ -259,6 +259,7 @@ class Kkd_Pff_Paystack_Admin {
 			add_meta_box('kkd_pff_paystack_editor_add_recur_data', 'Recurring Payment', 'kkd_pff_paystack_editor_add_recur_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_email_data', 'Email Receipt Settings', 'kkd_pff_paystack_editor_add_email_data', 'paystack_form', 'normal', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_quantity_data', 'Quantity Payment', 'kkd_pff_paystack_editor_add_quantity_data', 'paystack_form', 'side', 'default');
+			add_meta_box('kkd_pff_paystack_editor_add_agreement_data', 'Agreement checkbox', 'kkd_pff_paystack_editor_add_agreement_data', 'paystack_form', 'side', 'default');
 			
 	  }
 
@@ -389,6 +390,29 @@ class Kkd_Pff_Paystack_Admin {
 				<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
 
 	}
+	function kkd_pff_paystack_editor_add_agreement_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$useagreement = get_post_meta($post->ID, '_useagreement', true);
+	  	$agreementlink = get_post_meta($post->ID, '_agreementlink', true);
+
+			if ($useagreement == "") {$useagreement = 'no';}
+			if ($agreementlink  == "") {$agreementlink = '';}
+			// Echo out the field
+			echo '<small>Allow your users pay in multiple quantity</small><p>Use agreement checkbox:</p>';
+			echo '<select class="form-control" name="_useagreement" style="width:100%;">
+							<option value="no" '.kkd_pff_paystack_txncheck('no',$useagreement).'>No</option>
+							<option value="yes" '.kkd_pff_paystack_txncheck('yes',$useagreement).'>Yes</option>
+						</select>';
+			echo '<p>Agreement Page Link:</p>';
+	  	echo '<input type="text" name="_agreementlink" value="' . $agreementlink  . '" class="widefat" />';
+
+	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
@@ -417,6 +441,9 @@ class Kkd_Pff_Paystack_Admin {
 			$form_meta['_recurplan'] = $_POST['_recurplan'];
 			$form_meta['_usequantity'] = $_POST['_usequantity'];
 			$form_meta['_quantity'] = $_POST['_quantity'];
+
+			$form_meta['_useagreement'] = $_POST['_useagreement'];
+			$form_meta['_agreementlink'] = $_POST['_agreementlink'];
 
 			// Add values of $form_meta as custom fields
 
@@ -467,6 +494,7 @@ function kkd_pff_paystack_payment_submissions(){
 		 $loggedin = get_post_meta($id,'_loggedin',true);
 		 $txncharge = get_post_meta($id,'_txncharge',true);
 
+		 echo "<title>".$obj->post_title." Payments </title>";
 		 echo "<h1>".$obj->post_title." Payments</h1>";
 		 $exampleListTable = new Kkd_Pff_Paystack_Payments_List_Table();
 		 $exampleListTable->prepare_items();
@@ -483,17 +511,17 @@ class Kkd_Pff_Paystack_Wp_List_Table{
     public function __construct(){
         add_action( 'admin_menu', array($this, 'add_menu_example_list_table_page' ));
     }
-		public function add_menu_example_list_table_page(){
+	public function add_menu_example_list_table_page(){
         add_menu_page( '', '', 'manage_options', 'example-list-table.php', array($this, 'list_table_page') );
     }
-		public function list_table_page(){
+	public function list_table_page(){
         $exampleListTable = new Example_List_Table();
 				$exampleListTable->prepare_items($data);
         ?>
-					<div class="wrap">
-              <div id="icon-users" class="icon32"></div>
-              <?php $exampleListTable->display(); ?>
-          </div>
+		<div class="wrap">
+            <div id="icon-users" class="icon32"></div>
+            <?php $exampleListTable->display(); ?>
+         </div>
         <?php
     }
 }
@@ -508,9 +536,9 @@ function format_data($data){
 	if (array_key_exists("0", $new)) {
 		foreach ($new as $key => $item) {
 			if ($item->type == 'text') {
-				$text.= '<b>'.$item->display_name."</b> :".$item->value."<br />";
+				$text.= '<b>'.$item->display_name.": </b> ".$item->value."<br />";
 			}else{
-				$text.= '<b>'.$item->display_name."</b> : <a target='_blank' href='".$item->value."'>link</a><br />";
+				$text.= '<b>'.$item->display_name.": </b>  <a target='_blank' href='".$item->value."'>link</a><br />";
 			}
 
 		}
@@ -518,7 +546,7 @@ function format_data($data){
 		$text = '';
 		if (count($new) > 0) {
 			foreach ($new as $key => $item) {
-				$text.= '<b>'.$key."</b> :".$item."<br />";
+				$text.= '<b>'.$key.": </b> ".$item."<br />";
 			}
 		}
 	}
