@@ -77,6 +77,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 1.1.1 =
+*  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
 = 1.1.0 =
 *  Added quantity option for minimal selling of items in quantity.
 = 1.0.9 =
