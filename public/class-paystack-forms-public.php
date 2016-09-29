@@ -1184,8 +1184,8 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata){
 			];
 		}elseif ($key == 'pf-quantity') {
 			$custom_fields[] = [
-				'display_name' => 'Plan Quantity',
-				'variable_name' => 'Plan Quantity',
+				'display_name' => 'Quantity',
+				'variable_name' => 'Quantity',
 	      'type' => 'text',
 	      'value' => $value
 			];

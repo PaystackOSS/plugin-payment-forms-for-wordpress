@@ -29,6 +29,13 @@ When you set the 'recur' option to 'optional' on the form settings, your donors/
 
 This can come in handy for weekly/monthly offerings & tithes or recurring donor donations.
 
+= For selling items =
+
+To create a form to allow your users buy or pay for value in quantity.
+
+*  Set quantified to be 'yes'.
+*  Set the max quantity a user can buy.
+
 = Plugin Features =
 
 *   __Accept payment__ via MasterCard and Visa Cards.

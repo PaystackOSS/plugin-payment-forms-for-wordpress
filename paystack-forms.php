@@ -154,6 +154,7 @@ function kkd_pff_paystack_invoice_url_rewrite(){
     global $wp_rewrite;
     $plugin_url = plugins_url( 'includes/paystack-invoice.php', __FILE__ );
 		$plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
-    $wp_rewrite->non_wp_rules['paystackinvoice.php$'] = $plugin_url;
+    $wp_rewrite->non_wp_rules['paystackinvoice$'] = $plugin_url;
+    $wp_rewrite->non_wp_rules['paystackinvoice/$'] = $plugin_url;
     file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );
 }
