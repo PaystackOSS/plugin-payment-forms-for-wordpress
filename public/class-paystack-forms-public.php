@@ -51,14 +51,15 @@ define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval((PAYSTACK_CROSSOVER_TOTAL*PAY
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval((PAYSTACK_LOCAL_CAP-PAYSTACK_ADDITIONAL_CHARGE)/PAYSTACK_PERCENTAGE));
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - PAYSTACK_LOCAL_CAP);
 
-function kkd_pff_paystack_add_paystack_charge($amountinkobo)
+function kkd_pff_paystack_add_paystack_charge($amount)
 {
+    $amountinkobo = $amount * 100;
     if ($amountinkobo > PAYSTACK_FLATLINE_AMOUNT)
-        return $amountinkobo + PAYSTACK_LOCAL_CAP;
+        return ($amountinkobo + PAYSTACK_LOCAL_CAP)/100;
     elseif ($amountinkobo > PAYSTACK_CROSSOVER_AMOUNT)
-        return intval(($amountinkobo + PAYSTACK_ADDITIONAL_CHARGE) / PAYSTACK_CHARGE_DIVIDER);
+        return (intval(($amountinkobo + PAYSTACK_ADDITIONAL_CHARGE) / PAYSTACK_CHARGE_DIVIDER))/100;
     else
-        return intval($amountinkobo / PAYSTACK_CHARGE_DIVIDER);
+        return (intval($amountinkobo / PAYSTACK_CHARGE_DIVIDER))/100;
 }
 
 add_filter ("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
