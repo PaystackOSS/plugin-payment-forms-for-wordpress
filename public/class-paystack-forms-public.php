@@ -40,6 +40,27 @@ class Kkd_Pff_Paystack_Public {
 	}
 
 }
+
+define('KKD_PFF_PAYSTACK_PERCENTAGE', 0.015);
+define('KKD_PFF_PAYSTACK_CROSSOVER_TOTAL', 250000);
+define('KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE', 10000);
+define('KKD_PFF_PAYSTACK_LOCAL_CAP', 200000);
+
+define('KKD_PFF_PAYSTACK_CHARGE_DIVIDER', floatval(1-PAYSTACK_PERCENTAGE));
+define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval((PAYSTACK_CROSSOVER_TOTAL*PAYSTACK_CHARGE_DIVIDER)-PAYSTACK_ADDITIONAL_CHARGE));
+define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval((PAYSTACK_LOCAL_CAP-PAYSTACK_ADDITIONAL_CHARGE)/PAYSTACK_PERCENTAGE));
+define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - PAYSTACK_LOCAL_CAP);
+
+function kkd_pff_paystack_add_paystack_charge($amountinkobo)
+{
+    if ($amountinkobo > PAYSTACK_FLATLINE_AMOUNT)
+        return $amountinkobo + PAYSTACK_LOCAL_CAP;
+    elseif ($amountinkobo > PAYSTACK_CROSSOVER_AMOUNT)
+        return intval(($amountinkobo + PAYSTACK_ADDITIONAL_CHARGE) / PAYSTACK_CHARGE_DIVIDER);
+    else
+        return intval($amountinkobo / PAYSTACK_CHARGE_DIVIDER);
+}
+
 add_filter ("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
 function kkd_pff_paystack_mail_content_type() {
 	return "text/html";
@@ -987,18 +1008,7 @@ function kkd_pff_paystack_submit_action() {
 		}
 	}
 	if ($txncharge == 'customer') {
-		$percent = (1.55/100)*$amount;
-		if ($percent > 2000) {
-			$newamount =  $amount + 2000;
-		}else{
-			if ($amount > 2500) {
-				$newamount =  $amount + $percent+100;
-			}else{
-				$newamount =  $amount + $percent;
-			}
-		}
-
-		$amount = $newamount;
+		$amount = kkd_pff_paystack_add_paystack_charge($amount);
 	}
 	$maxFileSize = $filelimit * 1024 * 1024;
 
@@ -1270,18 +1280,7 @@ function kkd_pff_paystack_confirm_payment() {
 
 
 								if ($txncharge == 'customer') {
-									$percent = (1.55/100)*$amount;
-									if ($percent > 2000) {
-										$newamount =  $amount + 2000;
-									}else{
-										if ($amount > 2500) {
-											$newamount =  $amount + $percent+100;
-										}else{
-											$newamount =  $amount + $percent;
-										}
-									}
-
-									$amount = $newamount;
+									$amount = kkd_pff_paystack_add_paystack_charge($amount);
 								}
 								if( $amount !=  $amount_paid ) {
 									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
