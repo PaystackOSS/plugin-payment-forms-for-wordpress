@@ -297,7 +297,7 @@ class Kkd_Pff_Paystack_Admin {
 				echo '<p>Transaction Charges:</p>';
 				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
 								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added) - 1.55%+ NGN100 if above NGN2,500 </option>
+								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Calculated Paystack Local Fee added) </option>
 							</select>';
 				echo '<p>User logged In:</p>';
 				echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
