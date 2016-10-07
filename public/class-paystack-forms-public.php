@@ -675,7 +675,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
  				 	<input type="hidden" value="'.$amount.'" id="pf-qamount"/>
  					 <select class="form-control" id="pf-quantity" name="pf-quantity" >';
  					 $max = $quantity+1;
- 					 for ($i=1; $i < $max; $i++) { 
+ 					 for ($i=1; $i < $max; $i++) {
  					 	echo  ' <option value="'.$i.'">'.$i.'</ption>';
  					 }
  					echo  '</select>
@@ -830,7 +830,7 @@ function kkd_pff_paystack_radio_shortcode($atts) {
 				$code.= ' required="required"';
 			}
 				}
-			
+
 			$code.= '/>
 				<i></i>
 				'.$option.'
@@ -941,6 +941,12 @@ function kkd_pff_paystack_submit_action() {
   	// Exit here, for not processing further because of the error
   	exit(json_encode($response));
   }
+
+	// Hookable location. Allows other plugins use a fresh submission before it is saved to the database.
+	// Such a plugin only needs do
+	// add_action( 'kkd_pff_paystack_before_save', 'function_to_use_posted_values' );
+	// somewhere in their code;
+  do_action( 'kkd_pff_paystack_before_save' );
 
   global $wpdb;
 	$code = kkd_pff_paystack_generate_code();
