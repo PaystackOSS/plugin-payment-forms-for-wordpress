@@ -67,7 +67,7 @@ function kkd_pff_paystack_mail_content_type() {
 	return "text/html";
 }
 add_filter ("wp_mail_from_name", "kkd_pff_paystack_mail_from_name");
-function kkd_pff_paystack_email_from_name() {
+function kkd_pff_paystack_mail_from_name() {
 	$name = get_option( 'blogname' );
 	return $name;
 }
@@ -777,6 +777,7 @@ function kkd_pff_paystack_text_shortcode($atts) {
 		'name' => 'Title',
     'required' => '0',
  	), $atts));
+  // pf-amount
 	$code = '<div class="span12 unit">
 		<label class="label">'.$name;
 		if ($required == 'required') {
