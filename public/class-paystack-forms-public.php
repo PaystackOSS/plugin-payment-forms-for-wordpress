@@ -35,7 +35,7 @@ class Kkd_Pff_Paystack_Public {
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
 		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
-		wp_localize_script( 'paystack_frontend', 'settings', ['key'=> $key]);
+		wp_localize_script( 'paystack_frontend', 'settings', array('key'=> $key));
 
 	}
 
@@ -262,7 +262,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	$heading = get_post_meta($id, '_heading', true);
 	$sitemessage = get_post_meta($id, '_message', true);
 
-	$email_subject =$subject;// "Payment Invoice for ".$currency.' '.number_format($amount);
+	$email_subject =$subject;
 
 		ob_start();
 	?>
@@ -282,29 +282,13 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</head>
 	<body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" style="margin:0;padding:0;min-width:100%;background-color:#fff">
 	<div class="email_body" style="padding:32px 6px;text-align:center;background-color:#fff">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="588" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="588" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="email_container" style="display:inline-block;width:100%;vertical-align:top;text-align:center;margin:0 auto;max-width:588px;font-size:0!important">
 	<table class="header" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 	<tbody>
 	<tr>
 	<td class="header_cell col-bottom-0" align="center" valign="top" style="padding:0;text-align:center;padding-bottom:16px;border-top:4px solid;border-bottom:0 solid;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
+	
 	</td>
 	</tr>
 	</tbody>
@@ -313,19 +297,9 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	<tbody>
 	<tr>
 	<td class="content_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px">
 	<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 	<tbody>
@@ -341,19 +315,9 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</tbody>
 	</table>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
+	
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
+	
 	</td>
 	</tr>
 	</tbody>
@@ -362,19 +326,9 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	<tbody>
 	<tr>
 	<td class="jumbotron_cell invoice_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fafafa;font-size:0!important">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="190" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:left">
 	<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 	<tbody>
@@ -424,12 +378,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</table>
 	</div>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
+	
 	</td>
 	</tr>
 	</tbody>
@@ -438,19 +387,9 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	<tbody>
 	<tr>
 	<td class="jumbotron_cell product_row" align="center" valign="top" style="padding:0 0 16px;text-align:center;background-color:#f2f2f5;border-left:4px solid;border-right:4px solid;border-top:1px solid;border-color:#d8dde4;font-size:0!important">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
+	
 	<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px">
 	<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 	<tbody>
@@ -463,19 +402,8 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</tbody>
 	</table>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
+	
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
 	</td>
 	</tr>
 	</tbody>
@@ -484,19 +412,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	<tbody>
 	<tr>
 	<td class="footer_cell" align="center" valign="top" style="padding:0;text-align:center;padding-bottom:16px;border-top:1px solid;border-bottom:4px solid;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="580" align="center" valign="top">
-	<![endif]-->
 	<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	<!--[if (gte mso 9)|(IE)]>
-	<table width="580" border="0" cellspacing="0" cellpadding="0" align="center" style="vertical-align:top">
-	<tbody>
-	<tr>
-	<td width="390" align="center" valign="top">
-	<![endif]-->
 	<div class="col-13 col-bottom-0" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:390px">
 	<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 	<tbody>
@@ -508,10 +424,6 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</tbody>
 	</table>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	<td width="190" align="center" valign="top">
-	<![endif]-->
 	<div class="col-1 col-bottom-0" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:190px">
 	<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 	<tbody>
@@ -522,30 +434,12 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 	</tbody>
 	</table>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
 	</td>
 	</tr>
 	</tbody>
 	</table>
 	</div>
-	<!--[if (gte mso 9)|(IE)]>
-	</td>
-	</tr>
-	</tbody>
-	</table>
-	<![endif]-->
 	</div>
 	</body>
 	</html>
@@ -587,7 +481,6 @@ function kkd_pff_paystack_form_shortcode($atts) {
     ob_start();
 
 		global $current_user;
-		// wp_get_current_user();
 		$user_id = $current_user->ID;
 		$email = $current_user->user_email;
 		$fname = $current_user->user_firstname;
@@ -736,8 +629,6 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 		  echo(do_shortcode($obj->post_content));
 
-			//  echo '<br /><p>Transaction charge:'.$currency.'<b class="txn_charge">13,000</b></p>';
-			//  echo '<p>Total charge:'.$currency.'<b class="total_charge">13,000</b></p>';
 			if ($useagreement == 'yes'){
 				echo '<div class="span12 unit">
 						<label class="checkbox">
@@ -777,8 +668,7 @@ function kkd_pff_paystack_text_shortcode($atts) {
 		'name' => 'Title',
     'required' => '0',
  	), $atts));
-  // pf-amount
-	$code = '<div class="span12 unit">
+  $code = '<div class="span12 unit">
 		<label class="label">'.$name;
 		if ($required == 'required') {
 			 $code.= ' <span>*</span>';
@@ -1004,12 +894,12 @@ function kkd_pff_paystack_submit_action() {
 		if ($usequantity == 'no') {
 			$amount = (int)str_replace(' ', '', $formamount);
 		}else{
-			$fixedmetadata[] = [
+			$fixedmetadata[] =  array(
 				'display_name' => 'Unit Price',
 				'variable_name' => 'Unit_Price',
 				'type' => 'text',
 				'value' => $currency.number_format($formamount)
-			];
+			);
 			$quantity = $_POST["pf-quantity"];
 			$unitamount = (int)str_replace(' ', '', $formamount);
 			$amount = $quantity*$unitamount;
@@ -1030,20 +920,20 @@ function kkd_pff_paystack_submit_action() {
 				}else{
 					$attachment_id = media_handle_upload($keyname, $_POST["pf-id"]);
 					$url = wp_get_attachment_url( $attachment_id);
-					$fixedmetadata[] = [
+					$fixedmetadata[] =  array(
 						'display_name' => ucwords(str_replace("_", " ", $keyname)),
 						'variable_name' => $keyname,
-			      'type' => 'link',
-			      'value' => $url
-					];
+					      'type' => 'link',
+					      'value' => $url
+					);
 				}
 			}else{
-				$fixedmetadata[] = [
+				$fixedmetadata[] =  array(
 					'display_name' => ucwords(str_replace("_", " ", $keyname)),
 					'variable_name' => $keyname,
-		      'type' => 'text',
-		      'value' => 'No file Uploaded'
-				];
+				      'type' => 'text',
+				      'value' => 'No file Uploaded'
+				);
 			}
 
 		}
@@ -1080,12 +970,12 @@ function kkd_pff_paystack_submit_action() {
 						if ($response->meta->total >= 1) {
 							$plan = $response->data[0];
 							$plancode = $plan->plan_code;
-							$fixedmetadata[] = [
+							$fixedmetadata[] =  array(
 								'display_name' => 'Plan Interval',
 								'variable_name' => 'Plan Interval',
 								'type' => 'text',
 								'value' => $plan->interval
-							];
+							);
 						}else{
 							//Create Plan
 							$body = array(
@@ -1103,12 +993,12 @@ function kkd_pff_paystack_submit_action() {
 							if( ! is_wp_error( $request )) {
 								$paystack_response = json_decode(wp_remote_retrieve_body($request));
 								$plancode	= $paystack_response->data->plan_code;
-								$fixedmetadata[] = [
+								$fixedmetadata[] =  array(
 									'display_name' => 'Plan Interval',
 									'variable_name' => 'Plan Interval',
 									'type' => 'text',
 									'value' => $paystack_response->data->interval
-								];
+								);
 
 							}
 						}
@@ -1123,12 +1013,12 @@ function kkd_pff_paystack_submit_action() {
 		}
 	}
 	if($plancode != 'none'){
-		$fixedmetadata[] = [
+		$fixedmetadata[] =  array(
 			'display_name' => 'Plan',
 			'variable_name' => 'Plan',
 			'type' => 'text',
 			'value' => $plancode
-		];
+		);
 	}
 
 	$insert =  array(
@@ -1180,40 +1070,40 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata){
 	$custom_fields = [];
 	foreach ($metadata as $key => $value) {
 		if ($key == 'pf-fname') {
-			$custom_fields[] = [
+			$custom_fields[] =  array(
 				'display_name' => 'Full Name',
 				'variable_name' => 'Full_Name',
 	      'type' => 'text',
 	      'value' => $value
-			];
+			);
 		}elseif ($key == 'pf-plancode') {
-			$custom_fields[] = [
+			$custom_fields[] =  array(
 				'display_name' => 'Plan',
 				'variable_name' => 'Plan',
 	      'type' => 'text',
 	      'value' => $value
-			];
+			);
 		}elseif ($key == 'pf-interval') {
-			$custom_fields[] = [
+			$custom_fields[] =  array(
 				'display_name' => 'Plan Interval',
 				'variable_name' => 'Plan Interval',
 	      'type' => 'text',
 	      'value' => $value
-			];
+			);
 		}elseif ($key == 'pf-quantity') {
-			$custom_fields[] = [
+			$custom_fields[] =  array(
 				'display_name' => 'Quantity',
 				'variable_name' => 'Quantity',
 	      'type' => 'text',
 	      'value' => $value
-			];
+			);
 		}else{
-			$custom_fields[] = [
+			$custom_fields[] =  array(
 				'display_name' => ucwords(str_replace("_", " ", $key)),
 				'variable_name' => $key,
 	      'type' => 'text',
 	      'value' => $value
-			];
+			);
 		}
 
 	}

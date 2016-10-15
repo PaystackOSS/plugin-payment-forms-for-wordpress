@@ -47,8 +47,7 @@ class Kkd_Pff_Paystack_Admin {
 								<tr valign="top">
 				        <th scope="row">Test Secret Key</th>
 				        <td>
-
-								<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
+				        	<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
 				        </tr>
 
 				        <tr valign="top">

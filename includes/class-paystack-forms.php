@@ -43,7 +43,7 @@ class Kkd_Pff_Paystack {
 	public function __construct() {
 
 		$this->plugin_name = 'pff-paystack';
-		$this->version = '1.0.4';
+		$this->version = '2.0.0';
 
 		$this->load_dependencies();
 		$this->set_locale();
