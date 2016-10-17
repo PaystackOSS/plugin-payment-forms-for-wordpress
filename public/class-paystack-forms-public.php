@@ -187,13 +187,13 @@ function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code){
 	<table class="primary_btn" align="center" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;clear:both;margin:0 auto">
 	<tbody>
 	<tr>
-	<!-- <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">Use this link below to try again, if you encountered <br />any issue while trying to make the payment.</small><br>
+	<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">Use this link below to try again, if you encountered <br />any issue while trying to make the payment.</small><br>
 	</p>
 	<td class="font_default" style="padding:12px 24px;font-family:Helvetica,Arial,sans-serif;font-size:16px;mso-line-height-rule:exactly;text-align:center;vertical-align:middle;-webkit-border-radius:4px;border-radius:4px;background-color:#666">
-	<a href="<?php  echo $code; ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
+	<a href="<?php  echo get_site_url().'/paystackinvoice/?code='.$code; ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
 	<span style="text-decoration:none;color:#fff;text-align:center;display:block">Try Again</span>
 	</a>
-	</td> -->
+	</td>
 	</tr>
 	</tbody>
 	</table>
@@ -527,6 +527,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
 
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
+			 // echo get_site_url().'/paystackinvoice/?code=ddddddd';
 			 echo '<form  enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
 			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
@@ -1120,7 +1121,7 @@ function kkd_pff_paystack_confirm_payment() {
 
   	exit(json_encode($response));
   }
-  global $wpdb;
+ 	global $wpdb;
 	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 	$code = $_POST['code'];
 	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
@@ -1187,6 +1188,181 @@ function kkd_pff_paystack_confirm_payment() {
 								}else{
 
 									$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
+									$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+									$message = $thankyou;
+									$result = "success";
+								}
+							}
+						}
+
+			}else {
+				$message = "Transaction Failed/Invalid Code";
+				$result = "failed";
+			}
+
+		}
+	}else{
+		$message = "Payment Verification Failed.";
+		$result = "failed";
+
+	}
+
+	if ($result == 'success') {
+		$sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
+		if($sendreceipt == 'yes'){
+			$decoded = json_decode($payment_array->metadata);
+			$fullname = $decoded[0]->value;
+			kkd_pff_paystack_send_receipt($payment_array->post_id,$currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
+
+		}
+
+	}
+	$response = array(
+     'result' => $result,
+     'message' => $message,
+   );
+	if ($result == 'success' && $redirect != '') {
+	 $response['result'] = 'success2';
+	 $response['link'] = $redirect;
+	}
+
+	 
+  echo json_encode($response);
+
+  die();
+}
+
+
+add_action( 'wp_ajax_kkd_pff_paystack_retry_action', 'kkd_pff_paystack_retry_action' );
+add_action( 'wp_ajax_nopriv_kkd_pff_paystack_retry_action', 'kkd_pff_paystack_retry_action' );
+function kkd_pff_paystack_retry_action() {
+  if (trim($_POST['code']) == '') {
+    $response['result'] = 'failed';
+  	$response['message'] = 'Cde is required';
+
+  	// Exit here, for not processing further because of the error
+  	exit(json_encode($response));
+  }
+  do_action( 'kkd_pff_paystack_before_save' );
+
+  global $wpdb;
+  	$code = $_POST['code'];
+	$newcode = kkd_pff_paystack_generate_code();
+	$newcode = $newcode.'_2';
+	$insert = [];
+  	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+	if (array_key_exists("0", $record)) {
+		$dbdata = $record[0];
+		$plan = $dbdata->plan;
+		$quantity = 1;
+		$wpdb->update( $table, array( 'txn_code_2' => $newcode),array('txn_code' => $code));
+								
+		$currency = get_post_meta($dbdata->post_id,'_currency',true);
+		$fixedmetadata = kkd_pff_paystack_meta_as_custom_fields($dbdata->metadata);
+		$nmeta = json_decode($dbdata->metadata);
+		foreach ($nmeta as $nkey => $nvalue) {
+			if ($nvalue->variable_name == 'Quantity') {
+				$quantity = $nvalue->value;
+			}
+			if ($nvalue->variable_name == 'Full_Name') {
+				$fullname = $nvalue->value;
+			}
+		}
+
+	}
+
+	 $response = array(
+     'result' => 'success',
+		 'code' => $newcode,
+     'plan' => $plan,
+     'quantity' => $quantity,
+		 'email' => $dbdata->email,
+     'name' => $fullname,
+   	 'total' => $dbdata->amount*100,
+		 'custom_fields' => $fixedmetadata
+   );
+  echo json_encode($response);
+
+  die();
+}
+add_action( 'wp_ajax_kkd_pff_paystack_rconfirm_payment', 'kkd_pff_paystack_rconfirm_payment' );
+add_action( 'wp_ajax_nopriv_kkd_pff_paystack_rconfirm_payment', 'kkd_pff_paystack_rconfirm_payment' );
+
+function kkd_pff_paystack_rconfirm_payment() {
+  if (trim($_POST['code']) == '') {
+    $response['error'] = true;
+  	$response['error_message'] = "Did you make a payment?";
+
+  	exit(json_encode($response));
+  }
+ 	global $wpdb;
+	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+	$code = $_POST['code'];
+	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code_2 = '".$code."')");
+	if (array_key_exists("0", $record)) {
+
+		$payment_array = $record[0];
+		$amount = get_post_meta($payment_array->post_id,'_amount',true);
+		$recur = get_post_meta($payment_array->post_id,'_recur',true);
+		$currency = get_post_meta($payment_array->post_id,'_currency',true);
+		$txncharge = get_post_meta($payment_array->post_id,'_txncharge',true);
+		$redirect = get_post_meta($payment_array->post_id,'_redirect',true);
+
+
+		$mode =  esc_attr( get_option('mode') );
+		if ($mode == 'test') {
+			$key = esc_attr( get_option('tsk') );
+		}else{
+			$key = esc_attr( get_option('lsk') );
+		}
+		$paystack_url = 'https://api.paystack.co/transaction/verify/' . $code;
+		$headers = array(
+			'Authorization' => 'Bearer ' . $key
+		);
+		$args = array(
+			'headers'	=> $headers,
+			'timeout'	=> 60
+		);
+		$request = wp_remote_get( $paystack_url, $args );
+		if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
+			$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
+			if ( 'success' == $paystack_response->data->status ) {
+						$amount_paid	= $paystack_response->data->amount / 100;
+						$paystack_ref 	= $paystack_response->data->reference;
+						if ($recur == 'optional' || $recur == 'plan') {
+							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code_2'=>$paystack_ref));
+							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+							$message = $thankyou;
+							$result = "success";
+						}else{
+
+							if ($amount == 0) {
+								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code_2'=>$paystack_ref));
+								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+								$message = $thankyou;
+								$result = "success";
+								// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+							}else{
+								$usequantity = get_post_meta($payment_array->post_id,'_usequantity',true);
+								if ($usequantity == 'no') {
+									$amount = (int)str_replace(' ', '', $amount);
+								}else{
+									$quantity = $_POST["quantity"];
+									$unitamount = (int)str_replace(' ', '', $amount);
+									$amount = $quantity*$unitamount;
+								}
+
+
+								if ($txncharge == 'customer') {
+									$amount = kkd_pff_paystack_add_paystack_charge($amount);
+								}
+								if( $amount !=  $amount_paid ) {
+									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
+									$result = "failed";
+								}else{
+
+									$wpdb->update( $table, array( 'paid' => 1),array('txn_code_2'=>$paystack_ref));
 									$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 									$message = $thankyou;
 									$result = "success";

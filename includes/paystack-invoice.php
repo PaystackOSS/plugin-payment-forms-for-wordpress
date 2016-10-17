@@ -2,78 +2,98 @@
 require_once('../../../../wp-load.php');
 
 $code = @$_GET['code'];
+function kkd_format_metadata($data){
+	$new = json_decode($data);
+	$text = '';
+	if (array_key_exists("0", $new)) {
+		foreach ($new as $key => $item) {
+			if ($item->type == 'text') {
+				$text.= '<div class="span12 unit">
+								<label class="label inline">'.$item->display_name.':</label>
+								<strong>'.$item->value.'</strong>
+							</div>';
+			}else{
+				$text.= '<div class="span12 unit">
+								<label class="label inline">'.$item->display_name.':</label>
+								<strong> <a target="_blank" href="'.$item->value.'">link</a></strong>
+							</div>';
+			}
 
-$mode =  esc_attr( get_option('mode') );
-if ($mode == 'test') {
-	$key = esc_attr( get_option('tpk') );
-}else{
-	$key = esc_attr( get_option('lpk') );
+		}
+	}else{
+		$text = '';
+		if (count($new) > 0) {
+			foreach ($new as $key => $item) {
+				$text.= '<div class="span12 unit">
+								<label class="label inline">'.$key.':</label>
+								<strong>'.$item.'</strong>
+							</div>';
+			}
+		}
+	}
+	//
+	return $text;
 }
- ?>
 
-<?php
-/**
- * Template Name: Alphabetical Posts
- */
- 
-get_header(); ?>
+	global $wpdb;
+	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+
+	if (array_key_exists("0", $record)) {
+		get_header();
+		$dbdata = $record[0];
+		$currency = get_post_meta($dbdata->post_id,'_currency',true);
+
+		
+		
+
+ ?>
 <div class="content-area main-content" id="primary">
 	<main role="main" class="site-main" id="main">
 		<div class="blog_post">
 			<article class="post-4 page type-page status-publish hentry" id="post-4">
-				<form action="" method="" class="j-forms" id="pf-form" novalidate="">
+				<form action="<?php echo admin_url('admin-ajax.php'); ?>" method="post"   enctype="multipart/form-data"  class="j-forms retry-form" id="pf-form" novalidate="">
+				<input type="hidden" name="action" value="kkd_pff_paystack_retry_action">
+				<input type="hidden" name="code" value="<?php echo $code; ?>" />
 					<div class="content">
 
 						<div class="divider-text gap-top-20 gap-bottom-45">
-							<span>Input</span>
+							<span>Payment Invoice</span>
 						</div>
 
 						<div class="j-row">
 							<div class="span12 unit">
-								<label class="label">Text input without icon <span>*</span></label>
-								<div class="input">
-									<input type="text" placeholder="placeholder text...">
-								</div>
+								<label class="label inline">Email:</label>
+								<strong><a href="mailto:<?php echo $dbdata->email; ?>"><?php echo $dbdata->email; ?></a></strong>
 							</div>
 							<div class="span12 unit">
-								<label class="label">Text input without icon</label>
-								<label class="select">
-									<select autocomplete="off">
-										<option value="none">Select fruit</option>
-										<option value="0">Apple</option>
-										<option value="1">Banana</option>
-										<option value="2">Coconut</option>
-										<option value="3">Mango</option>
-										<option value="4">Melon</option>
-										<option value="5">Orange</option>
-										<option value="6">Pear</option>
-										<option value="7">Watermelon</option>
-									</select>
-									<i></i>
-								</label>
+								<label class="label inline">Amount:</label>
+								<strong><?php echo $currency.number_format($dbdata->amount); ?></strong>
 							</div>
+							<?php echo kkd_format_metadata($dbdata->metadata); ?>
+							
 							<div class="span12 unit">
-								<label class="input append-small-btn">
-									<div class="file-button">
-										Browse
-										<input type="file" onchange="document.getElementById('append-small-btn').value = this.value;">
-									</div>
-									<input type="text" id="append-small-btn" readonly="" placeholder="no file selected">
-								</label>
+								<label class="label inline">Date:</label>
+								<strong><?php echo $currency.number_format($dbdata->amount); ?></strong>
 							</div>
+							<?php if($dbdata->paid == 1) {?>
 							<div class="span12 unit">
-								<label class="label">Textarea</label>
-								<div class="input">
-									<textarea placeholder="your message..." spellcheck="false" id="textarea"></textarea>
-								</div>
+								<label class="label inline">Payment Status:</label>
+								<strong> Successful</strong>
 							</div>
+							<?php } ?>
+
+
 						</div>
 					</div>
 
 					<div class="footer">
 						<small><span style="color: red;">*</span> are compulsory</small><br>
-							<img class="paystack-cardlogos size-full wp-image-1096" alt="cardlogos" src="http://localhost/wordpress/wp-content/plugins/paystack-forms/public/../images/logos@2x.png">
-						<button type="submit" class="primary-btn">Submit</button>
+							<img class="paystack-cardlogos size-full wp-image-1096" alt="cardlogos" src="<?php echo plugins_url( '../images/logos@2x.png' , __FILE__ ) ;?>">
+						<?php if($dbdata->paid == 0) {?>
+							<button type="submit" class="primary-btn" id='submitbtn'>Retry Payment</button>
+						<?php } ?>
+
 					</div>
 				</form>
 			</article>
@@ -82,3 +102,6 @@ get_header(); ?>
 </div>
 <?php
 get_footer();
+}else{
+	die('Invoice code invalid');
+}

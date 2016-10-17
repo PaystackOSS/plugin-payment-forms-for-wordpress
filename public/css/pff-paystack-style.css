@@ -33,10 +33,10 @@
 	-moz-border-radius:3px;
 	-o-border-radius:3px;
 	border-radius:3px;
-	-webkit-box-shadow:0 1px 1px rgba(0,0,0,.6);
-	-moz-box-shadow:0 1px 1px rgba(0,0,0,.6);
-	-o-box-shadow:0 1px 1px rgba(0,0,0,.6);
-	box-shadow:0 1px 1px rgba(0,0,0,.6);
+	-webkit-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	-moz-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	-o-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
 	-webkit-box-sizing:border-box;
 	-moz-box-sizing:border-box;
 	box-sizing:border-box;
@@ -1810,3 +1810,10 @@
      border-color: red  !important;
 }
 /*#3676c8*/
+.j-forms strong {
+	color:#333 !important;
+	font-size: 18px  !important;
+}
+.j-forms .inline {
+	display:inline-block !important;
+}
