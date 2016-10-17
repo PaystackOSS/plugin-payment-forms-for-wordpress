@@ -1068,7 +1068,7 @@ function kkd_pff_paystack_submit_action() {
 }
 
 function kkd_pff_paystack_meta_as_custom_fields($metadata){
-	$custom_fields = [];
+	$custom_fields = array();
 	foreach ($metadata as $key => $value) {
 		if ($key == 'pf-fname') {
 			$custom_fields[] =  array(
@@ -1249,7 +1249,7 @@ function kkd_pff_paystack_retry_action() {
   	$code = $_POST['code'];
 	$newcode = kkd_pff_paystack_generate_code();
 	$newcode = $newcode.'_2';
-	$insert = [];
+	$insert = array();
   	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 	$record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
 	if (array_key_exists("0", $record)) {
