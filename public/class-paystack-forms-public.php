@@ -46,20 +46,20 @@ define('KKD_PFF_PAYSTACK_CROSSOVER_TOTAL', 250000);
 define('KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE', 10000);
 define('KKD_PFF_PAYSTACK_LOCAL_CAP', 200000);
 
-define('KKD_PFF_PAYSTACK_CHARGE_DIVIDER', floatval(1-PAYSTACK_PERCENTAGE));
-define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval((PAYSTACK_CROSSOVER_TOTAL*PAYSTACK_CHARGE_DIVIDER)-PAYSTACK_ADDITIONAL_CHARGE));
-define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval((PAYSTACK_LOCAL_CAP-PAYSTACK_ADDITIONAL_CHARGE)/PAYSTACK_PERCENTAGE));
-define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - PAYSTACK_LOCAL_CAP);
+define('KKD_PFF_PAYSTACK_CHARGE_DIVIDER', floatval(1-KKD_PFF_PAYSTACK_PERCENTAGE));
+define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval((KKD_PFF_PAYSTACK_CROSSOVER_TOTAL*KKD_PFF_PAYSTACK_CHARGE_DIVIDER)-KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE));
+define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval((KKD_PFF_PAYSTACK_LOCAL_CAP-KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE)/KKD_PFF_PAYSTACK_PERCENTAGE));
+define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - KKD_PFF_PAYSTACK_LOCAL_CAP);
 
 function kkd_pff_paystack_add_paystack_charge($amount)
 {
     $amountinkobo = $amount * 100;
-    if ($amountinkobo > PAYSTACK_FLATLINE_AMOUNT)
-        return ($amountinkobo + PAYSTACK_LOCAL_CAP)/100;
-    elseif ($amountinkobo > PAYSTACK_CROSSOVER_AMOUNT)
-        return (intval(($amountinkobo + PAYSTACK_ADDITIONAL_CHARGE) / PAYSTACK_CHARGE_DIVIDER))/100;
+    if ($amountinkobo > KKD_PFF_PAYSTACK_FLATLINE_AMOUNT)
+        return ($amountinkobo + KKD_PFF_PAYSTACK_LOCAL_CAP)/100;
+    elseif ($amountinkobo > KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT)
+        return (intval(($amountinkobo + KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE) / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
     else
-        return (intval($amountinkobo / PAYSTACK_CHARGE_DIVIDER))/100;
+        return (intval($amountinkobo / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
 }
 
 add_filter ("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
@@ -1131,6 +1131,7 @@ function kkd_pff_paystack_confirm_payment() {
 		$recur = get_post_meta($payment_array->post_id,'_recur',true);
 		$currency = get_post_meta($payment_array->post_id,'_currency',true);
 		$txncharge = get_post_meta($payment_array->post_id,'_txncharge',true);
+		$redirect = get_post_meta($payment_array->post_id,'_redirect',true);
 
 
 		$mode =  esc_attr( get_option('mode') );
@@ -1215,11 +1216,16 @@ function kkd_pff_paystack_confirm_payment() {
 		}
 
 	}
-
-	 $response = array(
+	$response = array(
      'result' => $result,
      'message' => $message,
    );
+	if ($result == 'success' && $redirect != '') {
+	 $response['result'] = 'success2';
+	 $response['link'] = $redirect;
+	}
+
+	 
   echo json_encode($response);
 
   die();

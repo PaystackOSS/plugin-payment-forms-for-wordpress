@@ -278,6 +278,7 @@ class Kkd_Pff_Paystack_Admin {
 				$loggedin = get_post_meta($post->ID, '_loggedin', true);
 				$currency = get_post_meta($post->ID, '_currency', true);
 		    $filelimit = get_post_meta($post->ID, '_filelimit', true);
+		    $redirect = get_post_meta($post->ID, '_redirect', true);
 
 				if ($amount == "") {$amount = 0;}
 				if ($filelimit == "") {$filelimit = 2;}
@@ -305,8 +306,10 @@ class Kkd_Pff_Paystack_Admin {
 							</select>';
 		  	echo '<p>Success Message after Payment</p>';
 		    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
-				echo '<p>File Upload Limit(MB):</p>';
+			echo '<p>File Upload Limit(MB):</p>';
 		  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
+		  	echo '<p>Redirect to page link after payment(keep blank to use normal success message):</p>';
+		  	echo '<input ttype="text" name="_redirect" value="' . $redirect  . '" class="widefat" />';
 
 	  }
 	function kkd_pff_paystack_editor_add_email_data() {
@@ -423,13 +426,14 @@ class Kkd_Pff_Paystack_Admin {
 				return $post->ID;
 			}
 
-		  $form_meta['_amount'] = $_POST['_amount'];
+		  	$form_meta['_amount'] = $_POST['_amount'];
 			$form_meta['_paybtn'] = $_POST['_paybtn'];
 			$form_meta['_currency'] = $_POST['_currency'];
 			$form_meta['_successmsg'] = $_POST['_successmsg'];
 			$form_meta['_txncharge'] = $_POST['_txncharge'];
 			$form_meta['_loggedin'] = $_POST['_loggedin'];
 			$form_meta['_filelimit'] = $_POST['_filelimit'];
+			$form_meta['_redirect'] = $_POST['_redirect'];
 			///
 			$form_meta['_subject'] = $_POST['_subject'];
 			$form_meta['_heading'] = $_POST['_heading'];

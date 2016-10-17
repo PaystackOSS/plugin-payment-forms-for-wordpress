@@ -163,6 +163,9 @@
 					 						$.blockUI({ message: 'Please wait...' });
 					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref,'quantity':quantity}, function(newdata) {
 					 									data = JSON.parse(newdata);
+					 									if (data.result == 'success2'){
+									                       window.location.href = data.link;
+									                    }
 					 									if (data.result == 'success'){
 					 										$('.paystack-form')[0].reset();
 					 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
@@ -199,6 +202,9 @@
 					 						$.blockUI({ message: 'Please wait...' });
 					 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function(newdata) {
 					 									data = JSON.parse(newdata);
+					 									if (data.result == 'success2'){
+									                       window.location.href = data.link;
+									                    }
 					 									if (data.result == 'success'){
 					 										$('.paystack-form')[0].reset();
 					 										$('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
