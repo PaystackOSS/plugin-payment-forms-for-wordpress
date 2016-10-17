@@ -84,6 +84,11 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.0.0 =
+*  Fixed compatibility for PHP 5.3 and below.
+*  Added option to redirect to page after payment.
+*  Add retry payment link to email invoice.
+*  Fixed pricing calculation.
 = 1.1.1 =
 *  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
 = 1.1.0 =
