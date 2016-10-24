@@ -74,7 +74,7 @@ function kkd_format_metadata($data){
 							
 							<div class="span12 unit">
 								<label class="label inline">Date:</label>
-								<strong><?php echo $currency.number_format($dbdata->amount); ?></strong>
+								<strong><?php echo $dbdata->created_at; ?></strong>
 							</div>
 							<?php if($dbdata->paid == 1) {?>
 							<div class="span12 unit">

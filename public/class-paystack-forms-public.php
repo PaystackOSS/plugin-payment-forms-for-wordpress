@@ -885,6 +885,7 @@ function kkd_pff_paystack_submit_action() {
 	$currency = get_post_meta($_POST["pf-id"],'_currency',true);
 	$formamount = get_post_meta($_POST["pf-id"],'_amount',true);
 	$recur = get_post_meta($_POST["pf-id"],'_recur',true);
+	$subaccount = get_post_meta($_POST["pf-id"],'_subaccount',true);
 
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
 	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
@@ -1060,7 +1061,8 @@ function kkd_pff_paystack_submit_action() {
 		 'email' => $insert['email'],
      'name' => $fullname,
    	 'total' => $insert['amount']*100,
-		 'custom_fields' => $fixedmetadata
+		 'custom_fields' => $fixedmetadata,
+		 'subaccount' => $subaccount
    );
   echo json_encode($response);
 

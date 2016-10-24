@@ -155,7 +155,8 @@
 						 					amount: data.total,
 											firstname: firstName,
 			 								lastname: lastName,
-						 					ref: data.code,
+						 					subaccount:data.subaccount,
+                            				ref: data.code,
 						 					metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
 						 						$.blockUI({ message: 'Please wait...' });

@@ -259,6 +259,7 @@ class Kkd_Pff_Paystack_Admin {
 			add_meta_box('kkd_pff_paystack_editor_add_email_data', 'Email Receipt Settings', 'kkd_pff_paystack_editor_add_email_data', 'paystack_form', 'normal', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_quantity_data', 'Quantity Payment', 'kkd_pff_paystack_editor_add_quantity_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_agreement_data', 'Agreement checkbox', 'kkd_pff_paystack_editor_add_agreement_data', 'paystack_form', 'side', 'default');
+			add_meta_box('kkd_pff_paystack_editor_add_subaccount_data', 'Sub Account', 'kkd_pff_paystack_editor_add_subaccount_data', 'paystack_form', 'side', 'default');
 			
 	  }
 
@@ -415,6 +416,22 @@ class Kkd_Pff_Paystack_Admin {
 	  	echo '<input type="text" name="_agreementlink" value="' . $agreementlink  . '" class="widefat" />';
 
 	}
+	function kkd_pff_paystack_editor_add_subaccount_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$subaccount = get_post_meta($post->ID, '_subaccount', true);
+
+		
+			if ($subaccount  == "") {$subaccount = '';}
+		echo '<p>Sub Account code:</p>';
+	  	echo '<input type="text" name="_subaccount" value="' . $subaccount  . '" class="widefat" />';
+
+	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
@@ -447,6 +464,7 @@ class Kkd_Pff_Paystack_Admin {
 
 			$form_meta['_useagreement'] = $_POST['_useagreement'];
 			$form_meta['_agreementlink'] = $_POST['_agreementlink'];
+			$form_meta['_subaccount'] = $_POST['_subaccount'];
 
 			// Add values of $form_meta as custom fields
 
