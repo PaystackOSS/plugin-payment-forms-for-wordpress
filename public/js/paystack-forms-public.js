@@ -156,7 +156,7 @@
 											firstname: firstName,
 			 								lastname: lastName,
 						 					subaccount:data.subaccount,
-						 					bearer:'subaccount',
+						 					bearer:data.txnbearer,
                             				ref: data.code,
 						 					metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
@@ -197,7 +197,9 @@
 											firstname: firstName,
 			 								lastname: lastName,
 						 					ref: data.code,
-						 					metadata: {'custom_fields': data.custom_fields},
+						 					subaccount:data.subaccount,
+						 					bearer:data.txnbearer,
+                            				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
 						 						$.blockUI({ message: 'Please wait...' });
 						 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function(newdata) {

@@ -425,12 +425,17 @@ class Kkd_Pff_Paystack_Admin {
 
 	  	// Get the location data if its already been entered
 			$subaccount = get_post_meta($post->ID, '_subaccount', true);
+			$txnbearer = get_post_meta($post->ID, '_txnbearer', true);
 
 		
 			if ($subaccount  == "") {$subaccount = '';}
 		echo '<p>Sub Account code:</p>';
 	  	echo '<input type="text" name="_subaccount" value="' . $subaccount  . '" class="widefat" />';
-
+	  	echo '<p>Transaction Charge bearer:</p>';
+			echo '<select class="form-control" name="_txnbearer" id="parent_id" style="width:100%;">
+							<option value="account" '.kkd_pff_paystack_txncheck('account',$txnbearer).'>Merchant (default)</option>
+							<option value="subaccount" '.kkd_pff_paystack_txncheck('subaccount',$txnbearer).'>Sub Account</option>
+						</select>';
 	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
@@ -465,6 +470,7 @@ class Kkd_Pff_Paystack_Admin {
 			$form_meta['_useagreement'] = $_POST['_useagreement'];
 			$form_meta['_agreementlink'] = $_POST['_agreementlink'];
 			$form_meta['_subaccount'] = $_POST['_subaccount'];
+			$form_meta['_txnbearer'] = $_POST['_txnbearer'];
 
 			// Add values of $form_meta as custom fields
 
