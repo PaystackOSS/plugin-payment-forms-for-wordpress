@@ -156,6 +156,7 @@
 											firstname: firstName,
 			 								lastname: lastName,
 						 					subaccount:data.subaccount,
+						 					bearer:'subaccount',
                             				ref: data.code,
 						 					metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){

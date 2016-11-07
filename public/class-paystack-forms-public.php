@@ -539,9 +539,9 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 <div class="input">
 					 <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . $fullname. '"
 					 ';
-					 if($loggedin == 'yes'){
-						 echo 'readonly ';
-					 }
+					 // if($loggedin == 'yes'){
+						//  echo 'readonly ';
+					 // }
 
 			echo' required>
 				 </div>
