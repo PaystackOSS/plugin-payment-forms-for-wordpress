@@ -50,11 +50,11 @@
 								 var fees = multiplier * transaction_amount;
 								 var extrafee = 0;
 								 if (fees > 2000) {
-									 var extrafee = 2000;
+									 var fees = 2000;
 								 }else{
-									 if (transaction_amount > 2500) {extrafee = 100};
+									 if (transaction_amount > 2500) {fees += 100};
 								 }
-								 var total = transaction_amount + fees + extrafee;
+								 var total = transaction_amount + fees;
 								//  console.log(transaction_amount);
 		             if (transaction_amount == '' || transaction_amount == 0 || transaction_amount.length == 0 || transaction_amount == null || isNaN (transaction_amount)) {
 									 var total = 0;
@@ -148,7 +148,7 @@
 									var lastName = names[1] || "";
 									var quantity =data.quantity;
 									// console.log(firstName+ " - "+lastName);
-									if (data.plan == 'none') {
+									if (data.plan == 'none' || data.plan == ''  || data.plan == 'no' ) {
 										var handler = PaystackPop.setup({
 						 					key: settings.key,
 						 					email: data.email,
@@ -158,6 +158,7 @@
 						 					subaccount:data.subaccount,
 						 					bearer:data.txnbearer,
                             				ref: data.code,
+                            				transaction_charge:'0',
 						 					metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
 						 						$.blockUI({ message: 'Please wait...' });
@@ -198,6 +199,7 @@
 			 								lastname: lastName,
 						 					ref: data.code,
 						 					subaccount:data.subaccount,
+						 					transaction_charge:'0',
 						 					bearer:data.txnbearer,
                             				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
