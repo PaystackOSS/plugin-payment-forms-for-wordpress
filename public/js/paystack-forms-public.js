@@ -271,7 +271,7 @@
 							var lastName = names[1] || "";
 							var quantity =data.quantity;
 							// console.log(firstName+ " - "+lastName);
-							if (data.plan == 'none') {
+							if (data.plan == 'none' || data.plan == ''  || data.plan == 'no' ) {
 								var handler = PaystackPop.setup({
 				 					key: settings.key,
 				 					email: data.email,
