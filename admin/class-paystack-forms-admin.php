@@ -34,7 +34,7 @@ class Kkd_Pff_Paystack_Admin {
 			 <h1>Paystack Forms API KEYS Settings!</h1>
 			 <h3>Paystack</h3>
 
-        <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo get_site_url().'/kkd/wpffp/webhook/'; ?></code></pre></strong></
+        		<h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo get_site_url().'/kkd/wpffp/webhook/'; ?></code></pre></strong></
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">
@@ -171,7 +171,7 @@ class Kkd_Pff_Paystack_Admin {
 	  	$columns = array(
 	  		'cb' => '<input type="checkbox" />',
 	  		'title' => __( 'Name' ),
-				'shortcode' => __( 'Shortcode' ),
+			'shortcode' => __( 'Shortcode' ),
 	  		'payments' => __( 'Payments' ),
 	  		'date' => __( 'Date' )
 	  	);
@@ -524,11 +524,21 @@ function kkd_pff_paystack_payment_submissions(){
 		 $loggedin = get_post_meta($id,'_loggedin',true);
 		 $txncharge = get_post_meta($id,'_txncharge',true);
 
-		 echo "<title>".$obj->post_title." Payments </title>";
-		 echo "<h1>".$obj->post_title." Payments</h1>";
 		 $exampleListTable = new Kkd_Pff_Paystack_Payments_List_Table();
 		 $exampleListTable->prepare_items();
 		 ?>
+		 <div id="welcome-panel" class="welcome-panel">
+			<div class="welcome-panel-content">
+				<h1 style="margin: 0px;"><?php echo $obj->post_title; ?> Payments </h1>
+				<p class="about-description">All payments made for this form</p>
+				<form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+				  <input type="hidden" name="action" value="kkd_pff_export_excel">
+				  <input type="hidden" name="form_id" value="<?php echo $id; ?>">
+				  <button type="submit"  class="button button-primary button-hero load-customize" >Export Data to Excel</button>
+				</form>
+				<br><br>
+			</div>
+		</div>
 		 <div class="wrap">
 				 <div id="icon-users" class="icon32"></div>
 				 <?php $exampleListTable->display(); ?>
@@ -536,6 +546,110 @@ function kkd_pff_paystack_payment_submissions(){
 		 <?php
 
 	}
+}
+add_action( 'admin_post_kkd_pff_export_excel', 'Kkd_pff_export_excel' );
+
+function Kkd_pff_export_excel() {
+	global $wpdb;
+	
+	$post_id = $_POST['form_id'];
+	$obj = get_post($post_id);
+	$csv_output = "";
+	
+	
+  	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+	$data = array();
+	$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')  ORDER BY `id` ASC");
+	$i = 0;
+	
+	if (count($alldbdata) > 0) {
+		$header = $alldbdata[0];
+		$csv_output .= "#,";
+		$csv_output .= "Email,";
+		$csv_output .= "Amount,";
+		$csv_output .= "Reference,";
+		$new = json_decode($header->metadata);
+		$text = '';
+		if (array_key_exists("0", $new)) {
+			foreach ($new as $key => $item) {
+				$csv_output .= $item->display_name.",";
+			}
+		}else{
+			if (count($new) > 0) {
+				foreach ($new as $key => $item) {
+					$csv_output .= $key.",";
+				}
+			}
+		}
+		$csv_output .= "\n";
+		
+
+	}
+	foreach ($alldbdata as $key => $dbdata) {
+		$newkey = $key+1;
+		if ($dbdata->txn_code_2 != "") {
+			$txn_code = $dbdata->txn_code_2;
+		}else{
+			$txn_code = $dbdata->txn_code;
+		}
+		// $csv_output .= $txn_code;//.",";
+		// $csv_output .= "\n";
+		// $i++;
+		// $data[] = array(
+		// 	'id'  => $newkey,
+		// 	'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
+  //         'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
+  //         'txn_code' => $txn_code,
+  //         'metadata' => format_data($dbdata->metadata),
+  //         'date'  => $dbdata->created_at
+		// );
+		$csv_output .= $newkey.",";
+		$csv_output .= $dbdata->email.",";
+		$csv_output .= $currency.' '.$dbdata->amount.",";
+		$csv_output .= $txn_code.",";
+		$new = json_decode($header->metadata);
+		$text = '';
+		if (array_key_exists("0", $new)) {
+			foreach ($new as $key => $item) {
+				$csv_output .= $item->value.",";
+			}
+		}else{
+			if (count($new) > 0) {
+				foreach ($new as $key => $item) {
+					$csv_output .= $item.",";
+				}
+			}
+		}
+		$csv_output .= "\n";
+	}
+
+	// $link = mysql_connect($host, $user, $pass) or die("Can not connect." . mysql_error());
+	// mysql_select_db($db) or die("Can not connect.");
+
+	// $result = mysql_query("SHOW COLUMNS FROM ".$table."");
+	// if (mysql_num_rows($result) > 0) {
+	// while ($row = mysql_fetch_assoc($result)) {
+	// $csv_output .= $row[‘Field’]."; ";
+	// $i++;
+	// }
+	// }
+
+	// $values = mysql_query("SELECT * FROM ".$table."");
+	// while ($rowr = mysql_fetch_row($values)) {
+	// for ($j=0;$j<$i;$j++) {
+	// $csv_output .= $rowr[$j]."; ";
+	// }
+	// $csv_output .= "\n";
+	// }
+
+	$filename = $obj->post_title."_payments_".date("Y-m-d_H-i",time());
+	header("Content-type: application/vnd.ms-excel");
+	header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+	header( "Content-disposition: filename=".$filename.".csv");
+	print $csv_output;
+	exit;
+	
+    // Handle request then generate response using echo or leaving PHP and using HTML
 }
 class Kkd_Pff_Paystack_Wp_List_Table{
     public function __construct(){
@@ -591,7 +705,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
 
 			global $wpdb;
 
-		  $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+		  	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 			$data = array();
 			$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')");
 
@@ -603,8 +717,8 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
 					$txn_code = $dbdata->txn_code;
 				}
 				$data[] = array(
-							'id'  => $newkey,
-							'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
+					'id'  => $newkey,
+					'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
 		          'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
 		          'txn_code' => $txn_code,
 		          'metadata' => format_data($dbdata->metadata),

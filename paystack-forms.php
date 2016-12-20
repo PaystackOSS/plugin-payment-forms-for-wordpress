@@ -158,3 +158,13 @@ function kkd_pff_paystack_invoice_url_rewrite(){
     $wp_rewrite->non_wp_rules['paystackinvoice/$'] = $plugin_url;
     file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );
 }
+
+add_action( 'init', 'kkd_pff_paystack_webhook_url_rewrite' );
+function kkd_pff_paystack_webhook_url_rewrite(){
+    global $wp_rewrite;
+    $plugin_url = plugins_url( 'includes/paystack-webhook.php', __FILE__ );
+    $plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
+    $wp_rewrite->non_wp_rules['kkd_wppf_webhoook$'] = $plugin_url;
+    $wp_rewrite->non_wp_rules['kkd_wppf_webhoook/$'] = $plugin_url;
+    file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );
+}
