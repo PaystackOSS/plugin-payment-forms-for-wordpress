@@ -1,5 +1,7 @@
 <?php
-require_once('../../../../wp-load.php');
+// $parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
+// require_once( $parse_uri[0] . 'wp-load.php' );
+require_once(ABSPATH.'wp-load.php');
 
 $code = @$_GET['code'];
 function kkd_format_metadata($data){
