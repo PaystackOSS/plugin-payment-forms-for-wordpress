@@ -33,7 +33,7 @@ class Kkd_Pff_Paystack_Admin {
 			?>
 			 <h1>Paystack Forms API KEYS Settings!</h1>
 			
-        		<h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></
+        		<h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4>
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">

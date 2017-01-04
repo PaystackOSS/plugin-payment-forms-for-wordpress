@@ -647,7 +647,7 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
 	ob_end_clean();
 	$admin_email = get_option('admin_email');
 	$website = get_option('blogname');
-	$headers = array("From: $website <$admin_email>" . "\r\n");
+	// $headers = array("From: $website <$admin_email>" . "\r\n");
 	$headers = "From: ".$website."<$admin_email>" . "\r\n";
 	wp_mail($admin_email, $email_subject, $message,$headers);
 
@@ -1233,16 +1233,17 @@ function kkd_pff_paystack_submit_action() {
   );
 	$exist = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
 			AND email = '".$insert['email']."'
-			AND user_id = '".$insert['pf-user_id']."'
+			AND user_id = '".$insert['user_id']."'
 			AND amount = '".$insert['amount']."'
 			AND plan = '".$insert['plan']."'
 			AND ip = '".$insert['ip']."'
 			AND paid = '0'
 			AND metadata = '". $insert['metadata'] ."')");
 	 if (count($exist) > 0) {
-		 $insert['txn_code'] = $exist[0]->txn_code;
-		 $insert['plan'] = $exist[0]->plan;
-
+		 // $insert['txn_code'] = $code;
+		 // $insert['plan'] = $exist[0]->plan;
+		 $wpdb->update( $table, array( 'txn_code' => $code,'plan' =>$insert['plan']),array('id'=>$exist[0]->id));
+							
    } else {
 		 $wpdb->insert(
 	        $table,
@@ -1401,6 +1402,9 @@ function kkd_pff_paystack_confirm_payment() {
 				$result = "failed";
 			}
 
+		}else{
+			$message = "Payment Verifiction Failed";
+				$result = "failed";
 		}
 	}else{
 		$message = "Payment Verification Failed.";
