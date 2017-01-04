@@ -1594,7 +1594,8 @@ function kkd_pff_paystack_rconfirm_payment() {
 			$decoded = json_decode($payment_array->metadata);
 			$fullname = $decoded[0]->value;
 			kkd_pff_paystack_send_receipt($payment_array->post_id,$currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
-
+			kkd_pff_paystack_send_receipt_owner($payment_array->post_id,$currency,$amount_paid,$fullname,$payment_array->email,$paystack_ref,$payment_array->metadata);
+			
 		}
 
 	}
