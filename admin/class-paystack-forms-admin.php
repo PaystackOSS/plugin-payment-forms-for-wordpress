@@ -335,7 +335,7 @@ class Kkd_Pff_Paystack_Admin {
 			if ($heading == "") {$heading = "We've received your payment";}
 			if ($message == "") {$message = 'Your payment was received and we appreciate it.';}
 	  	// Echo out the field
-			echo '<p>Send Invoice for failed transactions:</p>';
+			echo '<p>Send an invoices when a payment is attempted:</p>';
 			echo '<select class="form-control" name="_sendinvoice" id="parent_id" style="width:100%;">
 			       <option value="no" '.kkd_pff_paystack_txncheck('no',$sendinvoice).'>Don\'t send</option>
 			       <option value="yes" '.kkd_pff_paystack_txncheck('yes',$sendinvoice).'>Send</option>
