@@ -32,6 +32,8 @@ class Kkd_Pff_Paystack_Admin {
 		function kkd_pff_paystack_setting_page() {
 			?>
 			 <h1>Paystack Forms API KEYS Settings!</h1>
+			
+        		<h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4>
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">
@@ -47,8 +49,7 @@ class Kkd_Pff_Paystack_Admin {
 								<tr valign="top">
 				        <th scope="row">Test Secret Key</th>
 				        <td>
-
-								<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
+				        	<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
 				        </tr>
 
 				        <tr valign="top">
@@ -169,7 +170,7 @@ class Kkd_Pff_Paystack_Admin {
 	  	$columns = array(
 	  		'cb' => '<input type="checkbox" />',
 	  		'title' => __( 'Name' ),
-				'shortcode' => __( 'Shortcode' ),
+			'shortcode' => __( 'Shortcode' ),
 	  		'payments' => __( 'Payments' ),
 	  		'date' => __( 'Date' )
 	  	);
@@ -260,6 +261,7 @@ class Kkd_Pff_Paystack_Admin {
 			add_meta_box('kkd_pff_paystack_editor_add_email_data', 'Email Receipt Settings', 'kkd_pff_paystack_editor_add_email_data', 'paystack_form', 'normal', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_quantity_data', 'Quantity Payment', 'kkd_pff_paystack_editor_add_quantity_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_agreement_data', 'Agreement checkbox', 'kkd_pff_paystack_editor_add_agreement_data', 'paystack_form', 'side', 'default');
+			add_meta_box('kkd_pff_paystack_editor_add_subaccount_data', 'Sub Account', 'kkd_pff_paystack_editor_add_subaccount_data', 'paystack_form', 'side', 'default');
 			
 	  }
 
@@ -279,6 +281,7 @@ class Kkd_Pff_Paystack_Admin {
 				$loggedin = get_post_meta($post->ID, '_loggedin', true);
 				$currency = get_post_meta($post->ID, '_currency', true);
 		    $filelimit = get_post_meta($post->ID, '_filelimit', true);
+		    $redirect = get_post_meta($post->ID, '_redirect', true);
 
 				if ($amount == "") {$amount = 0;}
 				if ($filelimit == "") {$filelimit = 2;}
@@ -297,7 +300,7 @@ class Kkd_Pff_Paystack_Admin {
 				echo '<p>Transaction Charges:</p>';
 				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
 								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Extra Fee added) - 1.55%+ NGN100 if above NGN2,500 </option>
+								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Calculated Paystack Local Fee added) </option>
 							</select>';
 				echo '<p>User logged In:</p>';
 				echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
@@ -306,8 +309,10 @@ class Kkd_Pff_Paystack_Admin {
 							</select>';
 		  	echo '<p>Success Message after Payment</p>';
 		    echo '<textarea rows="3"  name="_successmsg"  class="widefat" >'.$successmsg.'</textarea>';
-				echo '<p>File Upload Limit(MB):</p>';
+			echo '<p>File Upload Limit(MB):</p>';
 		  	echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
+		  	echo '<p>Redirect to page link after payment(keep blank to use normal success message):</p>';
+		  	echo '<input ttype="text" name="_redirect" value="' . $redirect  . '" class="widefat" />';
 
 	  }
 	function kkd_pff_paystack_editor_add_email_data() {
@@ -413,6 +418,27 @@ class Kkd_Pff_Paystack_Admin {
 	  	echo '<input type="text" name="_agreementlink" value="' . $agreementlink  . '" class="widefat" />';
 
 	}
+	function kkd_pff_paystack_editor_add_subaccount_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$subaccount = get_post_meta($post->ID, '_subaccount', true);
+			$txnbearer = get_post_meta($post->ID, '_txnbearer', true);
+
+		
+			if ($subaccount  == "") {$subaccount = '';}
+		echo '<p>Sub Account code:</p>';
+	  	echo '<input type="text" name="_subaccount" value="' . $subaccount  . '" class="widefat" />';
+	  	echo '<p>Transaction Charge bearer:</p>';
+			echo '<select class="form-control" name="_txnbearer" id="parent_id" style="width:100%;">
+							<option value="account" '.kkd_pff_paystack_txncheck('account',$txnbearer).'>Merchant (default)</option>
+							<option value="subaccount" '.kkd_pff_paystack_txncheck('subaccount',$txnbearer).'>Sub Account</option>
+						</select>';
+	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
@@ -424,13 +450,14 @@ class Kkd_Pff_Paystack_Admin {
 				return $post->ID;
 			}
 
-		  $form_meta['_amount'] = $_POST['_amount'];
+		  	$form_meta['_amount'] = $_POST['_amount'];
 			$form_meta['_paybtn'] = $_POST['_paybtn'];
 			$form_meta['_currency'] = $_POST['_currency'];
 			$form_meta['_successmsg'] = $_POST['_successmsg'];
 			$form_meta['_txncharge'] = $_POST['_txncharge'];
 			$form_meta['_loggedin'] = $_POST['_loggedin'];
 			$form_meta['_filelimit'] = $_POST['_filelimit'];
+			$form_meta['_redirect'] = $_POST['_redirect'];
 			///
 			$form_meta['_subject'] = $_POST['_subject'];
 			$form_meta['_heading'] = $_POST['_heading'];
@@ -444,6 +471,8 @@ class Kkd_Pff_Paystack_Admin {
 
 			$form_meta['_useagreement'] = $_POST['_useagreement'];
 			$form_meta['_agreementlink'] = $_POST['_agreementlink'];
+			$form_meta['_subaccount'] = $_POST['_subaccount'];
+			$form_meta['_txnbearer'] = $_POST['_txnbearer'];
 
 			// Add values of $form_meta as custom fields
 
@@ -494,11 +523,26 @@ function kkd_pff_paystack_payment_submissions(){
 		 $loggedin = get_post_meta($id,'_loggedin',true);
 		 $txncharge = get_post_meta($id,'_txncharge',true);
 
-		 echo "<title>".$obj->post_title." Payments </title>";
-		 echo "<h1>".$obj->post_title." Payments</h1>";
 		 $exampleListTable = new Kkd_Pff_Paystack_Payments_List_Table();
-		 $exampleListTable->prepare_items();
+		$data = $exampleListTable->prepare_items();
+		
 		 ?>
+		 <div id="welcome-panel" class="welcome-panel">
+			<div class="welcome-panel-content">
+				<h1 style="margin: 0px;"><?php echo $obj->post_title; ?> Payments </h1>
+				<p class="about-description">All payments made for this form</p>
+				<?php if ($data > 0) { ?>
+					
+				<form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+				  <input type="hidden" name="action" value="kkd_pff_export_excel">
+				  <input type="hidden" name="form_id" value="<?php echo $id; ?>">
+				  <button type="submit"  class="button button-primary button-hero load-customize" >Export Data to Excel</button>
+				</form>
+				<?php } ?>
+				
+				<br><br>
+			</div>
+		</div>
 		 <div class="wrap">
 				 <div id="icon-users" class="icon32"></div>
 				 <?php $exampleListTable->display(); ?>
@@ -506,6 +550,81 @@ function kkd_pff_paystack_payment_submissions(){
 		 <?php
 
 	}
+}
+add_action( 'admin_post_kkd_pff_export_excel', 'Kkd_pff_export_excel' );
+
+function Kkd_pff_export_excel() {
+	global $wpdb;
+	
+	$post_id = $_POST['form_id'];
+	$obj = get_post($post_id);
+	$csv_output = "";
+	
+	
+  	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+	$data = array();
+	$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')  ORDER BY `id` ASC");
+	$i = 0;
+	
+	if (count($alldbdata) > 0) {
+			$header = $alldbdata[0];
+			$csv_output .= "#,";
+			$csv_output .= "Email,";
+			$csv_output .= "Amount,";
+			$csv_output .= "Reference,";
+			$new = json_decode($header->metadata);
+			$text = '';
+			if (array_key_exists("0", $new)) {
+				foreach ($new as $key => $item) {
+					$csv_output .= $item->display_name.",";
+				}
+			}else{
+				if (count($new) > 0) {
+					foreach ($new as $key => $item) {
+						$csv_output .= $key.",";
+					}
+				}
+			}
+			$csv_output .= "\n";
+			
+			foreach ($alldbdata as $key => $dbdata) {
+			$newkey = $key+1;
+			if ($dbdata->txn_code_2 != "") {
+				$txn_code = $dbdata->txn_code_2;
+			}else{
+				$txn_code = $dbdata->txn_code;
+			}
+			$csv_output .= $newkey.",";
+			$csv_output .= $dbdata->email.",";
+			$csv_output .= $currency.' '.$dbdata->amount.",";
+			$csv_output .= $txn_code.",";
+			$new = json_decode($header->metadata);
+			$text = '';
+			if (array_key_exists("0", $new)) {
+				foreach ($new as $key => $item) {
+					$csv_output .= $item->value.",";
+				}
+			}else{
+				if (count($new) > 0) {
+					foreach ($new as $key => $item) {
+						$csv_output .= $item.",";
+					}
+				}
+			}
+			$csv_output .= "\n";
+		}
+
+
+		$filename = $obj->post_title."_payments_".date("Y-m-d_H-i",time());
+		header("Content-type: application/vnd.ms-excel");
+		header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+		header( "Content-disposition: filename=".$filename.".csv");
+		print $csv_output;
+		exit;
+	}
+	
+	
+    // Handle request then generate response using echo or leaving PHP and using HTML
 }
 class Kkd_Pff_Paystack_Wp_List_Table{
     public function __construct(){
@@ -561,17 +680,22 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
 
 			global $wpdb;
 
-		  $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
+		  	$table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
 			$data = array();
 			$alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')");
 
 			foreach ($alldbdata as $key => $dbdata) {
 				$newkey = $key+1;
+				if ($dbdata->txn_code_2 != "") {
+					$txn_code = $dbdata->txn_code_2;
+				}else{
+					$txn_code = $dbdata->txn_code;
+				}
 				$data[] = array(
-							'id'  => $newkey,
-							'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
+					'id'  => $newkey,
+					'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
 		          'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
-		          'txn_code' => $dbdata->txn_code,
+		          'txn_code' => $txn_code,
 		          'metadata' => format_data($dbdata->metadata),
 		          'date'  => $dbdata->created_at
 				);
@@ -591,6 +715,9 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
        $data = array_slice($data,(($currentPage-1)*$perPage),$perPage);
        $this->_column_headers = array($columns, $hidden, $sortable);
        $this->items = $data;
+
+       $rows = count($alldbdata);
+       return $rows;
    }
 	 public function get_columns(){
        $columns = array(

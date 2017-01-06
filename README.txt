@@ -3,8 +3,8 @@ Contributors: kendysond
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
-Tested up to: 4.6.1
-Stable tag: 1.1.0
+Tested up to: 4.7
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,13 @@ Setting the form payment amount to '0' allows the user to make a custom payment 
 When you set the 'recur' option to 'optional' on the form settings, your donors/members will have the option of making a one-time payment or weekly,monthly or annually recurring payment.
 
 This can come in handy for weekly/monthly offerings & tithes or recurring donor donations.
+
+= For selling items =
+
+To create a form to allow your users buy or pay for value in quantity.
+
+*  Set quantified to be 'yes'.
+*  Set the max quantity a user can buy.
 
 = Plugin Features =
 
@@ -77,6 +84,21 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.0.3 =
+*  Send email notification to merchant for every payment.
+*  Export payment data to CSV.
+= 2.0.2 =
+*  Price calculation and bug fixes.
+= 2.0.1 =
+*  Bug fixes.
+= 2.0.1 =
+*  Added option to use subaccount on a form.
+*  General bug fixes.
+= 2.0.0 =
+*  Fixed compatibility for PHP 5.3 and below.
+*  Added option to redirect to page after payment.
+*  Add retry payment link to email invoice.
+*  Fixed pricing calculation.
 = 1.1.1 =
 *  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
 = 1.1.0 =

@@ -43,7 +43,7 @@ class Kkd_Pff_Paystack {
 	public function __construct() {
 
 		$this->plugin_name = 'pff-paystack';
-		$this->version = '1.0.4';
+		$this->version = '2.0.0';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -144,6 +144,7 @@ function add_tinymce_toolbar_button( $buttons ) {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-paystack-forms-public.php';
+		// require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/paystack-webhook.php';
 
 		$this->loader = new Kkd_Pff_Paystack_Loader();
 

@@ -7,7 +7,7 @@
 /*=================================================================*/
 .paystack-cardlogos {
 	width:300px !important;
-	height:36px !important;
+	height:87px !important;
 }
 
 /* Default
@@ -24,6 +24,27 @@
 
 .wrapper-640 { max-width:640px; }
 
+
+#pf-form.j-forms {
+	 /*max-width:640px;*/
+	 /*margin-left:70px;*/
+	background-color:#fff;
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	-o-border-radius:3px;
+	border-radius:3px;
+	-webkit-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	-moz-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	-o-box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	box-sizing:border-box;
+	color:rgba(0,0,0,.54);
+	font:16px 'Open Sans',Helvetica,Arial,sans-serif;
+	line-height:1;
+	position:relative;
+}
 .j-forms .input { position:relative; }
 
 .j-forms .unit { position:relative; margin-bottom:25px; }
@@ -1789,3 +1810,10 @@
      border-color: red  !important;
 }
 /*#3676c8*/
+.j-forms strong {
+	color:#333 !important;
+	font-size: 18px  !important;
+}
+.j-forms .inline {
+	display:inline-block !important;
+}
