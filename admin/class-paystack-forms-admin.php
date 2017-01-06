@@ -327,12 +327,19 @@ class Kkd_Pff_Paystack_Admin {
 	  	$heading = get_post_meta($post->ID, '_heading', true);
 			$message = get_post_meta($post->ID, '_message', true);
 			$sendreceipt = get_post_meta($post->ID, '_sendreceipt', true);
+			$sendinvoice = get_post_meta($post->ID, '_sendinvoice', true);
 
 			if ($subject == "") {$subject = 'Thank you for your payment';}
 			if ($sendreceipt == "") {$sendreceipt = 'yes';}
+			if ($sendinvoice == "") {$sendinvoice = 'yes';}
 			if ($heading == "") {$heading = "We've received your payment";}
 			if ($message == "") {$message = 'Your payment was received and we appreciate it.';}
 	  	// Echo out the field
+			echo '<p>Send an invoices when a payment is attempted:</p>';
+			echo '<select class="form-control" name="_sendinvoice" id="parent_id" style="width:100%;">
+			       <option value="no" '.kkd_pff_paystack_txncheck('no',$sendinvoice).'>Don\'t send</option>
+			       <option value="yes" '.kkd_pff_paystack_txncheck('yes',$sendinvoice).'>Send</option>
+			   </select>';
 			echo '<p>Send Email Receipt:</p>';
 			echo '<select class="form-control" name="_sendreceipt" id="parent_id" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no',$sendreceipt).'>Don\'t send</option>
