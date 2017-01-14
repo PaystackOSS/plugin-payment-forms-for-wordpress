@@ -705,6 +705,9 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			$quantity = get_post_meta($id,'_quantity',true);
 			$useagreement = get_post_meta($id,'_useagreement',true);
 			$agreementlink = get_post_meta($id,'_agreementlink',true);
+			$minimum = get_post_meta($id,'_minimum',true);
+			if ($minimum == "") {$minimum = 0;}
+
 			$showbtn = true;
 			$planerrorcode = 'Input Correct Recurring Plan Code';
 			  if ($recur == 'plan') {
@@ -758,6 +761,10 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 echo '<div class="span12 unit">
 				 <label class="label">Amount ('.$currency.') <span>*</span></label>
 				 <div class="input">';
+				 // echo "<pre>".$minimum. "</pre>";
+				 if ($minimum == 1) {
+					 echo '<small> Minimum payable amount <b style="font-size:87% !important;">'.$currency.'  '.number_format($amount).'</b></small>';
+				 }
 				 if ($recur == 'plan') {
 					 if ($showbtn) {
 						 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
@@ -771,7 +778,9 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 }else{
 					 	if ($amount == 0) {
 						 echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
-					 	}else{
+					 	}elseif($amount != 0 && $minimum == 1){
+							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" required/>';
+						}else{
 							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
 						}
 				 }
@@ -1080,13 +1089,14 @@ function kkd_pff_paystack_submit_action() {
 
 	$filelimit = get_post_meta($_POST["pf-id"],'_filelimit',true);
 	$currency = get_post_meta($_POST["pf-id"],'_currency',true);
-	$formamount = get_post_meta($_POST["pf-id"],'_amount',true);
+	$formamount = get_post_meta($_POST["pf-id"],'_amount',true);/// From form
 	$recur = get_post_meta($_POST["pf-id"],'_recur',true);
 	$subaccount = get_post_meta($_POST["pf-id"],'_subaccount',true);
 	$txnbearer = get_post_meta($_POST["pf-id"],'_txnbearer',true);
 
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
-	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
+	$minimum = get_post_meta($_POST["pf-id"],'_minimum',true);
+	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);//User input
 	$originalamount = $amount;
 	$quantity = 1;
 	$usequantity = get_post_meta($_POST["pf-id"],'_usequantity',true);
@@ -1103,6 +1113,13 @@ function kkd_pff_paystack_submit_action() {
 			$quantity = $_POST["pf-quantity"];
 			$unitamount = (int)str_replace(' ', '', $formamount);
 			$amount = $quantity*$unitamount;
+		}
+	}
+	if ($minimum == 1 && $formamount != 0) {
+		if ($originalamount < $formamount) {
+			$amount = $formamount;
+		}else{
+			$amount = $originalamount;
 		}
 	}
 	if ($txncharge == 'customer') {
@@ -1337,8 +1354,16 @@ function kkd_pff_paystack_confirm_payment() {
 		$currency = get_post_meta($payment_array->post_id,'_currency',true);
 		$txncharge = get_post_meta($payment_array->post_id,'_txncharge',true);
 		$redirect = get_post_meta($payment_array->post_id,'_redirect',true);
+		$minimum = get_post_meta($payment_array->post_id,'_minimum',true);
 
-
+		if ($minimum == 1 && $amount != 0) {
+			if ($payment_array->amount < $formamount) {
+				$amount = $formamount;
+			}else{
+				$amount = $payment_array->amount;
+			}
+		}
+		$oamount = $amount;
 		$mode =  esc_attr( get_option('mode') );
 		if ($mode == 'test') {
 			$key = esc_attr( get_option('tsk') );
@@ -1383,10 +1408,11 @@ function kkd_pff_paystack_confirm_payment() {
 								}
 
 
-								if ($txncharge == 'customer') {
-									$amount = kkd_pff_paystack_add_paystack_charge($amount);
-								}
-								if( $amount !=  $amount_paid ) {
+								// if ($txncharge == 'customer') {
+								// 	$amount = kkd_pff_paystack_add_paystack_charge($amount);
+								// }
+								if( $oamount !=  $amount_paid ) {
+									echo $amount. ' - '.$amount_paid;
 									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
 									$result = "failed";
 								}else{

@@ -282,6 +282,7 @@ class Kkd_Pff_Paystack_Admin {
 				$currency = get_post_meta($post->ID, '_currency', true);
 		    $filelimit = get_post_meta($post->ID, '_filelimit', true);
 		    $redirect = get_post_meta($post->ID, '_redirect', true);
+		    $minimum = get_post_meta($post->ID, '_minimum', true);
 
 				if ($amount == "") {$amount = 0;}
 				if ($filelimit == "") {$filelimit = 2;}
@@ -289,13 +290,19 @@ class Kkd_Pff_Paystack_Admin {
 				if ($successmsg == "") {$successmsg = 'Thank you for paying!';}
 				if ($currency == "") {$currency = 'NGN';}
 				if ($txncharge == "") {$txncharge = 'merchant';}
+				if ($minimum == "") {$minimum = 0;}
 		  	// Echo out the field
 				echo '<p>Currency:</p>';
 		  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
 				<small>We currently support only payments in Naira(NGN).</small>';
 				echo '<p>Amount to be paid(Set 0 for customer input):</p>';
 		  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
-				echo '<p>Pay button Description:</p>';
+		  	if ($minimum == 1) {
+		  		echo '<br><label><input name="_minimum" type="checkbox" value="1" checked> Make amount minimum payable </label>';
+		  	}else{
+		  		echo '<br><label><input name="_minimum" type="checkbox" value="1"> Make amount minimum payable </label>';
+		  	}
+			echo '<p>Pay button Description:</p>';
 		  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
 				echo '<p>Transaction Charges:</p>';
 				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
@@ -458,6 +465,7 @@ class Kkd_Pff_Paystack_Admin {
 			}
 
 		  	$form_meta['_amount'] = $_POST['_amount'];
+		  	$form_meta['_minimum'] = $_POST['_minimum'];
 			$form_meta['_paybtn'] = $_POST['_paybtn'];
 			$form_meta['_currency'] = $_POST['_currency'];
 			$form_meta['_successmsg'] = $_POST['_successmsg'];

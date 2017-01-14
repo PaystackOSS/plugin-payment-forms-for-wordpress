@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
 Requires at least: 3.1
 Tested up to: 4.7
-Stable tag: 2.0.3
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,10 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.0.5 =
+*  Set minimum payable amount. 
+= 2.0.4 =
+*  Fix for no action after clicking the pay button. 
 = 2.0.3 =
 *  Send email notification to merchant for every payment.
 *  Export payment data to CSV.

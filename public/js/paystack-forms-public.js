@@ -158,8 +158,7 @@
 						 					subaccount:data.subaccount,
 						 					bearer:data.txnbearer,
                             				ref: data.code,
-                            				transaction_charge:'0',
-						 					metadata: {'custom_fields': data.custom_fields},
+                            				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
 						 						$.blockUI({ message: 'Please wait...' });
 						 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref,'quantity':quantity}, function(newdata) {
@@ -199,7 +198,6 @@
 			 								lastname: lastName,
 						 					ref: data.code,
 						 					subaccount:data.subaccount,
-						 					transaction_charge:'0',
 						 					bearer:data.txnbearer,
                             				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
