@@ -157,6 +157,7 @@
 			 								lastname: lastName,
 						 					subaccount:data.subaccount,
 						 					bearer:data.txnbearer,
+						 					transaction_charge:data.transaction_charge,
                             				ref: data.code,
                             				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
@@ -199,6 +200,7 @@
 						 					ref: data.code,
 						 					subaccount:data.subaccount,
 						 					bearer:data.txnbearer,
+                            				transaction_charge:data.transaction_charge,
                             				metadata: {'custom_fields': data.custom_fields},
 						 					callback: function(response){
 						 						$.blockUI({ message: 'Please wait...' });
@@ -277,7 +279,10 @@
 									firstname: firstName,
 	 								lastname: lastName,
 				 					ref: data.code,
-				 					metadata: {'custom_fields': data.custom_fields},
+				 					subaccount:data.subaccount,
+				 					bearer:data.txnbearer,
+                    				transaction_charge:data.transaction_charge,
+                    				metadata: {'custom_fields': data.custom_fields},
 				 					callback: function(response){
 				 						$.blockUI({ message: 'Please wait...' });
 				 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref,'quantity':quantity}, function(newdata) {
@@ -316,7 +321,10 @@
 									firstname: firstName,
 	 								lastname: lastName,
 				 					ref: data.code,
-				 					metadata: {'custom_fields': data.custom_fields},
+				 					subaccount:data.subaccount,
+				 					bearer:data.txnbearer,
+                    				transaction_charge:data.transaction_charge,
+                    				metadata: {'custom_fields': data.custom_fields},
 				 					callback: function(response){
 				 						$.blockUI({ message: 'Please wait...' });
 				 						$.post($form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref}, function(newdata) {

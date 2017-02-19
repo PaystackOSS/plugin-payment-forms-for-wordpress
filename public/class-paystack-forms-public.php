@@ -1102,7 +1102,9 @@ function kkd_pff_paystack_submit_action() {
 	$recur = get_post_meta($_POST["pf-id"],'_recur',true);
 	$subaccount = get_post_meta($_POST["pf-id"],'_subaccount',true);
 	$txnbearer = get_post_meta($_POST["pf-id"],'_txnbearer',true);
-
+	$transaction_charge = get_post_meta($_POST["pf-id"],'_merchantamount',true);
+	$transaction_charge = $transaction_charge*100;
+		
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
 	$minimum = get_post_meta($_POST["pf-id"],'_minimum',true);
 	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);//User input
@@ -1279,7 +1281,14 @@ function kkd_pff_paystack_submit_action() {
 			kkd_pff_paystack_send_invoice($currency,$insert['amount'],$fullname,$insert['email'],$code);
 		}
 	}
-
+	if ($subaccount == "" || !isset($subaccount)) {
+		$subaccount = NULL;
+		$txnbearer = NULL;
+		$transaction_charge = NULL;
+	}
+	if ($transaction_charge == "" || $transaction_charge == 0 || $transaction_charge == NULL) {
+		$transaction_charge = NULL;
+	}
 	 $response = array(
      'result' => 'success',
 		 'code' => $insert['txn_code'],
@@ -1290,7 +1299,8 @@ function kkd_pff_paystack_submit_action() {
    	 'total' => $insert['amount']*100,
 		 'custom_fields' => $fixedmetadata,
 		 'subaccount' => $subaccount,
-		 'txnbearer' => $txnbearer
+		 'txnbearer' => $txnbearer,
+		 'transaction_charge' => $transaction_charge
    );
   echo json_encode($response);
 
@@ -1502,6 +1512,10 @@ function kkd_pff_paystack_retry_action() {
 		$wpdb->update( $table, array( 'txn_code_2' => $newcode),array('txn_code' => $code));
 								
 		$currency = get_post_meta($dbdata->post_id,'_currency',true);
+		$subaccount = get_post_meta($dbdata->post_id,'_subaccount',true);
+		$txnbearer = get_post_meta($dbdata->post_id,'_txnbearer',true);
+		$transaction_charge = get_post_meta($dbdata->post_id,'_merchantamount',true);
+		$transaction_charge = $transaction_charge*100;
 		$fixedmetadata = kkd_pff_paystack_meta_as_custom_fields($dbdata->metadata);
 		$nmeta = json_decode($dbdata->metadata);
 		foreach ($nmeta as $nkey => $nvalue) {
@@ -1514,7 +1528,14 @@ function kkd_pff_paystack_retry_action() {
 		}
 
 	}
-
+	if ($subaccount == "" || !isset($subaccount)) {
+		$subaccount = NULL;
+		$txnbearer = NULL;
+		$transaction_charge = NULL;
+	}
+	if ($transaction_charge == "" || $transaction_charge == 0 || $transaction_charge == NULL || !isset($transaction_charge)) {
+		$transaction_charge = NULL;
+	}
 	 $response = array(
      'result' => 'success',
 		 'code' => $newcode,
@@ -1523,7 +1544,10 @@ function kkd_pff_paystack_retry_action() {
 		 'email' => $dbdata->email,
      'name' => $fullname,
    	 'total' => $dbdata->amount*100,
-		 'custom_fields' => $fixedmetadata
+		 'custom_fields' => $fixedmetadata,
+		 'subaccount' => $subaccount,
+		 'txnbearer' => $txnbearer,
+		 'transaction_charge' => $transaction_charge
    );
   echo json_encode($response);
 
