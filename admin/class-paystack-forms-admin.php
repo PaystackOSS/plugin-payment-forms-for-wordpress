@@ -31,9 +31,10 @@ class Kkd_Pff_Paystack_Admin {
 		}
 		function kkd_pff_paystack_setting_page() {
 			?>
-			 <h1>Paystack Forms API KEYS Settings!</h1>
+			 <h1>Paystack Forms API keys settings</h1>
 			
-        		<h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4>
+        		<!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
+        		<h3>Get your api keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </h4>
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">
@@ -42,8 +43,8 @@ class Kkd_Pff_Paystack_Admin {
 
 								<td>
 									<select class="form-control" name="mode" id="parent_id">
-										<option value="live" <?php echo kkd_pff_paystack_txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
 										<option value="test" <?php echo kkd_pff_paystack_txncheck('test',esc_attr( get_option('mode') )) ?>>Test Mode</option>
+										<option value="live" <?php echo kkd_pff_paystack_txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
 									</select>
 								</tr>
 								<tr valign="top">

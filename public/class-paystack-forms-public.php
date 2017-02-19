@@ -696,7 +696,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
    ), $atts));
     $pk = Kkd_Pff_Paystack_Public::fetchPublicKey();
     if(!$pk){
-        echo "<h5>You must set your Paystack API keys to receive payments</h5>";
+		$settingslink = get_admin_url().'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php';
+        echo "<h5>You must set your Paystack API keys first <a href='".$settingslink."'>settings</a></h5>";
     }
     else if ($id != 0) {
      $obj = get_post($id);
