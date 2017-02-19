@@ -137,7 +137,7 @@ class Kkd_Pff_Paystack_Admin {
 				return $qtInit;
 		}
 		function kkd_pff_paystack_disable_wyswyg( $default ){
-	    global $post_type, $_wp_theme_features;;
+	    global $post_type, $_wp_theme_features;
 
 
 	    if ($post_type == 'paystack_form') {
@@ -222,22 +222,10 @@ class Kkd_Pff_Paystack_Admin {
 		    do_meta_boxes( null, 'custom-metabox-holder', $post );
 		}
 		add_action( 'edit_form_after_title', 'kkd_pff_paystack_editor_help_metabox' );
-		function kkd_pff_paystack_editor_add_help_metabox() {
-
-				add_meta_box(
-					'awesome_metabox_id',
-					'Help Section',
-					'kkd_pff_paystack_editor_help_metabox_details',
-					'paystack_form',
-					'custom-metabox-holder'	//Look what we have here, a new context
-				);
-
-		}
-		add_action( 'add_meta_boxes', 'kkd_pff_paystack_editor_add_help_metabox' );
-
+		
 		function kkd_pff_paystack_editor_help_metabox_details( $post ) {
 			echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
-	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+	  			wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
 
 			?>
 			<div class="awesome-meta-admin">
@@ -252,10 +240,25 @@ class Kkd_Pff_Paystack_Admin {
 
 		<?php
 		}
+		function kkd_pff_paystack_editor_shortcode_details( $post ) {
+			?>
+			<p class="description">
+				<label for="wpcf7-shortcode">Copy this shortcode and paste it into your post, page, or text widget content:</label>
+				<span class="shortcode wp-ui-highlight">
+				<input type="text" id="wpcf7-shortcode" onfocus="this.select();" readonly="readonly" class="large-text code" 
+				value="[pff-paystack id=&quot;<?php echo $post->ID; ?>&quot;]"></span>
+			</p>
+
+		<?php
+		}
 
 		add_action( 'add_meta_boxes', 'kkd_pff_paystack_editor_add_extra_metaboxes' );
 	  function kkd_pff_paystack_editor_add_extra_metaboxes() {
 
+	  		if ($_GET['action'] == 'edit') {
+	  			add_meta_box( 'kkd_pff_paystack_editor_help_shortcode', 'Paste shortcode on preferred page', 'kkd_pff_paystack_editor_shortcode_details', 'paystack_form', 'custom-metabox-holder');
+			}
+			add_meta_box( 'kkd_pff_paystack_editor_help_data', 'Help Section', 'kkd_pff_paystack_editor_help_metabox_details', 'paystack_form', 'custom-metabox-holder');
 			add_meta_box('kkd_pff_paystack_editor_add_form_data', 'Extra Form Description', 'kkd_pff_paystack_editor_add_form_data', 'paystack_form', 'normal', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_recur_data', 'Recurring Payment', 'kkd_pff_paystack_editor_add_recur_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_email_data', 'Email Receipt Settings', 'kkd_pff_paystack_editor_add_email_data', 'paystack_form', 'normal', 'default');
@@ -442,16 +445,21 @@ class Kkd_Pff_Paystack_Admin {
 	  	// Get the location data if its already been entered
 			$subaccount = get_post_meta($post->ID, '_subaccount', true);
 			$txnbearer = get_post_meta($post->ID, '_txnbearer', true);
+			$merchantamount = get_post_meta($post->ID, '_merchantamount', true);
 
 		
 			if ($subaccount  == "") {$subaccount = '';}
+			if ($merchantamount  == "") {$merchantamount = '';}
 		echo '<p>Sub Account code:</p>';
 	  	echo '<input type="text" name="_subaccount" value="' . $subaccount  . '" class="widefat" />';
 	  	echo '<p>Transaction Charge bearer:</p>';
-			echo '<select class="form-control" name="_txnbearer" id="parent_id" style="width:100%;">
-							<option value="account" '.kkd_pff_paystack_txncheck('account',$txnbearer).'>Merchant (default)</option>
-							<option value="subaccount" '.kkd_pff_paystack_txncheck('subaccount',$txnbearer).'>Sub Account</option>
-						</select>';
+		echo '<select class="form-control" name="_txnbearer" id="parent_id" style="width:100%;">
+						<option value="account" '.kkd_pff_paystack_txncheck('account',$txnbearer).'>Merchant (default)</option>
+						<option value="subaccount" '.kkd_pff_paystack_txncheck('subaccount',$txnbearer).'>Sub Account</option>
+					</select>';
+		echo '<p>Merchant Amount:</p>';
+	  	echo '<input type="text" name="_merchantamount" value="' . $merchantamount . '" class="widefat" />';
+	  	
 	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
@@ -488,6 +496,7 @@ class Kkd_Pff_Paystack_Admin {
 			$form_meta['_agreementlink'] = $_POST['_agreementlink'];
 			$form_meta['_subaccount'] = $_POST['_subaccount'];
 			$form_meta['_txnbearer'] = $_POST['_txnbearer'];
+			$form_meta['_merchantamount'] = $_POST['_merchantamount'];
 
 			// Add values of $form_meta as custom fields
 
