@@ -23,19 +23,23 @@ class Kkd_Pff_Paystack_Public {
 
 	}
 
-	public function enqueue_scripts() {
-
+	public static function fetchPublicKey(){
 		$mode =  esc_attr( get_option('mode') );
 		if ($mode == 'test') {
 			$key = esc_attr( get_option('tpk') );
 		}else{
 			$key = esc_attr( get_option('lpk') );
 		}
+		return $key;
+	}
+
+	public function enqueue_scripts() {
+
 		wp_enqueue_script( 'blockUI', plugin_dir_url( __FILE__ ) . 'js/jquery.blockUI.min.js', array( 'jquery' ), $this->version, false );
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
 		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
-		wp_localize_script( 'paystack_frontend', 'settings', array('key'=> $key));
+		wp_localize_script( 'paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey()));
 
 	}
 
@@ -690,7 +694,11 @@ function kkd_pff_paystack_form_shortcode($atts) {
 		extract(shortcode_atts(array(
       'id' => 0,
    ), $atts));
-  if ($id != 0) {
+    $pk = Kkd_Pff_Paystack_Public::fetchPublicKey();
+    if(!$pk){
+        echo "<h5>You must set your Paystack API keys to receive payments</h5>";
+    }
+    else if ($id != 0) {
      $obj = get_post($id);
 		 if ($obj->post_type == 'paystack_form') {
 			$amount = get_post_meta($id,'_amount',true);
