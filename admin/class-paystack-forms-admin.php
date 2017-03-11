@@ -427,7 +427,7 @@ class Kkd_Pff_Paystack_Admin {
 			if ($useagreement == "") {$useagreement = 'no';}
 			if ($agreementlink  == "") {$agreementlink = '';}
 			// Echo out the field
-			echo '<small>Allow your users pay in multiple quantity</small><p>Use agreement checkbox:</p>';
+			echo '<p>Use agreement checkbox:</p>';
 			echo '<select class="form-control" name="_useagreement" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no',$useagreement).'>No</option>
 							<option value="yes" '.kkd_pff_paystack_txncheck('yes',$useagreement).'>Yes</option>

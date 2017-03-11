@@ -737,7 +737,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
 			 // echo get_site_url().'/paystackinvoice/?code=ddddddd';
-			 echo '<form  enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
+			 echo '<form version="2.0.7" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
 			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
@@ -1419,11 +1419,17 @@ function kkd_pff_paystack_confirm_payment() {
 							}else{
 								$usequantity = get_post_meta($payment_array->post_id,'_usequantity',true);
 								if ($usequantity == 'no') {
-									$amount = (int)str_replace(' ', '', $amount);
+									$oamount = (int)str_replace(' ', '', $amount);
 								}else{
 									$quantity = $_POST["quantity"];
 									$unitamount = (int)str_replace(' ', '', $amount);
-									$amount = $quantity*$unitamount;
+									$oamount = $quantity*$unitamount;
+
+									
+									
+								}
+								if ($txncharge == 'customer') {
+									$oamount = kkd_pff_paystack_add_paystack_charge($oamount);
 								}
 
 
@@ -1431,8 +1437,8 @@ function kkd_pff_paystack_confirm_payment() {
 								// 	$amount = kkd_pff_paystack_add_paystack_charge($amount);
 								// }
 								if( $oamount !=  $amount_paid ) {
-									echo $amount. ' - '.$amount_paid;
-									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
+									echo $oamount. ' - '.$amount_paid;
+									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
 									$result = "failed";
 								}else{
 

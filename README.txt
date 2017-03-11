@@ -1,10 +1,10 @@
 === Payment forms for Paystack ===
 Contributors: kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
 Requires at least: 3.1
 Tested up to: 4.7
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.0.7 =
+*  Bug fixes for quantity. 
 = 2.0.6 =
 *  Set transaction_charge for sub account implementation
 *  Copyable shortcode on admin form page
