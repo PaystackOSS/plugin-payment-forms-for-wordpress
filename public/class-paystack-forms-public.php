@@ -1286,9 +1286,9 @@ function kkd_pff_paystack_submit_action() {
 	        $table,
 	        $insert
 	    );
-	    if("yes" == get_post_meta($insert['post_id'],'_sendinvoice',true)){
+	    // if("yes" == get_post_meta($insert['post_id'],'_sendinvoice',true)){
 			kkd_pff_paystack_send_invoice($currency,$insert['amount'],$fullname,$insert['email'],$code);
-		}
+		// }
 	}
 	if ($subaccount == "" || !isset($subaccount)) {
 		$subaccount = NULL;
