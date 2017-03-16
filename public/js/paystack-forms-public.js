@@ -46,7 +46,7 @@
 		     function calculateFees() {
 		         setTimeout(function() {
 		             var transaction_amount = parseInt(amountField.val());
-								 var multiplier = 0.0155;
+								 var multiplier = 0.015;
 								 var fees = multiplier * transaction_amount;
 								 var extrafee = 0;
 								 if (fees > 2000) {
