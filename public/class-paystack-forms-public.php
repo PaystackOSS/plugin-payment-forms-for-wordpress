@@ -45,7 +45,7 @@ class Kkd_Pff_Paystack_Public {
 
 }
 
-define('KKD_PFF_PAYSTACK_PERCENTAGE', 0.015);
+define('KKD_PFF_PAYSTACK_PERCENTAGE', 0.0155);
 define('KKD_PFF_PAYSTACK_CROSSOVER_TOTAL', 250000);
 define('KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE', 10000);
 define('KKD_PFF_PAYSTACK_LOCAL_CAP', 200000);
@@ -57,13 +57,21 @@ define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS
 
 function kkd_pff_paystack_add_paystack_charge($amount)
 {
-    $amountinkobo = $amount * 100;
-    if ($amountinkobo > KKD_PFF_PAYSTACK_FLATLINE_AMOUNT)
-        return ($amountinkobo + KKD_PFF_PAYSTACK_LOCAL_CAP)/100;
-    elseif ($amountinkobo > KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT)
-        return (intval(($amountinkobo + KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE) / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
-    else
-        return (intval($amountinkobo / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
+    // $amountinkobo = $amount; // * 100;
+	$amount = intval($amount);
+    if ($amount <= 2500) {
+    	$amount = $amount + ($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
+    }else{
+    	$amount = $amount + ($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
+
+    }
+    return $amount;
+    // if ($amountinkobo > KKD_PFF_PAYSTACK_FLATLINE_AMOUNT)
+    //     return ($amountinkobo + KKD_PFF_PAYSTACK_LOCAL_CAP)/100;
+    // elseif ($amountinkobo > KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT)
+    //     return (intval(($amountinkobo + KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE) / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
+    // else
+    //     return (intval($amountinkobo / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
 }
 
 add_filter ("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
@@ -1135,6 +1143,7 @@ function kkd_pff_paystack_submit_action() {
 	}
 	if ($txncharge == 'customer') {
 		$amount = kkd_pff_paystack_add_paystack_charge($amount);
+		// print_r($amount);
 	}
 	$maxFileSize = $filelimit * 1024 * 1024;
 
