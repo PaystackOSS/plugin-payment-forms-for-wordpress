@@ -729,11 +729,10 @@ function kkd_pff_paystack_form_shortcode($atts) {
 		    if ($usevariableamount == "") {$usevariableamount = 0;}
 
 		    if ($usevariableamount == 1) {
-		    	// $variableamount = '3GB Etisalat:10000';
 		    	$paymentoptions = explode(',', $variableamount);
-		    	echo "<pre>";
-		    	print_r($paymentoptions);
-		    	echo "</pre>";
+		    	// echo "<pre>";
+		    	// print_r($paymentoptions);
+		    	// echo "</pre>";
 		    	// die();
 		    }
 			$showbtn = true;
@@ -782,7 +781,13 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 </div>
 			 </div>';
 			 echo '<div class="span12 unit">
-				 <label class="label">Amount ('.$currency.') <span>*</span></label>
+				 <label class="label">Amount ('.$currency;
+				 if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
+				 	echo ' '.number_format($amount);
+				 }
+				 
+
+				 echo ') <span>*</span></label>
 				 <div class="input">';
 				if ($usevariableamount == 0) {
 					if ($minimum == 1) {
@@ -813,7 +818,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 					}else{
 						if (count($paymentoptions) > 0) {
 								echo '<div class="select">
-			 				 	 	<input type="hidden"  id="pf-vname" />
+			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
 			 					 	$max = $quantity+1;
 			 					 	foreach ($paymentoptions as $key => $paymentoption) {
@@ -832,7 +837,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			echo '</div>
 			 </div>';
-			 if ($recur == 'no' && $usequantity == 'yes' && $amount != 0) {
+			 if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
 				echo '<div class="span12 unit">
  				 <label class="label">Quantity</label>
  				 <div class="select">
@@ -880,7 +885,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			if ($useagreement == 'yes'){
 				echo '<div class="span12 unit">
-						<label class="checkbox">
+						<label class="checkbox ">
 							<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
 							<i id="pf-agreementicon" ></i>
 							Accept terms <a target="_blank" href="'.$agreementlink.'">Link </a>
@@ -1142,24 +1147,15 @@ function kkd_pff_paystack_submit_action() {
 	$minimum = get_post_meta($_POST["pf-id"],'_minimum',true);
 	$variableamount = get_post_meta($_POST["pf-id"],'_variableamount',true);
 	$usevariableamount = get_post_meta($_POST["pf-id"],'_usevariableamount',true);
-	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);//User input
+	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
+	$variablename = $_POST["pf-vname"];
+	// pf-vname
 	$originalamount = $amount;
 	$quantity = 1;
 	$usequantity = get_post_meta($_POST["pf-id"],'_usequantity',true);
+
 	if(($recur == 'no') && ($formamount != 0)){
-		if ($usequantity == 'no') {
-			$amount = (int)str_replace(' ', '', $formamount);
-		}else{
-			$fixedmetadata[] =  array(
-				'display_name' => 'Unit Price',
-				'variable_name' => 'Unit_Price',
-				'type' => 'text',
-				'value' => $currency.number_format($formamount)
-			);
-			$quantity = $_POST["pf-quantity"];
-			$unitamount = (int)str_replace(' ', '', $formamount);
-			$amount = $quantity*$unitamount;
-		}
+		$amount = (int)str_replace(' ', '', $formamount);
 	}
 	if ($minimum == 1 && $formamount != 0) {
 		if ($originalamount < $formamount) {
@@ -1168,9 +1164,33 @@ function kkd_pff_paystack_submit_action() {
 			$amount = $originalamount;
 		}
 	}
+	if ($usevariableamount == 1) {
+		$paymentoptions = explode(',', $variableamount);
+		if (count($paymentoptions) > 0) {
+			foreach ($paymentoptions as $key => $paymentoption) {
+				list($a,$b) = explode(':', $paymentoption);
+				if ($variablename == $a) {
+					$amount = $b;
+				}
+		 	}
+		}
+	}
+	$fixedmetadata[] =  array(
+		'display_name' => 'Unit Price',
+		'variable_name' => 'Unit_Price',
+		'type' => 'text',
+		'value' => $currency.number_format($amount)
+	);
+		if ($usequantity != 'no') {
+			$quantity = $_POST["pf-quantity"];
+			$unitamount = (int)str_replace(' ', '', $amount);
+			$amount = $quantity*$unitamount;
+		}
+		
+	
+	
 	if ($txncharge == 'customer') {
 		$amount = kkd_pff_paystack_add_paystack_charge($amount);
-		// print_r($amount);
 	}
 	$maxFileSize = $filelimit * 1024 * 1024;
 
@@ -1360,6 +1380,13 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata){
 	      'type' => 'text',
 	      'value' => $value
 			);
+		}elseif ($key == 'pf-vname') {
+			$custom_fields[] =  array(
+				'display_name' => 'Payment Option',
+				'variable_name' => 'Payment Option',
+	      'type' => 'text',
+	      'value' => $value
+			);
 		}elseif ($key == 'pf-interval') {
 			$custom_fields[] =  array(
 				'display_name' => 'Plan Interval',
@@ -1410,6 +1437,8 @@ function kkd_pff_paystack_confirm_payment() {
 		$txncharge = get_post_meta($payment_array->post_id,'_txncharge',true);
 		$redirect = get_post_meta($payment_array->post_id,'_redirect',true);
 		$minimum = get_post_meta($payment_array->post_id,'_minimum',true);
+		$usevariableamount = get_post_meta($payment_array->post_id,'_usevariableamount',true);
+		$variableamount = get_post_meta($payment_array->post_id,'_variableamount',true);
 
 		if ($minimum == 1 && $amount != 0) {
 			if ($payment_array->amount < $formamount) {
@@ -1446,7 +1475,7 @@ function kkd_pff_paystack_confirm_payment() {
 							$result = "success";
 						}else{
 
-							if ($amount == 0) {
+							if ($amount == 0 || $usevariableamount == 1) {
 								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 								$message = $thankyou;
@@ -1460,9 +1489,7 @@ function kkd_pff_paystack_confirm_payment() {
 									$quantity = $_POST["quantity"];
 									$unitamount = (int)str_replace(' ', '', $amount);
 									$oamount = $quantity*$unitamount;
-
-									
-									
+	
 								}
 								if ($txncharge == 'customer') {
 									$oamount = kkd_pff_paystack_add_paystack_charge($oamount);

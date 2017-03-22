@@ -130,14 +130,16 @@
             		
 					stop = true;
 				});
-				if($("#pf-agreement").prop('checked') == false){
-					$("#pf-agreementicon").addClass('rerror');
-					stop = true;
-				}
-				if (stop) {
-					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
-					return false;
+				if($('#pf-agreement').length){
+					if($("#pf-agreement").prop('checked') == false){
+						$("#pf-agreementicon").addClass('rerror');
+						stop = true;
+					}
+					if (stop) {
+						$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+						return false;
 
+					}
 				}
 
 	 		 	var self = $(this);
