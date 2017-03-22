@@ -723,8 +723,19 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			$useagreement = get_post_meta($id,'_useagreement',true);
 			$agreementlink = get_post_meta($id,'_agreementlink',true);
 			$minimum = get_post_meta($id,'_minimum',true);
-			if ($minimum == "") {$minimum = 0;}
+			$variableamount = get_post_meta($id,'_variableamount',true);
+			$usevariableamount = get_post_meta($id,'_usevariableamount',true);
+		    if ($minimum == "") {$minimum = 0;}
+		    if ($usevariableamount == "") {$usevariableamount = 0;}
 
+		    if ($usevariableamount == 1) {
+		    	// $variableamount = '3GB Etisalat:10000';
+		    	$paymentoptions = explode(',', $variableamount);
+		    	echo "<pre>";
+		    	print_r($paymentoptions);
+		    	echo "</pre>";
+		    	// die();
+		    }
 			$showbtn = true;
 			$planerrorcode = 'Input Correct Recurring Plan Code';
 			  if ($recur == 'plan') {
@@ -740,12 +751,10 @@ function kkd_pff_paystack_form_shortcode($atts) {
 					}
 
 			  }
-			//  print_r($loggedin);
 			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
 
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
-			 // echo get_site_url().'/paystackinvoice/?code=ddddddd';
-			 echo '<form version="2.0.7" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
+			 echo '<form version="2.0.8" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
 			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
@@ -756,9 +765,6 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				 <div class="input">
 					 <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . $fullname. '"
 					 ';
-					 // if($loggedin == 'yes'){
-						//  echo 'readonly ';
-					 // }
 
 			echo' required>
 				 </div>
@@ -778,36 +784,55 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 echo '<div class="span12 unit">
 				 <label class="label">Amount ('.$currency.') <span>*</span></label>
 				 <div class="input">';
-				 // echo "<pre>".$minimum. "</pre>";
-				 if ($minimum == 1) {
-					 echo '<small> Minimum payable amount <b style="font-size:87% !important;">'.$currency.'  '.number_format($amount).'</b></small>';
-				 }
-				 if ($recur == 'plan') {
-					 if ($showbtn) {
-						 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
-	 				 }else{
-						 echo '<div class="span12 unit">
-	 									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$planerrorcode.'</label>
-	 								</div>';
-					 }
-				}elseif($recur == 'optional'){
-					 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
-				 }else{
-					 	if ($amount == 0) {
-						 echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
-					 	}elseif($amount != 0 && $minimum == 1){
-							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" required/>';
-						}else{
-							echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
+				if ($usevariableamount == 0) {
+					if ($minimum == 1) {
+						 echo '<small> Minimum payable amount <b style="font-size:87% !important;">'.$currency.'  '.number_format($amount).'</b></small>';
+					}
+					if ($recur == 'plan') {
+						 if ($showbtn) {
+							 echo '<input type="text" name="pf-amount" value="'.$planamount.'" id="pf-amount" readonly required/>';
+		 				 }else{
+							 echo '<div class="span12 unit">
+		 									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$planerrorcode.'</label>
+		 								</div>';
+						 }
+					}elseif($recur == 'optional'){
+						 echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
+					}else{
+						 	if ($amount == 0) {
+							 echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
+						 	}elseif($amount != 0 && $minimum == 1){
+								echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" required/>';
+							}else{
+								echo '<input type="text" name="pf-amount" value="'.$amount.'" id="pf-amount" readonly required/>';
+							}
+					}
+				}else{
+					if ($usevariableamount == "") {
+						echo "Form Error, set variable amount string";
+					}else{
+						if (count($paymentoptions) > 0) {
+								echo '<div class="select">
+			 				 	 	<input type="hidden"  id="pf-vname" />
+ 									<select class="form-control" id="pf-vamount" name="pf-amount">';
+			 					 	$max = $quantity+1;
+			 					 	foreach ($paymentoptions as $key => $paymentoption) {
+										list($a,$b) = explode(':', $paymentoption);
+			 					 		echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.'('.number_format($b).')</option>';
+
+									}
+			 					echo '</select> <i></i> </div>';
+							
 						}
-				 }
-			 if ($txncharge != 'merchant' && $recur != 'plan') {
-					 echo '<small>Transaction Charge: <b class="pf-txncharge">NGN1000</b>, Total:<b  class="pf-txntotal">NGN1000</b></small>';
-				 }
+					}
+				}
+			 	if ($txncharge != 'merchant' && $recur != 'plan') {
+					echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+				}
 
 			echo '</div>
 			 </div>';
-			 if ($recur == 'no' && $usequantity == 'yes') {
+			 if ($recur == 'no' && $usequantity == 'yes' && $amount != 0) {
 				echo '<div class="span12 unit">
  				 <label class="label">Quantity</label>
  				 <div class="select">
@@ -1115,6 +1140,8 @@ function kkd_pff_paystack_submit_action() {
 		
 	$txncharge = get_post_meta($_POST["pf-id"],'_txncharge',true);
 	$minimum = get_post_meta($_POST["pf-id"],'_minimum',true);
+	$variableamount = get_post_meta($_POST["pf-id"],'_variableamount',true);
+	$usevariableamount = get_post_meta($_POST["pf-id"],'_usevariableamount',true);
 	$amount = (int)str_replace(' ', '', $_POST["pf-amount"]);//User input
 	$originalamount = $amount;
 	$quantity = 1;

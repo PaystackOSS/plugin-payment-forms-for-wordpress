@@ -287,6 +287,8 @@ class Kkd_Pff_Paystack_Admin {
 		    $filelimit = get_post_meta($post->ID, '_filelimit', true);
 		    $redirect = get_post_meta($post->ID, '_redirect', true);
 		    $minimum = get_post_meta($post->ID, '_minimum', true);
+		    $usevariableamount = get_post_meta($post->ID, '_usevariableamount', true);
+		    $variableamount = get_post_meta($post->ID, '_variableamount', true);
 
 				if ($amount == "") {$amount = 0;}
 				if ($filelimit == "") {$filelimit = 2;}
@@ -295,18 +297,29 @@ class Kkd_Pff_Paystack_Admin {
 				if ($currency == "") {$currency = 'NGN';}
 				if ($txncharge == "") {$txncharge = 'merchant';}
 				if ($minimum == "") {$minimum = 0;}
+				if ($uservariableamount == "") {$uservariableamount = 0;}
+				if ($variableamount == "") {$variableamount = '';}
 		  	// Echo out the field
-				echo '<p>Currency:</p>';
+			
+				
+			echo '<p>Currency:</p>';
 		  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
 				<small>We currently support only payments in Naira(NGN).</small>';
-				echo '<p>Amount to be paid(Set 0 for customer input):</p>';
+			echo '<p>Amount to be paid(Set 0 for customer input):</p>';
 		  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 		  	if ($minimum == 1) {
 		  		echo '<br><label><input name="_minimum" type="checkbox" value="1" checked> Make amount minimum payable </label>';
 		  	}else{
 		  		echo '<br><label><input name="_minimum" type="checkbox" value="1"> Make amount minimum payable </label>';
 		  	}
-			echo '<p>Pay button Description:</p>';
+		  	echo '<p>Variable Dropdown Amount:<code><label>Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," </code></label></p>';
+		  	echo '<input type="text" name="_variableamount" value="' . $variableamount  . '" class="widefat " />';
+		  	if ($usevariableamount == 1) {
+		  		echo '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> Use dropdown amount option </label>';
+		  	}else{
+		  		echo '<br><label><input name="_usevariableamount" type="checkbox" value="1" > Use dropdown amount option </label>';
+		  	}
+		  	echo '<p>Pay button Description:</p>';
 		  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
 				echo '<p>Transaction Charges:</p>';
 				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
@@ -475,6 +488,10 @@ class Kkd_Pff_Paystack_Admin {
 
 		  	$form_meta['_amount'] = $_POST['_amount'];
 		  	$form_meta['_minimum'] = $_POST['_minimum'];
+
+			$form_meta['_variableamount'] = $_POST['_variableamount'];
+			$form_meta['_usevariableamount'] = $_POST['_usevariableamount'];
+
 			$form_meta['_paybtn'] = $_POST['_paybtn'];
 			$form_meta['_currency'] = $_POST['_currency'];
 			$form_meta['_successmsg'] = $_POST['_successmsg'];
@@ -498,7 +515,6 @@ class Kkd_Pff_Paystack_Admin {
 			$form_meta['_subaccount'] = $_POST['_subaccount'];
 			$form_meta['_txnbearer'] = $_POST['_txnbearer'];
 			$form_meta['_merchantamount'] = $_POST['_merchantamount'];
-
 			// Add values of $form_meta as custom fields
 
 			foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!

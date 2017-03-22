@@ -4,7 +4,13 @@
 
 	 $(document).ready(function($) {
 			 var international_card = false;
-		     var amountField = $('#pf-amount');
+			 if( $('#pf-vamount').length ){
+			 	var amountField = $('#pf-vamount');
+		     	
+			}else{
+				var amountField = $('#pf-amount');
+		     
+			}
 		     var max = 10;
 		     amountField.keydown(function(e) {
 		         format_validate(max, e);
@@ -43,25 +49,29 @@
 			        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") );
 			    })
 			}
-		     function calculateFees() {
+		     function calculateFees(transaction_amount) {
 		         setTimeout(function() {
-		             var transaction_amount = parseInt(amountField.val());
-								 var multiplier = 0.015;
-								 var fees = multiplier * transaction_amount;
-								 var extrafee = 0;
-								 if (fees > 2000) {
-									 var fees = 2000;
-								 }else{
-									 if (transaction_amount > 2500) {fees += 100};
-								 }
-								 var total = transaction_amount + fees;
+		         	transaction_amount = transaction_amount || parseInt(amountField.val());
+		         	if( $('#pf-vamount').length ){
+					 	var name = $('#pf-vamount option:selected').attr('data-name');
+			 			$('#pf-vname').val(name);
+					}
+     				 var multiplier = 0.015;
+					 var fees = multiplier * transaction_amount;
+					 var extrafee = 0;
+					 if (fees > 2000) {
+						 var fees = 2000;
+					 }else{
+						 if (transaction_amount > 2500) {fees += 100};
+					 }
+					 var total = transaction_amount + fees;
 								//  console.log(transaction_amount);
 		             if (transaction_amount == '' || transaction_amount == 0 || transaction_amount.length == 0 || transaction_amount == null || isNaN (transaction_amount)) {
-									 var total = 0;
-									 var fees = 0;
-								 }
-								 $(".pf-txncharge").hide().html("NGN"+fees.toFixed(2)).show().digits();
-		 						 $(".pf-txntotal").hide().html("NGN"+total.toFixed(2)).show().digits();
+						 var total = 0;
+						 var fees = 0;
+					 }
+					 $(".pf-txncharge").hide().html("NGN"+fees.toFixed(2)).show().digits();
+					 $(".pf-txntotal").hide().html("NGN"+total.toFixed(2)).show().digits();
 		         }, 100);
 		     }
 
@@ -79,12 +89,19 @@
 		           }
 		       }
 		   	});
-			$('#pf-quantity').on('change', function() {
-			 	var unit = $('#pf-qamount').val();
-			 	var quant = this.value;
-			 	var newvalue = unit*quant;
+			$('#pf-quantity,#pf-vamount').on('change', function() {
+				if( $('#pf-vamount').length ){
+				 	var amountField = $('#pf-vamount');
+			     	
+				}else{
+					var amountField = $('#pf-qamount');
+			     
+				}
+			 	var unit = amountField.val();
+			 	var quant = $('#pf-quantity').val();
+			 	var newvalue = unit * quant;
 			 	$('#pf-amount').val(newvalue);
-			 	calculateFees();
+			 	calculateFees(newvalue);
 			});
 		 	function validateEmail(email) {
 			  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
