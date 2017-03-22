@@ -837,7 +837,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			echo '</div>
 			 </div>';
-			 if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
+			 if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+			 // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
 				echo '<div class="span12 unit">
  				 <label class="label">Quantity</label>
  				 <div class="select">
