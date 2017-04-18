@@ -196,7 +196,7 @@ class Kkd_Pff_Paystack_Admin {
 						$count_query = 'select count(*) from '.$table.' WHERE post_id = "'.$post_id.'" AND paid = "1"';
 						$num = $wpdb->get_var($count_query);
 
-						echo '<a href="'.admin_url('admin.php?page=submissions&form='.$post_id) .'">'. $num.'</a>';
+						echo '<u><a href="'.admin_url('admin.php?page=submissions&form='.$post_id) .'">'. $num.'</a></u>';
 						break;
 				default :
 					break;

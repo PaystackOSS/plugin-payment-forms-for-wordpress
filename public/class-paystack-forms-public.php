@@ -753,7 +753,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
 
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
-			 echo '<form version="2.0.8" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
+			 echo '<form version="2.1.1" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
 			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
 			 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
@@ -1493,7 +1493,11 @@ function kkd_pff_paystack_confirm_payment() {
 	
 								}
 								if ($txncharge == 'customer') {
-									$oamount = kkd_pff_paystack_add_paystack_charge($oamount);
+
+									if ($minimum == 0 && $amount != 0) {
+										$oamount = kkd_pff_paystack_add_paystack_charge($oamount);
+										
+									}
 								}
 
 
@@ -1501,7 +1505,7 @@ function kkd_pff_paystack_confirm_payment() {
 								// 	$amount = kkd_pff_paystack_add_paystack_charge($amount);
 								// }
 								if( $oamount !=  $amount_paid ) {
-									echo $oamount. ' - '.$amount_paid;
+									// echo $oamount. ' - '.$amount_paid;
 									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
 									$result = "failed";
 								}else{
