@@ -119,6 +119,14 @@ function kkd_pff_paystack_shortcode_button_script(){
           function insertRadiob(){
               QTags.insertContent('[radio name="Text Title" options="option 1,option 2,option 3"]');
           }
+          QTags.addButton(
+              "r_shortcode",
+              "Insert Checkbox Options",
+              insertCheckboxb
+          );
+          function insertCheckboxb(){
+              QTags.insertContent('[checkbox name="Text Title" options="option 1,option 2,option 3"]');
+          }
 					QTags.addButton(
 							"i_shortcode",
 							"Insert File Upload",

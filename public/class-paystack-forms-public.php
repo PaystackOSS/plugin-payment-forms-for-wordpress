@@ -981,11 +981,6 @@ function kkd_pff_paystack_radio_shortcode($atts) {
 	$code.= '</label>
 		<div class="inline-group">
 		';
-	// if ($required == 'required') {
-	// 	 $code.= ' required="required" ';
-	// }
-	// $code.=">";
-
 	$soptions = explode(',', $options);
 	if (count($soptions) > 0) {
 		foreach ($soptions as $key => $option) {
@@ -1009,6 +1004,74 @@ function kkd_pff_paystack_radio_shortcode($atts) {
   return $code;
 }
 add_shortcode('radio', 'kkd_pff_paystack_radio_shortcode');
+function kkd_pff_paystack_checkbox_shortcode($atts) {
+	extract(shortcode_atts(array(
+		'name' => 'Title',
+		'options' => '',
+    'required' => '0',
+ 	), $atts));
+	$code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="inline-group">
+		';
+	// <div class="unit">
+	// 				<div class="inline-group">
+	// 					<label class="label">Inline checkbox</label>
+	// 					<label class="checkbox">
+	// 						<input type="checkbox">
+	// 						<i></i>
+	// 						Apple
+	// 					</label>
+	// 					<label class="checkbox">
+	// 						<input type="checkbox">
+	// 						<i></i>
+	// 						Mango
+	// 					</label>
+	// 					<label class="checkbox">
+	// 						<input type="checkbox">
+	// 						<i></i>
+	// 						Melon
+	// 					</label>
+	// 					<label class="checkbox">
+	// 						<input type="checkbox">
+	// 						<i></i>
+	// 						Lemon
+	// 					</label>
+	// 					<label class="checkbox">
+	// 						<input type="checkbox">
+	// 						<i></i>
+	// 						Watermelon
+	// 					</label>
+	// 				</div>
+	// 			</div>
+
+	$soptions = explode(',', $options);
+	if (count($soptions) > 0) {
+		foreach ($soptions as $key => $option) {
+			// $code.= '<option  value="'.$option.'" >'.$option.'</option>';
+			$code.= '<label class="checkbox">
+				<input type="checkbox" name="'.$name.'[]" value="'.$option.'"';
+				if ($key == 0) {
+					$code.= ' checked';
+					if ($required == 'required') {
+				$code.= ' required="required"';
+			}
+				}
+
+			$code.= '/>
+				<i></i>
+				'.$option.'
+			</label>';
+		}
+	}
+	$code.= '</div></div>';
+  return $code;
+}
+add_shortcode('checkbox', 'kkd_pff_paystack_checkbox_shortcode');
 function kkd_pff_paystack_textarea_shortcode($atts) {
 	extract(shortcode_atts(array(
       'name' => 'Title',
@@ -1132,9 +1195,10 @@ function kkd_pff_paystack_submit_action() {
 	unset($metadata['pf-interval']);
 
 			// echo '<pre>';
+	// print_r($_POST);
 
 	$fixedmetadata = kkd_pff_paystack_meta_as_custom_fields($metadata);
-
+// print_r($fixedmetadata );
 	$filelimit = get_post_meta($_POST["pf-id"],'_filelimit',true);
 	$currency = get_post_meta($_POST["pf-id"],'_currency',true);
 	$formamount = get_post_meta($_POST["pf-id"],'_amount',true);/// From form
@@ -1367,6 +1431,9 @@ function kkd_pff_paystack_submit_action() {
 function kkd_pff_paystack_meta_as_custom_fields($metadata){
 	$custom_fields = array();
 	foreach ($metadata as $key => $value) {
+		if (is_array($value)) {
+			$value = implode(', ',$value);
+		}
 		if ($key == 'pf-fname') {
 			$custom_fields[] =  array(
 				'display_name' => 'Full Name',
