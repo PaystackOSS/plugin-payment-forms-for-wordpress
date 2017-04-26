@@ -266,6 +266,7 @@ class Kkd_Pff_Paystack_Admin {
 			add_meta_box('kkd_pff_paystack_editor_add_quantity_data', 'Quantity Payment', 'kkd_pff_paystack_editor_add_quantity_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_agreement_data', 'Agreement checkbox', 'kkd_pff_paystack_editor_add_agreement_data', 'paystack_form', 'side', 'default');
 			add_meta_box('kkd_pff_paystack_editor_add_subaccount_data', 'Sub Account', 'kkd_pff_paystack_editor_add_subaccount_data', 'paystack_form', 'side', 'default');
+			add_meta_box('kkd_pff_paystack_editor_add_startdateplan_data', '*Special: Subscribe to plan after time', 'kkd_pff_paystack_editor_add_startdateplan_data', 'paystack_form', 'side', 'default');
 			
 	  }
 
@@ -475,6 +476,33 @@ class Kkd_Pff_Paystack_Admin {
 	  	echo '<input type="text" name="_merchantamount" value="' . $merchantamount . '" class="widefat" />';
 	  	
 	}
+	function kkd_pff_paystack_editor_add_startdateplan_data() {
+	  	global $post;
+
+	  	// Noncename needed to verify where the data originated
+	  	echo '<p>User subscribes to plan after number of days:</p>';
+		echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
+	  	wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
+
+	  	// Get the location data if its already been entered
+			$days = get_post_meta($post->ID, '_startdate_days', true);
+			$plan = get_post_meta($post->ID, '_startdate_plan_code', true);
+			$enabled = get_post_meta($post->ID, '_startdate_enabled', true);
+			
+		
+			if ($days  == "") {$days = '';}
+			if ($plan  == "") {$plan = '';}
+			if ($enabled  == "") {$enabled = 0;}
+		echo '<p>Number of days:</p>';
+	  	echo '<input type="number" name="_startdate_days" value="' . $days  . '" class="widefat  pf-number" />';
+	  	echo '<p>Plan:</p>';
+	  	echo '<input type="text" name="_startdate_plan_code" value="' . $plan . '" class="widefat" />';
+	  	if ($enabled == 1) {
+	  		echo '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1" checked> Enable </label></p>';
+	  	}else{
+	  		echo '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1"> Enable </label></p>';
+	  	}
+	}
 	function kkd_pff_paystack_save_data($post_id, $post) {
 
 			if ( !wp_verify_nonce( @$_POST['eventmeta_noncename'], plugin_basename(__FILE__) )) {
@@ -517,6 +545,11 @@ class Kkd_Pff_Paystack_Admin {
 			$form_meta['_merchantamount'] = $_POST['_merchantamount'];
 			// Add values of $form_meta as custom fields
 
+			//Custom Plan with Start Date
+			$form_meta['_startdate_days'] = $_POST['_startdate_days'];
+			$form_meta['_startdate_plan_code'] = $_POST['_startdate_plan_code'];
+			$form_meta['_startdate_enabled'] = $_POST['_startdate_enabled'];
+			
 			foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!
 				if( $post->post_type == 'revision' ) return; // Don't store custom data twice
 				$value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
@@ -820,7 +853,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
     */
    private function sort_data( $a, $b ){
        $orderby = 'date';
-       $order = 'asc';
+       $order = 'desc';
        if(!empty($_GET['orderby'])){
            $orderby = $_GET['orderby'];
        }

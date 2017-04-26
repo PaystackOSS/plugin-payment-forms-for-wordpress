@@ -60,9 +60,9 @@ function kkd_pff_paystack_add_paystack_charge($amount)
     // $amountinkobo = $amount; // * 100;
 	$amount = intval($amount);
     if ($amount <= 2500) {
-    	$amount = $amount + ($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
+    	$amount = $amount + floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
     }else{
-    	$amount = $amount + ($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
+    	$amount = $amount + floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
 
     }
     return $amount;
@@ -1361,6 +1361,7 @@ function kkd_pff_paystack_submit_action() {
 			unset($metadata['pf-plancode']);
 		}
 	}
+
 	if($plancode != 'none'){
 		$fixedmetadata[] =  array(
 			'display_name' => 'Plan',
@@ -1410,6 +1411,8 @@ function kkd_pff_paystack_submit_action() {
 	if ($transaction_charge == "" || $transaction_charge == 0 || $transaction_charge == NULL) {
 		$transaction_charge = NULL;
 	}
+
+		$amount = floatval($insert['amount'])*100;
 	 $response = array(
      'result' => 'success',
 		 'code' => $insert['txn_code'],
@@ -1417,13 +1420,14 @@ function kkd_pff_paystack_submit_action() {
      'quantity' => $quantity,
 		 'email' => $insert['email'],
      'name' => $fullname,
-   	 'total' => $insert['amount']*100,
+   	 'total' => round($amount),
 		 'custom_fields' => $fixedmetadata,
 		 'subaccount' => $subaccount,
 		 'txnbearer' => $txnbearer,
 		 'transaction_charge' => $transaction_charge
    );
-  echo json_encode($response);
+	 // print_r($response);
+  echo json_encode($response,JSON_NUMERIC_CHECK);
 
   die();
 }
@@ -1534,6 +1538,7 @@ function kkd_pff_paystack_confirm_payment() {
 		if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
 			$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
 			if ( 'success' == $paystack_response->data->status ) {
+						$customer_code = $paystack_response->data->customer->customer_code;
 						$amount_paid	= $paystack_response->data->amount / 100;
 						$paystack_ref 	= $paystack_response->data->reference;
 						if ($recur == 'optional' || $recur == 'plan') {
@@ -1601,6 +1606,47 @@ function kkd_pff_paystack_confirm_payment() {
 	}
 
 	if ($result == 'success') {
+		///
+		//Create Plan
+		$enabled_custom_plan = get_post_meta($payment_array->post_id, '_startdate_enabled', true);
+		if ($enabled_custom_plan == 1) {
+			$mode =  esc_attr( get_option('mode') );
+			if ($mode == 'test') {
+				$key = esc_attr( get_option('tsk') );
+			}else{
+				$key = esc_attr( get_option('lsk') );
+			}
+			//Create Plan
+			$paystack_url = 'https://api.paystack.co/subscription';
+			$headers = array(
+				'Content-Type'	=> 'application/json',
+				'Authorization' => 'Bearer ' . $key
+			);
+			$custom_plan = get_post_meta($payment_array->post_id, '_startdate_plan_code', true);
+			$days = get_post_meta($payment_array->post_id, '_startdate_days', true);
+
+			$start_date = date("c", strtotime("+".$days." days"));
+			$body = array(
+				'start_date'	=> $start_date,
+				'plan'			=> $custom_plan,
+				'customer'		=> $customer_code
+			);
+			$args = array(
+				'body'		=> json_encode( $body ),
+				'headers'	=> $headers,
+				'timeout'	=> 60
+			);
+
+			$request = wp_remote_post( $paystack_url, $args );
+			if( ! is_wp_error( $request )) {
+				$paystack_response = json_decode(wp_remote_retrieve_body($request));
+				$plancode	= $paystack_response->data->subscription_code;
+				// $message.= $message.'Subscribed<br>'.$plancode.'sssss';
+
+
+			}
+		}
+		
 		$sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
 		if($sendreceipt == 'yes'){
 			$decoded = json_decode($payment_array->metadata);
