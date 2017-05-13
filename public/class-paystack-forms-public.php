@@ -58,13 +58,19 @@ define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS
 function kkd_pff_paystack_add_paystack_charge($amount)
 {
     // $amountinkobo = $amount; // * 100;
+    $charge = 0;
 	$amount = intval($amount);
     if ($amount <= 2500) {
-    	$amount = $amount + floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
+    	$charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
     }else{
-    	$amount = $amount + floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
+    	$charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
 
     }
+    // echo $charge;
+    if ($charge > 2000) {
+    	$charge = 2000;
+    }
+    $amount += $charge;
     return $amount;
     // if ($amountinkobo > KKD_PFF_PAYSTACK_FLATLINE_AMOUNT)
     //     return ($amountinkobo + KKD_PFF_PAYSTACK_LOCAL_CAP)/100;
