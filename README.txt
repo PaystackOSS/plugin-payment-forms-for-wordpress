@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
 Requires at least: 3.1
 Tested up to: 4.7
-Stable tag: 2.1.3
+Stable tag: 2.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,10 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.1.5 =
+*  Fix bug with agreement checkbox
+= 2.1.4 =
+*  Updated list of countries
 = 2.1.3 =
 *  Bug fix for ignoring NGN 2,000 transaction cap
 *  Use https for fontawesome

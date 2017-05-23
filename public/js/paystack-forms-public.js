@@ -131,7 +131,9 @@
 					stop = true;
 				});
 				if($('#pf-agreement').length){
-					if($("#pf-agreement").prop('checked') == false){
+					if($("#pf-agreement").is(':checked')){
+						stop = false;
+					}else{
 						$("#pf-agreementicon").addClass('rerror');
 						stop = true;
 					}
