@@ -28,7 +28,7 @@ add_action('wp_print_styles', 'kkd_pff_paystack_enqueueStylesFix', 100);
 */
 function kkd_pff_paystack_enqueueScriptsFix() {
     if (!is_admin()) {
-        if (!empty($_SERVER['HTTPS'])) {
+        if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
             global $wp_scripts;
             foreach ((array) $wp_scripts->registered as $script) {
                 if (stripos($script->src, 'http://', 0) !== FALSE)
@@ -43,7 +43,7 @@ function kkd_pff_paystack_enqueueScriptsFix() {
 */
 function kkd_pff_paystack_enqueueStylesFix() {
     if (!is_admin()) {
-        if (!empty($_SERVER['HTTPS'])) {
+        if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
             global $wp_styles;
             foreach ((array) $wp_styles->registered as $script) {
                 if (stripos($script->src, 'http://', 0) !== FALSE)
