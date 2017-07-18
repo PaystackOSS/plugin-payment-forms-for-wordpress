@@ -85,8 +85,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 == Changelog ==
 = 2.1.7 =
+*  Added Datepicker input field.
 *  Fix bug with required input fields. 
-*  Added 
 = 2.1.6 =
 *  Fix bug with design breaking after installing the plugin.(SSL fix)
 = 2.1.5 =
