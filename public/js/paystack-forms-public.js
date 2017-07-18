@@ -3,6 +3,15 @@
 
 
 	 $(document).ready(function($) {
+
+	 		$(function(){
+				$(".date-picker").datepicker({
+					dateFormat: 'mm/dd/yy',
+					prevText: '<i class="fa fa-caret-left"></i>',
+					nextText: '<i class="fa fa-caret-right"></i>'
+				});
+			});
+
 			 var international_card = false;
 			 if( $('#pf-vamount').length ){
 			 	var amountField = $('#pf-vamount');
@@ -109,6 +118,7 @@
 			}
 		 	$('.paystack-form').on('submit', function(e) {
 				var stop = false;
+
 				$("#pf-agreementicon").removeClass('rerror');
 					
 				$(this).find("input,select, textarea").each(function() {
@@ -119,16 +129,18 @@
 				if (Number(amount) > 0) {
 				}else{
 					$(this).find("#pf-amount").addClass('rerror');//  css({ "border-color":"red" });
-					stop = true;
+					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+					return false;
 				}
 				if (!validateEmail(email)) {
 			    $(this).find("#pf-email").addClass('rerror');//.css({ "border-color":"red" });
-					stop = true;
+					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+					return false;
 				}
 				$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
             		$(this).addClass('rerror');
-            		
-					stop = true;
+            		$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+					return false;
 				});
 				if($('#pf-agreement').length){
 					if($("#pf-agreement").is(':checked')){
@@ -142,7 +154,10 @@
 						return false;
 
 					}
+				
 				}
+
+
 
 	 		 	var self = $(this);
 				var $form = $(this);

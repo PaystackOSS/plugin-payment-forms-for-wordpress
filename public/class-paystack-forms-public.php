@@ -35,11 +35,12 @@ class Kkd_Pff_Paystack_Public {
 
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( 'blockUI', plugin_dir_url( __FILE__ ) . 'js/jquery.blockUI.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'blockUI', plugin_dir_url( __FILE__ ) . 'js/jquery.blockUI.min.js', array( 'jquery' ), $this->version, true ,true  );
+		wp_enqueue_script( 'jQuery_UI', plugin_dir_url( __FILE__ ) . 'js/jquery.ui.min.js', array( 'jquery' ), $this->version, true ,true  );
 		wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
 		wp_enqueue_script('Paystack');
-		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, false );
-		wp_localize_script( 'paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey()));
+		wp_enqueue_script( 'paystack_frontend', plugin_dir_url( __FILE__ ) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, true ,true  );
+		wp_localize_script( 'paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey()), $this->version,true, true );
 
 	}
 
@@ -923,6 +924,28 @@ function kkd_pff_paystack_form_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode( 'pff-paystack', 'kkd_pff_paystack_form_shortcode' );
+
+function kkd_pff_paystack_datepicker_shortcode($atts) {
+  extract(shortcode_atts(array(
+		'name' => 'Title',
+    'required' => '0',
+ 	), $atts));
+  $code = '<div class="span12 unit">
+		<label class="label">'.$name;
+		if ($required == 'required') {
+			 $code.= ' <span>*</span>';
+		}
+	$code.= '</label>
+		<div class="input">
+			<input type="text" class="date-picker" name="'.$name.'" placeholder="Enter '.$name.'"';
+	if ($required == 'required') {
+		 $code.= ' required="required" ';
+	}
+	$code.= '" /></div></div>';
+  return $code;
+}
+add_shortcode('datepicker', 'kkd_pff_paystack_datepicker_shortcode');
+
 
 function kkd_pff_paystack_text_shortcode($atts) {
   extract(shortcode_atts(array(
