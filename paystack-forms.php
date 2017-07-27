@@ -120,7 +120,7 @@ function kkd_pff_paystack_shortcode_button_script(){
               QTags.insertContent('[radio name="Text Title" options="option 1,option 2,option 3"]');
           }
           QTags.addButton(
-              "r_shortcode",
+              "cb_shortcode",
               "Insert Checkbox Options",
               insertCheckboxb
           );
@@ -128,7 +128,7 @@ function kkd_pff_paystack_shortcode_button_script(){
               QTags.insertContent('[checkbox name="Text Title" options="option 1,option 2,option 3"]');
           }
           QTags.addButton(
-              "r_shortcode",
+              "dp_shortcode",
               "Insert Datepicker",
               insertDatepickerb
           );
