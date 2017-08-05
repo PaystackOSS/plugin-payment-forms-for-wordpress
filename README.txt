@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
 Requires at least: 3.1
 Tested up to: 4.7
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.1.8 =
+*  Fix datepicker shortcode addition bug (Courtesy of [Dane Medussa](https://github.com/blackmunk))
 = 2.1.7 =
 *  Added Datepicker input field.
 *  Fix bug with required input fields. 
