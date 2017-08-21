@@ -15,6 +15,7 @@
 			 var international_card = false;
 			 if( $('#pf-vamount').length ){
 			 	var amountField = $('#pf-vamount');
+			 	calculateTotal();
 		     	
 			}else{
 				var amountField = $('#pf-amount');
@@ -58,6 +59,23 @@
 			        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") );
 			    })
 			}
+			function calculateTotal(){
+					if( $('#pf-vamount').length ){
+					 	var amountField = $('#pf-vamount');
+				     	
+					}else{
+						var amountField = $('#pf-qamount');
+				     
+					}
+				 	var unit = amountField.val();
+				 	var quant = $('#pf-quantity').val();
+
+				 	if (quant == '' || quant == null) {
+				 		quant =  1;
+				 	}
+				 	var newvalue = unit * quant;
+				 	$('#pf-amount').val(newvalue);
+				}
 		     function calculateFees(transaction_amount) {
 		         setTimeout(function() {
 		         	transaction_amount = transaction_amount || parseInt(amountField.val());
@@ -99,17 +117,9 @@
 		       }
 		   	});
 			$('#pf-quantity,#pf-vamount').on('change', function() {
-				if( $('#pf-vamount').length ){
-				 	var amountField = $('#pf-vamount');
-			     	
-				}else{
-					var amountField = $('#pf-qamount');
-			     
-				}
-			 	var unit = amountField.val();
-			 	var quant = $('#pf-quantity').val();
-			 	var newvalue = unit * quant;
-			 	$('#pf-amount').val(newvalue);
+
+			 	calculateTotal();
+				
 			 	calculateFees(newvalue);
 			});
 		 	function validateEmail(email) {
@@ -118,7 +128,8 @@
 			}
 		 	$('.paystack-form').on('submit', function(e) {
 				var stop = false;
-
+				e.preventDefault();
+				
 				$("#pf-agreementicon").removeClass('rerror');
 					
 				$(this).find("input,select, textarea").each(function() {
@@ -128,7 +139,7 @@
 				var amount = $(this).find("#pf-amount").val();
 				if (Number(amount) > 0) {
 				}else{
-					$(this).find("#pf-amount").addClass('rerror');//  css({ "border-color":"red" });
+					$(this).find("#pf-amount,#pf-vamount").addClass('rerror');//  css({ "border-color":"red" });
 					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
 					return false;
 				}
@@ -161,7 +172,6 @@
 
 	 		 	var self = $(this);
 				var $form = $(this);
-				e.preventDefault();
 
 				$.blockUI({ message: 'Please wait...' });
 

@@ -290,6 +290,7 @@ class Kkd_Pff_Paystack_Admin {
 		    $minimum = get_post_meta($post->ID, '_minimum', true);
 		    $usevariableamount = get_post_meta($post->ID, '_usevariableamount', true);
 		    $variableamount = get_post_meta($post->ID, '_variableamount', true);
+		    $hidetitle = get_post_meta($post->ID, '_hidetitle', true);
 
 				if ($amount == "") {$amount = 0;}
 				if ($filelimit == "") {$filelimit = 2;}
@@ -299,11 +300,18 @@ class Kkd_Pff_Paystack_Admin {
 				if ($txncharge == "") {$txncharge = 'merchant';}
 				if ($minimum == "") {$minimum = 0;}
 				if ($uservariableamount == "") {$uservariableamount = 0;}
+				if ($hidetitle == "") {$hidetitle = 0;}
 				if ($variableamount == "") {$variableamount = '';}
 		  	// Echo out the field
 			
 				
-			echo '<p>Currency:</p>';
+			if ($hidetitle == 1) {
+		  		echo '<label><input name="_hidetitle" type="checkbox" value="1" checked> Hide the form title </label>';
+		  	}else{
+		  		echo '<label><input name="_hidetitle" type="checkbox" value="1" > Hide the form title </label>';
+		  	}
+		  	echo "<br>";
+		  	echo '<p>Currency:</p>';
 		  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
 				<small>We currently support only payments in Naira(NGN).</small>';
 			echo '<p>Amount to be paid(Set 0 for customer input):</p>';
@@ -515,6 +523,7 @@ class Kkd_Pff_Paystack_Admin {
 			}
 
 		  	$form_meta['_amount'] = $_POST['_amount'];
+		  	$form_meta['_hidetitle'] = $_POST['_hidetitle'];
 		  	$form_meta['_minimum'] = $_POST['_minimum'];
 
 			$form_meta['_variableamount'] = $_POST['_variableamount'];

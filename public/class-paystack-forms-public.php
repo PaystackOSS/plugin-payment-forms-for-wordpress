@@ -732,6 +732,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 			$minimum = get_post_meta($id,'_minimum',true);
 			$variableamount = get_post_meta($id,'_variableamount',true);
 			$usevariableamount = get_post_meta($id,'_usevariableamount',true);
+			$hidetitle = get_post_meta($id,'_hidetitle',true);
 		    if ($minimum == "") {$minimum = 0;}
 		    if ($usevariableamount == "") {$usevariableamount = 0;}
 
@@ -758,8 +759,10 @@ function kkd_pff_paystack_form_shortcode($atts) {
 
 			  }
 			 if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
-
+			 	if ($hidetitle != 1) {
 			 echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
+			 		
+			 	}
 			 echo '<form version="'.KKD_PFF_PAYSTACK_VERSION.'" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
 			 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
@@ -826,6 +829,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 						if (count($paymentoptions) > 0) {
 								echo '<div class="select">
 			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
+			 				 	 	<input type="hidden"  id="pf-amount" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
 			 					 	$max = $quantity+1;
 			 					 	foreach ($paymentoptions as $key => $paymentoption) {
