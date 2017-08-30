@@ -299,7 +299,7 @@ class Kkd_Pff_Paystack_Admin {
 				if ($currency == "") {$currency = 'NGN';}
 				if ($txncharge == "") {$txncharge = 'merchant';}
 				if ($minimum == "") {$minimum = 0;}
-				if ($uservariableamount == "") {$uservariableamount = 0;}
+				if ($usevariableamount == "") {$usevariableamount = 0;}
 				if ($hidetitle == "") {$hidetitle = 0;}
 				if ($variableamount == "") {$variableamount = '';}
 		  	// Echo out the field
