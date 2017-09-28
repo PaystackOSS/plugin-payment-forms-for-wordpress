@@ -681,7 +681,7 @@ function Kkd_pff_export_excel() {
 			$csv_output .= $dbdata->email.",";
 			$csv_output .= $currency.' '.$dbdata->amount.",";
 			$csv_output .= $txn_code.",";
-			$new = json_decode($header->metadata);
+			$new = json_decode($dbdata->metadata);
 			$text = '';
 			if (array_key_exists("0", $new)) {
 				foreach ($new as $key => $item) {
