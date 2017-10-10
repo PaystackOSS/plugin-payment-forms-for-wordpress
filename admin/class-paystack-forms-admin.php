@@ -636,6 +636,10 @@ function kkd_pff_paystack_payment_submissions(){
 }
 add_action( 'admin_post_kkd_pff_export_excel', 'Kkd_pff_export_excel' );
 
+function Kkd_pff_prep_csv_data($item){
+    return '"'.str_replace('"', '""', $item).'"';
+}
+
 function Kkd_pff_export_excel() {
 	global $wpdb;
 	
@@ -659,12 +663,12 @@ function Kkd_pff_export_excel() {
 			$text = '';
 			if (array_key_exists("0", $new)) {
 				foreach ($new as $key => $item) {
-					$csv_output .= $item->display_name.",";
+					$csv_output .= Kkd_pff_prep_csv_data($item->display_name).",";
 				}
 			}else{
 				if (count($new) > 0) {
 					foreach ($new as $key => $item) {
-						$csv_output .= $key.",";
+						$csv_output .= Kkd_pff_prep_csv_data($key).",";
 					}
 				}
 			}
@@ -677,20 +681,20 @@ function Kkd_pff_export_excel() {
 			}else{
 				$txn_code = $dbdata->txn_code;
 			}
-			$csv_output .= $newkey.",";
-			$csv_output .= $dbdata->email.",";
-			$csv_output .= $currency.' '.$dbdata->amount.",";
-			$csv_output .= $txn_code.",";
+			$csv_output .= Kkd_pff_prep_csv_data($newkey).",";
+			$csv_output .= Kkd_pff_prep_csv_data($dbdata->email).",";
+			$csv_output .= Kkd_pff_prep_csv_data($currency.' '.$dbdata->amount).",";
+			$csv_output .= Kkd_pff_prep_csv_data($txn_code).",";
 			$new = json_decode($dbdata->metadata);
 			$text = '';
 			if (array_key_exists("0", $new)) {
 				foreach ($new as $key => $item) {
-					$csv_output .= $item->value.",";
+					$csv_output .= Kkd_pff_prep_csv_data($item->value).",";
 				}
 			}else{
 				if (count($new) > 0) {
 					foreach ($new as $key => $item) {
-						$csv_output .= $item.",";
+						$csv_output .= Kkd_pff_prep_csv_data($item).",";
 					}
 				}
 			}
