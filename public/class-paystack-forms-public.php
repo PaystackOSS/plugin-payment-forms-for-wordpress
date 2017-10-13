@@ -1131,6 +1131,7 @@ function kkd_pff_paystack_input_shortcode($atts) {
     'required' => '0',
  	), $atts));
 
+    $uniqq = kkd_pff_paystack_generate_new_code();
 	$code = '<div class="span12 unit">
 		<label class="label">'.$name;
 		if ($required == 'required') {
@@ -1140,12 +1141,12 @@ function kkd_pff_paystack_input_shortcode($atts) {
 		<div class="input  append-small-btn">
 		<div class="file-button">
 			Browse
-			<input type="file" name="'.$name.'" onchange="document.getElementById(\'append-small-btn\').value = this.value;"';
+			<input type="file" name="'.$name.'" onchange="document.getElementById(\'append-small-btn-'.$uniqq.'\').value = this.value;"';
 	if ($required == 'required') {
 		 $code.= ' required="required" ';
 	}
 	$code.= '" /></div>
-		<input type="text" id="append-small-btn" readonly="" placeholder="no file selected">
+		<input type="text" id="append-small-btn-'.$uniqq.'" readonly="" placeholder="no file selected">
 	</div></div>';
   return $code;
 }
