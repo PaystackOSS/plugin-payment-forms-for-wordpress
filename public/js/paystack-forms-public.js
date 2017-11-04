@@ -147,11 +147,13 @@
 			    $(this).find("#pf-email").addClass('rerror');//.css({ "border-color":"red" });
 					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
 					return false;
+					stop = true;
 				}
 				$(this).find("input, select, textarea").filter("[required]").filter(function() { return this.value == ''; }).each(function() {
             		$(this).addClass('rerror');
             		$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
 					return false;
+					stop = true;
 				});
 				if($('#pf-agreement').length){
 					if($("#pf-agreement").is(':checked')){
@@ -166,6 +168,11 @@
 
 					}
 				
+				}
+				if (stop) {
+					$('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+					return false;
+
 				}
 
 
