@@ -1,17 +1,17 @@
 <?php
 /*
-	Plugin Name:	Payment forms for Paystack
-	Plugin URI: 	https://github.com/Kendysond/Wordpress-paystack-forms
-	Description: 	Payment forms for Paystack allows you create forms that will be used to bill clients for goods and services via Paystack.
-	Version: 		2.2.1
-	Author: 		Douglas Kendyson
-	Author URI: 	http://kendyson.com
-	License:        GPL-2.0+
-	License URI:    http://www.gnu.org/licenses/gpl-2.0.txt
+  Plugin Name:  Payment forms for Paystack
+  Plugin URI:   https://github.com/PaystackHQ/Wordpress-Payment-forms-for-Paystack
+  Description:  Payment forms for Paystack allows you create forms that will be used to bill clients for goods and services via Paystack.
+  Version:    2.3.0
+  Author:     Paystack
+  Author URI:   http://paystack.com
+  License:        GPL-2.0+
+  License URI:    http://www.gnu.org/licenses/gpl-2.0.txt
 */
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-	die;
+  die;
 }
 define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url( __FILE__ ) );
 define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
@@ -56,8 +56,8 @@ function kkd_pff_paystack_enqueueStylesFix() {
 
 
 function kkd_pff_paystack_activate_paystack_forms() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-activator.php';
-	Kkd_Pff_Paystack_Activator::activate();
+  require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-activator.php';
+  Kkd_Pff_Paystack_Activator::activate();
 }
 
 register_activation_hook( __FILE__, 'kkd_pff_paystack_activate_paystack_forms' );
@@ -67,8 +67,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms.php';
 
 function kkd_pff_paystack_run_paystack_forms() {
 
-	$plugin = new Kkd_Pff_Paystack();
-	$plugin->run();
+  $plugin = new Kkd_Pff_Paystack();
+  $plugin->run();
 
 }
 kkd_pff_paystack_run_paystack_forms();
@@ -92,23 +92,23 @@ function kkd_pff_paystack_shortcode_button_script(){
               "Insert Text",
               insertText
           );
-					function insertText(){
+          function insertText(){
               QTags.insertContent('[text name="Text Title"]');
           }
-					QTags.addButton(
+          QTags.addButton(
               "ta_shortcode",
               "Insert Textarea",
               insertTextarea
           );
-					function insertTextarea(){
+          function insertTextarea(){
               QTags.insertContent('[textarea name="Text Title"]');
           }
-					QTags.addButton(
+          QTags.addButton(
               "s_shortcode",
               "Insert Select Dropdown",
               insertSelectb
           );
-					function insertSelectb(){
+          function insertSelectb(){
               QTags.insertContent('[select name="Text Title" options="option 1,option 2,option 3"]');
           }
           QTags.addButton(
@@ -135,14 +135,14 @@ function kkd_pff_paystack_shortcode_button_script(){
           function insertDatepickerb(){
               QTags.insertContent('[datepicker name="Datepicker Title"]');
           }
-					QTags.addButton(
-							"i_shortcode",
-							"Insert File Upload",
-							insertInput
-					);
-					function insertInput(){
-							QTags.insertContent('[input name="File Name"]');
-					}
+          QTags.addButton(
+              "i_shortcode",
+              "Insert File Upload",
+              insertInput
+          );
+          function insertInput(){
+              QTags.insertContent('[input name="File Name"]');
+          }
           QTags.addButton(
               "ngs_shortcode",
               "Insert Nigerian States",
@@ -169,7 +169,7 @@ function kkd_pff_paystack_shortcode_button_script(){
 // function kkd_pff_paystack_invoice_url_rewrite(){
 //     global $wp_rewrite;
 //     $plugin_url = plugins_url( 'includes/paystack-invoice.php', __FILE__ );
-// 		$plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
+//    $plugin_url = substr( $plugin_url, strlen( home_url() ) + 1 );
 //     $wp_rewrite->non_wp_rules['paystackinvoice$'] = $plugin_url; WP_PLUGIN_URL . '/data-fetcher/list-data.php'
 //     $wp_rewrite->non_wp_rules['paystackinvoice/$'] = $plugin_url;
 //     file_put_contents(ABSPATH.'.htaccess', $wp_rewrite->mod_rewrite_rules() );

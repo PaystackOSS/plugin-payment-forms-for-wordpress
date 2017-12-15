@@ -1,10 +1,10 @@
 === Payment forms for Paystack ===
-Contributors: kendysond
+Contributors: paystack, kendysond
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
 Requires at least: 3.1
-Tested up to: 4.8.1
-Stable tag: 2.2.1
+Tested up to: 4.8.3
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,7 +39,7 @@ To create a form to allow your users buy or pay for value in quantity.
 = Plugin Features =
 
 *   __Accept payment__ via MasterCard and Visa Cards.
-*    __Seamless integration__ into any WordPress page or post. Accept subscription payments directly on your site
+*   __Seamless integration__ into any WordPress page or post. Accept subscription payments directly on your site
 
 
 
@@ -84,6 +84,9 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.3.0 =
+* Fix export where commas were breaking text fields into multiple columns
+* Fix upload fields using duplicate ID
 = 2.2.1 =
 *  Fix export to csv metadata
 = 2.2.0 =
