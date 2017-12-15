@@ -27,8 +27,8 @@
 
 			function checkMinimumVal(){
 				if($('#pf-minimum-hidden').length){
-					var min_amount = $('#pf-minimum-hidden').val();
-					var amt = $('#pf-amount').val();
+					var min_amount = Number($('#pf-minimum-hidden').val());
+					var amt = Number($('#pf-amount').val());
 					if(amt < min_amount){
 						$('#pf-min-val-warn').text('Amount cannot be less than the minimum amount');
 					}else{
