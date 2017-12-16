@@ -848,7 +848,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
 					echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
 				}
 
-			echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
+			echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
 			 if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
