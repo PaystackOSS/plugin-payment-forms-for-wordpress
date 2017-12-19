@@ -1,9 +1,6 @@
 (function( $ ) {
 	'use strict';
-
-
 	 $(document).ready(function($) {
-
 	 		$(function(){
 				$(".date-picker").datepicker({
 					dateFormat: 'mm/dd/yy',
@@ -11,7 +8,6 @@
 					nextText: '<i class="fa fa-caret-right"></i>'
 				});
 			});
-
 			 var international_card = false;
 			 if( $('#pf-vamount').length ){
 			 	var amountField = $('#pf-vamount');
@@ -19,15 +15,30 @@
 		     	
 			}else{
 				var amountField = $('#pf-amount');
-		     
 			}
 		     var max = 10;
 		     amountField.keydown(function(e) {
 		         format_validate(max, e);
 		     });
 
+			 amountField.keyup(function(e){
+				 checkMinimumVal();
+			 })
+
+			function checkMinimumVal(){
+				if($('#pf-minimum-hidden').length){
+					var min_amount = Number($('#pf-minimum-hidden').val());
+					var amt = Number($('#pf-amount').val());
+					if(amt < min_amount){
+						$('#pf-min-val-warn').text('Amount cannot be less than the minimum amount');
+					}else{
+						$('#pf-min-val-warn').text('');
+					}
+				}
+			}
+
 		     function format_validate(max, e) {
-		         var value = amountField.text();
+				 var value = amountField.text();
 		         if (e.which != 8 && value.length > max) {
 		             e.preventDefault();
 		         }
@@ -59,6 +70,7 @@
 			        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") );
 			    })
 			}
+
 			function calculateTotal(){
 					if( $('#pf-vamount').length ){
 					 	var amountField = $('#pf-vamount');

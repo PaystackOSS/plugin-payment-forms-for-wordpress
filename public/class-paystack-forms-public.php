@@ -802,6 +802,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
 				if ($usevariableamount == 0) {
 					if ($minimum == 1) {
 						 echo '<small> Minimum payable amount <b style="font-size:87% !important;">'.$currency.'  '.number_format($amount).'</b></small>';
+						 //make it available for javascript so we can test against the input value
+						 echo '<input type="hidden" name="pf-minimum-hidden" value="'.number_format($amount).'" id="pf-minimum-hidden">';
 					}
 					if ($recur == 'plan') {
 						 if ($showbtn) {
@@ -846,7 +848,8 @@ function kkd_pff_paystack_form_shortcode($atts) {
 					echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
 				}
 
-			echo '</div>
+			echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
+				</div>
 			 </div>';
 			 if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
 			 // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {

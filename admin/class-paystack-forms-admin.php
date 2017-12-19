@@ -330,11 +330,12 @@ class Kkd_Pff_Paystack_Admin {
 		  	}
 		  	echo '<p>Pay button Description:</p>';
 		  	echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
-				echo '<p>Transaction Charges:</p>';
+				echo '<p>Add Convenience Fee:</p>';
 				echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>Merchant Pays(Include in fee)</option>
-								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Client Pays(Calculated Paystack Local Fee added) </option>
-							</select>';
+								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant',$txncharge).'>No, do not add</option>
+								<option value="customer" '.kkd_pff_paystack_txncheck('customer',$txncharge).'>Yes, add it</option>
+							</select>
+						<br><small>This adds an estimate of Paystack transaction local fee to the transaction amount. This cushions the effect of the fees on the merchant</small>';
 				echo '<p>User logged In:</p>';
 				echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 								<option value="no" '.kkd_pff_paystack_txncheck('no',$loggedin).'>User must not be logged in</option>
