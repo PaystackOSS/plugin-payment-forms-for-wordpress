@@ -20,6 +20,11 @@ class Kkd_Pff_Paystack_Admin {
 			register_setting( 'kkd-pff-paystack-settings-group', 'tpk' );
 			register_setting( 'kkd-pff-paystack-settings-group', 'lsk' );
 			register_setting( 'kkd-pff-paystack-settings-group', 'lpk' );
+
+			register_setting( 'kkd-pff-paystack-settings-group', 'prc' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'ths' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'adc' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'cap' );
 		}
 		function kkd_pff_paystack_txncheck($name,$txncharge){
 			if ($name == $txncharge) {
@@ -66,6 +71,27 @@ class Kkd_Pff_Paystack_Admin {
 				        <th scope="row">Live Public Key</th>
 				        <td><input type="text" name="lpk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
 				        </tr>
+                        <hr>
+                        <h2>Fees Settings</h2>
+                        <tr valign="top">
+                            <th scope="row">Percentage</th>
+                            <td><input type="text" name="prc" value="<?php echo esc_attr( get_option('prc', 1.5) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Threshold (amount above which Paystack adds the fixed amount below)</th>
+                            <td><input type="text" name="ths" value="<?php echo esc_attr( get_option('ths', 2500) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Additional Charge (amount added to percentage fee when transaction amount is above threshold) (</th>
+                            <td><input type="text" name="adc" value="<?php echo esc_attr( get_option('adc', 100) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Cap (maximum charge paystack can charge on your transactions)</th>
+                            <td><input type="text" name="cap" value="<?php echo esc_attr( get_option('cap', 2000) ); ?>" /></td>
+                        </tr>
 				    </table>
 
 			    <?php submit_button(); ?>
