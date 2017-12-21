@@ -12,7 +12,7 @@ class Kkd_Pff_Paystack_Admin {
 		add_action( 'admin_init', 'kkd_pff_paystack_register_setting_page' );
 
 		function kkd_pff_paystack_add_settings_page() {
-			add_submenu_page('edit.php?post_type=paystack_form', 'Api Keys Settings', 'Api Keys Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
+			add_submenu_page('edit.php?post_type=paystack_form', 'Settings', 'Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
 		}
 		function kkd_pff_paystack_register_setting_page() {
 			register_setting( 'kkd-pff-paystack-settings-group', 'mode' );
@@ -118,7 +118,8 @@ class Kkd_Pff_Paystack_Admin {
 		        'add_new_item' => _x( 'Add Paystack Form', 'paystack_form' ),
 		        'edit_item' => _x( 'Edit Paystack Form', 'paystack_form' ),
 		        'new_item' => _x( 'Paystack Form', 'paystack_form' ),
-		        'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
+				'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
+				'all_items' => _x( 'All Forms' ),
 		        'search_items' => _x( 'Search Paystack Forms', 'paystack_form' ),
 		        'not_found' => _x( 'No Paystack Forms found', 'paystack_form' ),
 		        'not_found_in_trash' => _x( 'No Paystack Forms found in Trash', 'paystack_form' ),
