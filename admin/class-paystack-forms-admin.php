@@ -36,10 +36,12 @@ class Kkd_Pff_Paystack_Admin {
 		}
 		function kkd_pff_paystack_setting_page() {
 			?>
-			 <h1>Paystack Forms API keys settings</h1>
+			 <h1>Paystack Forms Settings</h1>
 			
         		<!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
-        		<h3>Get your api keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </h4>
+				<hr>
+				<h2>API Keys Settings</h2>
+        		<span>Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </span>
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">
@@ -71,8 +73,15 @@ class Kkd_Pff_Paystack_Admin {
 				        <th scope="row">Live Public Key</th>
 				        <td><input type="text" name="lpk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
 				        </tr>
-                        <hr>
-                        <h2>Fees Settings</h2>
+
+					</table>
+
+					<table class="form-table paystack_setting_page">
+                        
+						<hr>
+
+						<h2>Fees Settings</h2>
+
                         <tr valign="top">
                             <th scope="row">Percentage</th>
                             <td><input type="text" name="prc" value="<?php echo esc_attr( get_option('prc', 1.5) ); ?>" /></td>
@@ -84,7 +93,7 @@ class Kkd_Pff_Paystack_Admin {
                         </tr>
 
                         <tr valign="top">
-                            <th scope="row">Additional Charge (amount added to percentage fee when transaction amount is above threshold) (</th>
+                            <th scope="row">Additional Charge (amount added to percentage fee when transaction amount is above threshold) </th>
                             <td><input type="text" name="adc" value="<?php echo esc_attr( get_option('adc', 100) ); ?>" /></td>
                         </tr>
 
