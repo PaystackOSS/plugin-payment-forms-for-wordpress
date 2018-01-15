@@ -12,7 +12,7 @@ class Kkd_Pff_Paystack_Admin {
 		add_action( 'admin_init', 'kkd_pff_paystack_register_setting_page' );
 
 		function kkd_pff_paystack_add_settings_page() {
-			add_submenu_page('edit.php?post_type=paystack_form', 'Api Keys Settings', 'Api Keys Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
+			add_submenu_page('edit.php?post_type=paystack_form', 'Settings', 'Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
 		}
 		function kkd_pff_paystack_register_setting_page() {
 			register_setting( 'kkd-pff-paystack-settings-group', 'mode' );
@@ -20,6 +20,11 @@ class Kkd_Pff_Paystack_Admin {
 			register_setting( 'kkd-pff-paystack-settings-group', 'tpk' );
 			register_setting( 'kkd-pff-paystack-settings-group', 'lsk' );
 			register_setting( 'kkd-pff-paystack-settings-group', 'lpk' );
+
+			register_setting( 'kkd-pff-paystack-settings-group', 'prc' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'ths' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'adc' );
+			register_setting( 'kkd-pff-paystack-settings-group', 'cap' );
 		}
 		function kkd_pff_paystack_txncheck($name,$txncharge){
 			if ($name == $txncharge) {
@@ -31,10 +36,12 @@ class Kkd_Pff_Paystack_Admin {
 		}
 		function kkd_pff_paystack_setting_page() {
 			?>
-			 <h1>Paystack Forms API keys settings</h1>
+			 <h1>Paystack Forms Settings</h1>
 			
         		<!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
-        		<h3>Get your api keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </h4>
+				<hr>
+				<h2>API Keys Settings</h2>
+        		<span>Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </span>
 			 <form method="post" action="options.php">
 				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
 				    <table class="form-table paystack_setting_page">
@@ -66,6 +73,34 @@ class Kkd_Pff_Paystack_Admin {
 				        <th scope="row">Live Public Key</th>
 				        <td><input type="text" name="lpk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
 				        </tr>
+
+					</table>
+
+					<table class="form-table paystack_setting_page">
+                        
+						<hr>
+
+						<h2>Fees Settings</h2>
+
+                        <tr valign="top">
+                            <th scope="row">Percentage</th>
+                            <td><input type="text" name="prc" value="<?php echo esc_attr( get_option('prc', 1.5) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Threshold (amount above which Paystack adds the fixed amount below)</th>
+                            <td><input type="text" name="ths" value="<?php echo esc_attr( get_option('ths', 2500) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Additional Charge (amount added to percentage fee when transaction amount is above threshold) </th>
+                            <td><input type="text" name="adc" value="<?php echo esc_attr( get_option('adc', 100) ); ?>" /></td>
+                        </tr>
+
+                        <tr valign="top">
+                            <th scope="row">Cap (maximum charge paystack can charge on your transactions)</th>
+                            <td><input type="text" name="cap" value="<?php echo esc_attr( get_option('cap', 2000) ); ?>" /></td>
+                        </tr>
 				    </table>
 
 			    <?php submit_button(); ?>
@@ -83,7 +118,8 @@ class Kkd_Pff_Paystack_Admin {
 		        'add_new_item' => _x( 'Add Paystack Form', 'paystack_form' ),
 		        'edit_item' => _x( 'Edit Paystack Form', 'paystack_form' ),
 		        'new_item' => _x( 'Paystack Form', 'paystack_form' ),
-		        'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
+				'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
+				'all_items' => _x( 'All Forms' ),
 		        'search_items' => _x( 'Search Paystack Forms', 'paystack_form' ),
 		        'not_found' => _x( 'No Paystack Forms found', 'paystack_form' ),
 		        'not_found_in_trash' => _x( 'No Paystack Forms found in Trash', 'paystack_form' ),
