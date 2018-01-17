@@ -659,6 +659,7 @@ function Kkd_pff_export_excel() {
 			$csv_output .= "#,";
 			$csv_output .= "Email,";
 			$csv_output .= "Amount,";
+			$csv_output .= "Date Paid,";
 			$csv_output .= "Reference,";
 			$new = json_decode($header->metadata);
 			$text = '';
@@ -685,6 +686,7 @@ function Kkd_pff_export_excel() {
 			$csv_output .= Kkd_pff_prep_csv_data($newkey).",";
 			$csv_output .= Kkd_pff_prep_csv_data($dbdata->email).",";
 			$csv_output .= Kkd_pff_prep_csv_data($currency.' '.$dbdata->amount).",";
+			$csv_output .= Kkd_pff_prep_csv_data(substr($dbdata->paid_at, 0, 10)).",";
 			$csv_output .= Kkd_pff_prep_csv_data($txn_code).",";
 			$new = json_decode($dbdata->metadata);
 			$text = '';
@@ -782,10 +784,10 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table{
 				$data[] = array(
 					'id'  => $newkey,
 					'email' => '<a href="mailto:'.$dbdata->email.'">'.$dbdata->email.'</a>',
-		          'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
-		          'txn_code' => $txn_code,
-		          'metadata' => format_data($dbdata->metadata),
-		          'date'  => $dbdata->created_at
+					'amount' => $currency.'<b>'.number_format($dbdata->amount).'</b>',
+					'txn_code' => $txn_code,
+					'metadata' => format_data($dbdata->metadata),
+					'date'  => $dbdata->created_at
 				);
 			}
 
