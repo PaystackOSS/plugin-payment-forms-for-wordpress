@@ -1572,57 +1572,56 @@ function kkd_pff_paystack_confirm_payment() {
 		if( ! is_wp_error( $request ) && 200 == wp_remote_retrieve_response_code( $request ) ) {
 			$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
 			if ( 'success' == $paystack_response->data->status ) {
-						$customer_code = $paystack_response->data->customer->customer_code;
-						$amount_paid	= $paystack_response->data->amount / 100;
-						$paystack_ref 	= $paystack_response->data->reference;
-						if ($recur == 'optional' || $recur == 'plan') {
-							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
+				$customer_code  = $paystack_response->data->customer->customer_code;
+				$amount_paid	= $paystack_response->data->amount / 100;
+				$paystack_ref 	= $paystack_response->data->reference;
+				$paid_at        = $paystack_response->data->transaction_date;
+				if ($recur == 'optional' || $recur == 'plan') {
+					$wpdb->update( $table, array( 'paid' => 1,'amount' => $amount_paid, 'paid_at' => $paid_at),array('txn_code'=>$paystack_ref));
+					$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+					$message = $thankyou;
+					$result = "success";
+				}else{
+					if ($amount == 0 || $usevariableamount == 1) {
+						$wpdb->update( $table, array( 'paid' => 1,'amount' => $amount_paid, 'paid_at' => $paid_at),array('txn_code'=>$paystack_ref));
+						$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
+						$message = $thankyou;
+						$result = "success";
+						// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+					}else{
+						$usequantity = get_post_meta($payment_array->post_id,'_usequantity',true);
+						if ($usequantity == 'no') {
+							$oamount = (int)str_replace(' ', '', $amount);
+						}else{
+							$quantity = $_POST["quantity"];
+							$unitamount = (int)str_replace(' ', '', $amount);
+							$oamount = $quantity*$unitamount;
+
+						}
+						if ($txncharge == 'customer') {
+
+							if ($minimum == 0 && $amount != 0) {
+								$oamount = kkd_pff_paystack_add_paystack_charge($oamount);
+								
+							}
+						}
+
+						// if ($txncharge == 'customer') {
+						// 	$amount = kkd_pff_paystack_add_paystack_charge($amount);
+						// }
+						if( $oamount !=  $amount_paid ) {
+							// echo $oamount. ' - '.$amount_paid;
+							$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
+							$result = "failed";
+						}
+						else{
+							$wpdb->update( $table, array( 'paid' => 1, 'paid_at' => $paid_at),array('txn_code'=>$paystack_ref));
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
-						}else{
-
-							if ($amount == 0 || $usevariableamount == 1) {
-								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code'=>$paystack_ref));
-								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
-								$message = $thankyou;
-								$result = "success";
-								// kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
-							}else{
-								$usequantity = get_post_meta($payment_array->post_id,'_usequantity',true);
-								if ($usequantity == 'no') {
-									$oamount = (int)str_replace(' ', '', $amount);
-								}else{
-									$quantity = $_POST["quantity"];
-									$unitamount = (int)str_replace(' ', '', $amount);
-									$oamount = $quantity*$unitamount;
-	
-								}
-								if ($txncharge == 'customer') {
-
-									if ($minimum == 0 && $amount != 0) {
-										$oamount = kkd_pff_paystack_add_paystack_charge($oamount);
-										
-									}
-								}
-
-
-								// if ($txncharge == 'customer') {
-								// 	$amount = kkd_pff_paystack_add_paystack_charge($amount);
-								// }
-								if( $oamount !=  $amount_paid ) {
-									// echo $oamount. ' - '.$amount_paid;
-									$message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
-									$result = "failed";
-								}else{
-
-									$wpdb->update( $table, array( 'paid' => 1),array('txn_code'=>$paystack_ref));
-									$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
-									$message = $thankyou;
-									$result = "success";
-								}
-							}
 						}
+					}
+				}
 
 			}else {
 				$message = "Transaction Failed/Invalid Code";
@@ -1818,15 +1817,16 @@ function kkd_pff_paystack_rconfirm_payment() {
 			if ( 'success' == $paystack_response->data->status ) {
 						$amount_paid	= $paystack_response->data->amount / 100;
 						$paystack_ref 	= $paystack_response->data->reference;
+						$paid_at        = $paystack_response->data->transaction_date;
 						if ($recur == 'optional' || $recur == 'plan') {
-							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code_2'=>$paystack_ref));
+							$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid,'paid_at' => $paid_at),array('txn_code_2'=>$paystack_ref));
 							$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 							$message = $thankyou;
 							$result = "success";
 						}else{
 
 							if ($amount == 0) {
-								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid),array('txn_code_2'=>$paystack_ref));
+								$wpdb->update( $table, array( 'paid' => 1,'amount' =>$amount_paid,'paid_at' => $paid_at),array('txn_code_2'=>$paystack_ref));
 								$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 								$message = $thankyou;
 								$result = "success";
@@ -1850,7 +1850,7 @@ function kkd_pff_paystack_rconfirm_payment() {
 									$result = "failed";
 								}else{
 
-									$wpdb->update( $table, array( 'paid' => 1),array('txn_code_2'=>$paystack_ref));
+									$wpdb->update( $table, array( 'paid' => 1, 'paid_at' => $paid_at),array('txn_code_2'=>$paystack_ref));
 									$thankyou = get_post_meta($payment_array->post_id,'_successmsg',true);
 									$message = $thankyou;
 									$result = "success";
