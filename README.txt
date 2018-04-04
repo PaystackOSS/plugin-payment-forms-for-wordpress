@@ -84,6 +84,11 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.3.2 =
+* Carry out validation for required fields
+* Exports now carry dates of transaction
+= 2.3.1 =
+* Change transaction fees feature to convenience fee
 = 2.3.0 =
 * Fix export where commas were breaking text fields into multiple columns
 * Fix upload fields using duplicate ID
