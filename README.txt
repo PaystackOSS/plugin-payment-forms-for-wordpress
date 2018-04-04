@@ -1,10 +1,10 @@
 === Payment forms for Paystack ===
 Contributors: paystack, kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 4.8.3
-Stable tag: 2.3.0
+Tested up to: 4.9.4
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,11 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.3.2 =
+* Carry out validation for required fields
+* Exports now carry dates of transaction
+= 2.3.1 =
+* Change transaction fees feature to convenience fee
 = 2.3.0 =
 * Fix export where commas were breaking text fields into multiple columns
 * Fix upload fields using duplicate ID
