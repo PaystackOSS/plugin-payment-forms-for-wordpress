@@ -1,10 +1,10 @@
 === Payment forms for Paystack ===
 Contributors: paystack, kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 4.8.3
-Stable tag: 2.3.0
+Tested up to: 4.9.4
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,13 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.4.0 =
+* Add support for Ghanaian cedis
+= 2.3.2 =
+* Carry out validation for required fields
+* Exports now carry dates of transaction
+= 2.3.1 =
+* Change transaction fees feature to convenience fee
 = 2.3.0 =
 * Fix export where commas were breaking text fields into multiple columns
 * Fix upload fields using duplicate ID
@@ -145,30 +152,6 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 *  Added option to redirect to page after payment.
 *  Add retry payment link to email invoice.
 *  Fixed pricing calculation.
-= 1.1.1 =
-*  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
-= 1.1.0 =
-*  Added quantity option for minimal selling of items in quantity.
-= 1.0.9 =
-*  Updated to use Paystack plans filter before plan creation.
-= 1.0.8 =
-*  Fixed DB Schema on Update.
-= 1.0.7 =
-*   Added Transfer of transaction charges to the customer.
-= 1.0.6 =
-*   Fixed optional plans.
-= 1.0.5 =
-*   Bug Fixes to processes.
-= 1.0.4 =
-*   Recurring Payment Added with Design overhaul.
-= 1.0.3 =
-*   Invoice and Receipt Emails, with ability to disable them.
-= 1.0.2 =
-*   Added SSL suport for loading scripts.
-= 1.0.1 =
-*   New input file shortcode. For frontend file upload.
-= 1.0.0 =
-*   First release
 
 == Screenshots ==
 
