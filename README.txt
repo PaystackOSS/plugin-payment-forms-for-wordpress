@@ -84,6 +84,8 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 
 == Changelog ==
+= 2.4.0 =
+* Add support for Ghanaian cedis
 = 2.3.2 =
 * Carry out validation for required fields
 * Exports now carry dates of transaction
@@ -150,30 +152,6 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 *  Added option to redirect to page after payment.
 *  Add retry payment link to email invoice.
 *  Fixed pricing calculation.
-= 1.1.1 =
-*  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
-= 1.1.0 =
-*  Added quantity option for minimal selling of items in quantity.
-= 1.0.9 =
-*  Updated to use Paystack plans filter before plan creation.
-= 1.0.8 =
-*  Fixed DB Schema on Update.
-= 1.0.7 =
-*   Added Transfer of transaction charges to the customer.
-= 1.0.6 =
-*   Fixed optional plans.
-= 1.0.5 =
-*   Bug Fixes to processes.
-= 1.0.4 =
-*   Recurring Payment Added with Design overhaul.
-= 1.0.3 =
-*   Invoice and Receipt Emails, with ability to disable them.
-= 1.0.2 =
-*   Added SSL suport for loading scripts.
-= 1.0.1 =
-*   New input file shortcode. For frontend file upload.
-= 1.0.0 =
-*   First release
 
 == Screenshots ==
 
