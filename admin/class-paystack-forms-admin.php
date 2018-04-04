@@ -311,9 +311,12 @@ class Kkd_Pff_Paystack_Admin {
 		  		echo '<label><input name="_hidetitle" type="checkbox" value="1" > Hide the form title </label>';
 		  	}
 		  	echo "<br>";
-		  	echo '<p>Currency:</p>';
-		  	echo '<input type="text" name="_currency" value="' . $currency  . '" class="widefat" />
-				<small>We currently support only payments in Naira(NGN).</small>';
+			echo '<p>Currency:</p>';
+			echo '<select class="form-control" name="_currency" style="width:100%;">
+						<option value="NGN" '.kkd_pff_paystack_txncheck('NGN',$currency).'>Nigerian Naira</option>
+						<option value="GHS" '.kkd_pff_paystack_txncheck('GHS',$currency).'>Ghanaian Cedis</option>
+				  </select>';
+			echo '<small>We currently support only payments in Nigerian Naira and Ghanaian Cedis.</small>';
 			echo '<p>Amount to be paid(Set 0 for customer input):</p>';
 		  	echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
 		  	if ($minimum == 1) {

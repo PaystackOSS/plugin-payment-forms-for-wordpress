@@ -44,7 +44,8 @@
         e.preventDefault();
       }
       // Allow: backspace, delete, tab, escape, enter and .
-      if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+      if (
+        $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
         // Allow: Ctrl+A
         (e.keyCode == 65 && e.ctrlKey === true) ||
         // Allow: Ctrl+C
@@ -94,6 +95,7 @@
       var newvalue = unit * quant;
       $("#pf-amount").val(newvalue);
     }
+
     function calculateFees(transaction_amount) {
       setTimeout(function() {
         transaction_amount = transaction_amount || parseInt(amountField.val());
@@ -175,7 +177,7 @@
       $("#pf-agreementicon").removeClass("rerror");
 
       $(this)
-        .find("input,select, textarea")
+        .find("input, select, textarea")
         .each(function() {
           $(this).removeClass("rerror"); //.css({ "border-color":"#d1d1d1" });
         });
@@ -262,6 +264,7 @@
                 amount: data.total,
                 firstname: firstName,
                 lastname: lastName,
+                currency: data.currency,
                 subaccount: data.subaccount,
                 bearer: data.txnbearer,
                 transaction_charge: data.transaction_charge,
@@ -326,6 +329,7 @@
                 firstname: firstName,
                 lastname: lastName,
                 ref: data.code,
+                currency: data.currency,
                 subaccount: data.subaccount,
                 bearer: data.txnbearer,
                 transaction_charge: data.transaction_charge,
@@ -424,6 +428,7 @@
                 firstname: firstName,
                 lastname: lastName,
                 ref: data.code,
+                currency: data.currency,
                 subaccount: data.subaccount,
                 bearer: data.txnbearer,
                 transaction_charge: data.transaction_charge,
@@ -487,6 +492,7 @@
                 firstname: firstName,
                 lastname: lastName,
                 ref: data.code,
+                currency: data.currency,
                 subaccount: data.subaccount,
                 bearer: data.txnbearer,
                 transaction_charge: data.transaction_charge,

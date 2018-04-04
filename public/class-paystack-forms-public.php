@@ -1449,15 +1449,16 @@ function kkd_pff_paystack_submit_action() {
 		$transaction_charge = NULL;
 	}
 
-		$amount = floatval($insert['amount'])*100;
+	$amount = floatval($insert['amount'])*100;
 	 $response = array(
-     'result' => 'success',
+		 'result' => 'success',
 		 'code' => $insert['txn_code'],
-     'plan' => $insert['plan'],
-     'quantity' => $quantity,
-		 'email' => $insert['email'],
-     'name' => $fullname,
-   	 'total' => round($amount),
+         'plan' => $insert['plan'],
+         'quantity' => $quantity,
+         'email' => $insert['email'],
+         'name' => $fullname,
+         'total' => round($amount),
+         'currency' => $currency,
 		 'custom_fields' => $fixedmetadata,
 		 'subaccount' => $subaccount,
 		 'txnbearer' => $txnbearer,
@@ -1760,14 +1761,15 @@ function kkd_pff_paystack_retry_action() {
 		$transaction_charge = NULL;
 	}
 	 $response = array(
-     'result' => 'success',
-		 'code' => $newcode,
-     'plan' => $plan,
-     'quantity' => $quantity,
-		 'email' => $dbdata->email,
-     'name' => $fullname,
-   	 'total' => $dbdata->amount*100,
-		 'custom_fields' => $fixedmetadata,
+         'result' => 'success',
+         'code' => $newcode,
+         'plan' => $plan,
+         'quantity' => $quantity,
+         'email' => $dbdata->email,
+         'name' => $fullname,
+         'total' => $dbdata->amount*100,
+         'custom_fields' => $fixedmetadata,
+         'currency' => $currency,
 		 'subaccount' => $subaccount,
 		 'txnbearer' => $txnbearer,
 		 'transaction_charge' => $transaction_charge
