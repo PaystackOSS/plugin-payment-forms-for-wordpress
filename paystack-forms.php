@@ -3,7 +3,7 @@
   Plugin Name:  Payment forms for Paystack
   Plugin URI:   https://github.com/PaystackHQ/Wordpress-Payment-forms-for-Paystack
   Description:  Payment forms for Paystack allows you create forms that will be used to bill clients for goods and services via Paystack.
-  Version:      2.4.0
+  Version:      2.4.1
   Author:       Paystack
   Author URI:   http://paystack.com
   License:      GPL-2.0+
