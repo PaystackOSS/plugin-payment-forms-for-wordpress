@@ -10,13 +10,13 @@
   License URI:  http://www.gnu.org/licenses/gpl-2.0.txt
 */
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-  die;
+if (! defined('WPINC') ) {
+    die;
 }
-define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url( __FILE__ ) );
-define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
-define( 'KKD_PFF_PAYSTACK_VERSION', '2.2.1' );
-define( 'KKD_PFF_PAYSTACK_TABLE', 'paystack_forms_payments' );
+define('KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url(__FILE__));
+define('KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__);
+define('KKD_PFF_PAYSTACK_VERSION', '2.2.1');
+define('KKD_PFF_PAYSTACK_TABLE', 'paystack_forms_payments');
 
 
 // fix some badly enqueued scripts with no sense of HTTPS
@@ -24,30 +24,34 @@ add_action('wp_print_scripts', 'kkd_pff_paystack_enqueueScriptsFix', 100);
 add_action('wp_print_styles', 'kkd_pff_paystack_enqueueStylesFix', 100);
 
 /**
-* force plugins to load scripts with SSL if page is SSL
-*/
-function kkd_pff_paystack_enqueueScriptsFix() {
+ * force plugins to load scripts with SSL if page is SSL
+ */
+function kkd_pff_paystack_enqueueScriptsFix() 
+{
     if (!is_admin()) {
         if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
             global $wp_scripts;
             foreach ((array) $wp_scripts->registered as $script) {
-                if (stripos($script->src, 'http://', 0) !== FALSE)
+                if (stripos($script->src, 'http://', 0) !== false) {
                     $script->src = str_replace('http://', 'https://', $script->src);
+                }
             }
         }
     }
 }
 
 /**
-* force plugins to load styles with SSL if page is SSL
-*/
-function kkd_pff_paystack_enqueueStylesFix() {
+ * force plugins to load styles with SSL if page is SSL
+ */
+function kkd_pff_paystack_enqueueStylesFix() 
+{
     if (!is_admin()) {
         if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
             global $wp_styles;
             foreach ((array) $wp_styles->registered as $script) {
-                if (stripos($script->src, 'http://', 0) !== FALSE)
+                if (stripos($script->src, 'http://', 0) !== false) {
                     $script->src = str_replace('http://', 'https://', $script->src);
+                }
             }
         }
     }
@@ -55,26 +59,29 @@ function kkd_pff_paystack_enqueueStylesFix() {
 
 
 
-function kkd_pff_paystack_activate_paystack_forms() {
-  require_once plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms-activator.php';
-  Kkd_Pff_Paystack_Activator::activate();
+function kkd_pff_paystack_activate_paystack_forms() 
+{
+    include_once plugin_dir_path(__FILE__) . 'includes/class-paystack-forms-activator.php';
+    Kkd_Pff_Paystack_Activator::activate();
 }
 
-register_activation_hook( __FILE__, 'kkd_pff_paystack_activate_paystack_forms' );
+register_activation_hook(__FILE__, 'kkd_pff_paystack_activate_paystack_forms');
 
 
-require plugin_dir_path( __FILE__ ) . 'includes/class-paystack-forms.php';
+require plugin_dir_path(__FILE__) . 'includes/class-paystack-forms.php';
 
-function kkd_pff_paystack_run_paystack_forms() {
+function kkd_pff_paystack_run_paystack_forms() 
+{
 
-  $plugin = new Kkd_Pff_Paystack();
-  $plugin->run();
+    $plugin = new Kkd_Pff_Paystack();
+    $plugin->run();
 
 }
 kkd_pff_paystack_run_paystack_forms();
 
-function kkd_pff_paystack_shortcode_button_script(){
-    if(wp_script_is("quicktags")){
+function kkd_pff_paystack_shortcode_button_script()
+{
+    if(wp_script_is("quicktags")) {
         ?>
       <script type="text/javascript">
 
@@ -162,7 +169,7 @@ function kkd_pff_paystack_shortcode_button_script(){
           
           //
       </script>
-  <?php
+    <?php
     }
 }
 // add_action( 'init', 'kkd_pff_paystack_invoice_url_rewrite' );
@@ -183,13 +190,14 @@ function kkd_pff_paystack_shortcode_button_script(){
 //     $wp_rewrite->flush_rules(true);  // This should really be done in a plugin activation
 // }
 
-add_action( 'init', 'kkd_pff_init' );
-function kkd_pff_init() {
-    add_rewrite_rule( '^paystackinvoice$', 'index.php?kkd_pff_stats=true', 'top' );
+add_action('init', 'kkd_pff_init');
+function kkd_pff_init() 
+{
+    add_rewrite_rule('^paystackinvoice$', 'index.php?kkd_pff_stats=true', 'top');
 }
 
 // But WordPress has a whitelist of variables it allows, so we must put it on that list
-add_action( 'query_vars', 'kkd_pff_query_vars' );
+add_action('query_vars', 'kkd_pff_query_vars');
 function kkd_pff_query_vars( $query_vars )
 {
     $query_vars[] = 'kkd_pff_stats';
@@ -199,11 +207,11 @@ function kkd_pff_query_vars( $query_vars )
 // If this is done, we can access it later
 // This example checks very early in the process:
 // if the variable is set, we include our page and stop execution after it
-add_action( 'parse_request', 'kkd_pff_parse_request' );
+add_action('parse_request', 'kkd_pff_parse_request');
 function kkd_pff_parse_request( &$wp )
 {
-    if ( array_key_exists( 'kkd_pff_stats', $wp->query_vars ) ) {
-        include( dirname( __FILE__ ) . '/includes/paystack-invoice.php' );
+    if (array_key_exists('kkd_pff_stats', $wp->query_vars) ) {
+        include dirname(__FILE__) . '/includes/paystack-invoice.php';
         exit();
     }
 }

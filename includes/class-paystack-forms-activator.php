@@ -1,15 +1,17 @@
 <?php
 
-class Kkd_Pff_Paystack_Activator {
+class Kkd_Pff_Paystack_Activator
+{
 
-	public static function activate() {
-		global $wpdb;
-		$version = get_option( 'kkd_db_version', '1.0' );
-		$table_name = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+    public static function activate() 
+    {
+        global $wpdb;
+        $version = get_option('kkd_db_version', '1.0');
+        $table_name = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 
-		$charset_collate = $wpdb->get_charset_collate();
+        $charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE `".$table_name."` (
+        $sql = "CREATE TABLE `".$table_name."` (
 			id int(11) NOT NULL AUTO_INCREMENT,
 			post_id int(11) NOT NULL,
 		  user_id int(11) NOT NULL,
@@ -26,12 +28,12 @@ class Kkd_Pff_Paystack_Activator {
 		  modified timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		  UNIQUE KEY id (id),PRIMARY KEY  (id)
 		) $charset_collate;";
-		
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		dbDelta($sql);
+        
+        include_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
 
-		if ( version_compare( $version, '2.0' ) < 0 ) {
-			$sql = "CREATE TABLE `".$table_name."` (
+        if (version_compare($version, '2.0') < 0 ) {
+            $sql = "CREATE TABLE `".$table_name."` (
 				iid int(11) NOT NULL AUTO_INCREMENT,
 				post_id int(11) NOT NULL,
 				user_id int(11) NOT NULL,
@@ -49,26 +51,30 @@ class Kkd_Pff_Paystack_Activator {
 				modified timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL,
 				UNIQUE KEY id (id),PRIMARY KEY  (id)
 			) $charset_collate;";
-			
-			dbDelta( $sql );
-		
-			update_option( 'kkd_db_version', '2.0' );	
-		}
+            
+            dbDelta($sql);
+        
+            update_option('kkd_db_version', '2.0');    
+        }
 
-		
-		$row = $wpdb->get_results(  "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE table_name = '".$table_name."' AND column_name = 'plan'"  );
-		if(empty($row)){
-			$wpdb->query("ALTER TABLE `".$table_name."` ADD `plan` VARCHAR(255) NOT NULL AFTER `paid`;");
-		}
-		
-		$row1 = $wpdb->get_results(  "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE table_name = '".$table_name."' AND column_name = 'txn_code_2'"  );
-		if(empty($row1)){
-			$wpdb->query("ALTER TABLE `".$table_name."` ADD `txn_code_2` VARCHAR(255) DEFAULT '' NULL AFTER `txn_code`;");
-		}
+        
+        $row = $wpdb->get_results(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+			WHERE table_name = '".$table_name."' AND column_name = 'plan'"  
+        );
+        if(empty($row)) {
+            $wpdb->query("ALTER TABLE `".$table_name."` ADD `plan` VARCHAR(255) NOT NULL AFTER `paid`;");
+        }
+        
+        $row1 = $wpdb->get_results(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+			WHERE table_name = '".$table_name."' AND column_name = 'txn_code_2'"  
+        );
+        if(empty($row1)) {
+            $wpdb->query("ALTER TABLE `".$table_name."` ADD `txn_code_2` VARCHAR(255) DEFAULT '' NULL AFTER `txn_code`;");
+        }
 
-	}
+    }
 
 
 
