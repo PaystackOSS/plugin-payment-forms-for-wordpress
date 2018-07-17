@@ -3,8 +3,8 @@ Contributors: paystack, kendysond
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 4.9.4
-Stable tag: 2.4.0
+Tested up to: 4.9.7
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -83,7 +83,7 @@ You can find help and information on Paystack on our [Help Desk](https://paystac
  
 = Where can I get support or talk to other users? =
  
-If you get stuck, you can ask for help in the [WooCommerce Plugin Forum](https://wordpress.org/support/plugin/wpjobster-paystack-gateway). You can also directly email support@paystack.com for assistance.
+If you get stuck, you can ask for help in the [Payment forms for Paystack Plugin Forum](https://wordpress.org/support/plugin/payment-forms-for-paystack). You can also directly email support@paystack.com for assistance.
  
 = Payment Forms for Paystack is awesome! Can I contribute? =
  
@@ -162,7 +162,5 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 *  Fixed pricing calculation.
 
 == Screenshots ==
-
-
-
-== Other Notes ==
+1. Adding a new payment form.
+2. What customer sees for making payment.
