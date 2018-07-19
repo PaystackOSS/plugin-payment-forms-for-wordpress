@@ -37,15 +37,24 @@ class Kkd_Pff_Paystack_Public
         return $key;
     }
 
+    public static function fetchFeeSettings()
+    {
+        $ret = [];
+        $ret['prc'] = intval(floatval(esc_attr(get_option('prc', 1.5))) * 100) / 10000;
+        $ret['ths'] = intval(floatval(esc_attr(get_option('ths', 2500))) * 100);
+        $ret['adc'] = intval(floatval(esc_attr(get_option('adc', 100))) * 100);
+        $ret['cap'] = intval(floatval(esc_attr(get_option('cap', 2000))) * 100);
+        return $ret;
+    }
+
     public function enqueue_scripts() 
     {
-
         wp_enqueue_script('blockUI', plugin_dir_url(__FILE__) . 'js/jquery.blockUI.min.js', false, $this->version);
         wp_enqueue_script('jQuery_UI', plugin_dir_url(__FILE__) . 'js/jquery.ui.min.js', false, $this->version);
         wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
         wp_enqueue_script('Paystack');
         wp_enqueue_script('paystack_frontend', plugin_dir_url(__FILE__) . 'js/paystack-forms-public.js', false, $this->version);
-        wp_localize_script('paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey()), $this->version, true, true);
+        wp_localize_script('paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey(), 'fee'=>Kkd_Pff_Paystack_Public::fetchFeeSettings()), $this->version, true, true);
 
     }
 

@@ -1,12 +1,93 @@
-(function ($) {
-    "use strict";
+function KkdPffPaystackFee() 
+{
+    this.DEFAULT_PERCENTAGE = 0.015;
+    this.DEFAULT_ADDITIONAL_CHARGE = 10000;
+    this.DEFAULT_THRESHOLD = 250000;
+    this.DEFAULT_CAP = 200000;
+
+    this.percentage = this.DEFAULT_PERCENTAGE;
+    this.additional_charge = this.DEFAULT_ADDITIONAL_CHARGE;
+    this.threshold = this.DEFAULT_THRESHOLD;
+    this.cap = this.DEFAULT_CAP;
+
+    this.chargeDivider = 0;
+    this.crossover = 0;
+    this.flatlinePlusCharge = 0;
+    this.flatline = 0;
+
+    this.withPercentage = function (percentage) {
+        this.percentage = percentage;
+        this.__setup();
+    };
+
+    this.withAdditionalCharge = function (additional_charge) {
+        this.additional_charge = additional_charge;
+        this.__setup();
+    };
+
+    this.withThreshold = function (threshold) {
+        this.threshold = threshold;
+        this.__setup();
+    };
+
+    this.withCap = function (cap) {
+        this.cap = cap;
+        this.__setup();
+    };
+
+    this.__setup = function () {
+        this.chargeDivider = this.__chargeDivider();
+        this.crossover = this.__crossover();
+        this.flatlinePlusCharge = this.__flatlinePlusCharge();
+        this.flatline = this.__flatline();
+    };
+
+    this.__chargeDivider = function () {
+        return 1 - this.percentage;
+    };
+
+    this.__crossover = function () {
+        return (this.threshold * this.chargeDivider) - this.additional_charge;
+    };
+
+    this.__flatlinePlusCharge = function () {
+        return (this.cap - this.additional_charge) / this.percentage;
+    };
+
+    this.__flatline = function () {
+        return this.flatlinePlusCharge - this.cap;
+    };
+
+    this.addFor = function (amountinkobo) {
+        if (amountinkobo > this.flatline) {
+            return parseInt(Math.round(amountinkobo + this.cap));
+        } else if (amountinkobo > this.crossover) {
+            return parseInt(Math.round((amountinkobo + this.additional_charge) / this.chargeDivider));
+        } else {
+            return parseInt(Math.round(amountinkobo / this.chargeDivider));
+        }
+    };
+
+
+    this.__setup = function () {
+        this.chargeDivider = this.__chargeDivider();
+        this.crossover = this.__crossover();
+        this.flatlinePlusCharge = this.__flatlinePlusCharge();
+        this.flatline = this.__flatline();
+    };
+
+    this.__setup();
+}
+
+(function ( $ ) {
+    'use strict';
     $(document).ready(
         function ($) {
             $(
                 function () {
                     $(".date-picker").datepicker(
                         {
-                            dateFormat: "mm/dd/yy",
+                            dateFormat: 'mm/dd/yy',
                             prevText: '<i class="fa fa-caret-left"></i>',
                             nextText: '<i class="fa fa-caret-right"></i>'
                         }
@@ -14,11 +95,12 @@
                 }
             );
             var international_card = false;
-            if ($("#pf-vamount").length) {
-                var amountField = $("#pf-vamount");
+            if($('#pf-vamount').length ) {
+                var amountField = $('#pf-vamount');
                 calculateTotal();
-            } else {
-                var amountField = $("#pf-amount");
+                 
+            }else{
+                var amountField = $('#pf-amount');
             }
             var max = 10;
             amountField.keydown(
@@ -31,19 +113,17 @@
                 function (e) {
                     checkMinimumVal();
                 }
-            );
+            )
 
-            function checkMinimumVal() 
+            function checkMinimumVal()
             {
-                if ($("#pf-minimum-hidden").length) {
-                    var min_amount = Number($("#pf-minimum-hidden").val());
-                    var amt = Number($("#pf-amount").val());
-                    if (amt < min_amount) {
-                        $("#pf-min-val-warn").text(
-                            "Amount cannot be less than the minimum amount"
-                        );
-                    } else {
-                        $("#pf-min-val-warn").text("");
+                if($('#pf-minimum-hidden').length) {
+                    var min_amount = Number($('#pf-minimum-hidden').val());
+                    var amt = Number($('#pf-amount').val());
+                    if(amt < min_amount) {
+                        $('#pf-min-val-warn').text('Amount cannot be less than the minimum amount');
+                    }else{
+                        $('#pf-min-val-warn').text('');
                     }
                 }
             }
@@ -70,115 +150,91 @@
                     return;
                 }
                 // Ensure that it is a number and stop the keypress
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) 
-                    && (e.keyCode < 96 || e.keyCode > 105)
-                ) {
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
                     e.preventDefault();
                 } else {
                     calculateFees();
                 }
             }
 
+
             $.fn.digits = function () {
                 return this.each(
                     function () {
-                        $(this).text(
-                            $(this)
-                            .text()
-                            .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
-                        );
+                        $(this).text($(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                     }
-                );
-            };
-
-            function calculateTotal() 
-            {
-                if ($("#pf-vamount").length) {
-                    var amountField = $("#pf-vamount");
-                } else {
-                    var amountField = $("#pf-qamount");
-                }
-                var unit = amountField.val();
-                var quant = $("#pf-quantity").val();
-
-                if (quant == "" || quant == null) {
-                    quant = 1;
-                }
-                var newvalue = unit * quant;
-                $("#pf-amount").val(newvalue);
+                )
             }
 
+            function calculateTotal()
+            {
+                if($('#pf-vamount').length ) {
+                    var amountField = $('#pf-vamount');
+                         
+                }else{
+                    var amountField = $('#pf-qamount');
+                     
+                }
+                var unit = amountField.val();
+                var quant = $('#pf-quantity').val();
+
+                if (quant == '' || quant == null) {
+                    quant =  1;
+                }
+                var newvalue = unit * quant;
+                $('#pf-amount').val(newvalue);
+            }
             function calculateFees(transaction_amount) 
             {
                 setTimeout(
                     function () {
                         transaction_amount = transaction_amount || parseInt(amountField.val());
-                        if ($("#pf-vamount").length) {
-                            var name = $("#pf-vamount option:selected").attr("data-name");
-                            $("#pf-vname").val(name);
+                        if($('#pf-vamount').length ) {
+                            var name = $('#pf-vamount option:selected').attr('data-name');
+                            $('#pf-vname').val(name);
                         }
-                        var multiplier = 0.015;
-                        var fees = multiplier * transaction_amount;
-                        var extrafee = 0;
-                        if (fees > 2000) {
-                            var fees = 2000;
-                        } else {
-                            if (transaction_amount > 2500) {
-                                fees += 100;
-                            }
-                        }
-                        var total = transaction_amount + fees;
-                        //  console.log(transaction_amount);
-                        if (transaction_amount == "" 
-                            || transaction_amount == 0 
-                            || transaction_amount.length == 0 
-                            || transaction_amount == null 
-                            || isNaN(transaction_amount)
-                        ) {
+                        if (transaction_amount == '' || transaction_amount == 0 || transaction_amount.length == 0 || transaction_amount == null || isNaN(transaction_amount)) {
                             var total = 0;
                             var fees = 0;
+                        } else {
+                            var obj = new KkdPffPaystackFee();
+
+                            obj.withAdditionalCharge(settings.fee.adc);
+                            obj.withThreshold(settings.fee.ths);
+                            obj.withCap(settings.fee.cap);
+                            obj.withPercentage(settings.fee.prc);
+
+                            var total = obj.addFor(transaction_amount * 100) / 100;
+                            var fees = total - transaction_amount;
                         }
-                        $(".pf-txncharge")
-                        .hide()
-                        .html("NGN" + fees.toFixed(2))
-                        .show()
-                        .digits();
-                        $(".pf-txntotal")
-                        .hide()
-                        .html("NGN" + total.toFixed(2))
-                        .show()
-                        .digits();
+                        $(".pf-txncharge").hide().html("NGN"+fees.toFixed(2)).show().digits();
+                        $(".pf-txntotal").hide().html("NGN"+total.toFixed(2)).show().digits();
                     }, 100
                 );
             }
 
             calculateFees();
 
-            $(".pf-number").keydown(
+            $('.pf-number').keydown(
                 function (event) {
-                    if (event.keyCode == 46 
-                        || event.keyCode == 8 
-                        || event.keyCode == 9 
-                        || event.keyCode == 27 
-                        || event.keyCode == 13 
-                        || (event.keyCode == 65 && event.ctrlKey === true) 
+                    if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9
+                        || event.keyCode == 27 || event.keyCode == 13
+                        || (event.keyCode == 65 && event.ctrlKey === true)
                         || (event.keyCode >= 35 && event.keyCode <= 39)
                     ) {
-                        return;
-                    } else {
-                        if (event.shiftKey 
-                            || ((event.keyCode < 48 || event.keyCode > 57) 
-                            && (event.keyCode < 96 || event.keyCode > 105))
-                        ) {
+                         return;
+                    }else{
+                        if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
                             event.preventDefault();
                         }
                     }
                 }
             );
-            $("#pf-quantity,#pf-vamount").on(
-                "change", function () {
-                    calculateTotal();
+            $('#pf-quantity,#pf-vamount').on(
+                'change', function () {
 
+                    calculateTotal();
+                
                     calculateFees();
                 }
             );
@@ -187,102 +243,91 @@
                 var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return re.test(email);
             }
-            $(".paystack-form").on(
-                "submit", function (e) {
-                    var requiredFieldIsInvalid = false;
+            $('.paystack-form').on(
+                'submit', function (e) {
+                    var stop = false;
                     e.preventDefault();
-
-                    $("#pf-agreementicon").removeClass("rerror");
-
-                    $(this)
-                    .find("input, select, textarea")
-                    .each(
+                
+                    $("#pf-agreementicon").removeClass('rerror');
+                    
+                    $(this).find("input,select, textarea").each(
                         function () {
-                            $(this).removeClass("rerror"); //.css({ "border-color":"#d1d1d1" });
+                            $(this).removeClass('rerror');//.css({ "border-color":"#d1d1d1" });
                         }
                     );
-                    var email = $(this)
-                    .find("#pf-email")
-                    .val();
-                    var amount = $(this)
-                    .find("#pf-amount")
-                    .val();
+                    var email = $(this).find("#pf-email").val();
+                    var amount = $(this).find("#pf-amount").val();
                     if (Number(amount) > 0) {
-                    } else {
-                        $(this)
-                        .find("#pf-amount,#pf-vamount")
-                        .addClass("rerror"); //  css({ "border-color":"red" });
-                        $("html,body").animate(
-                            { scrollTop: $(".rerror").offset().top - 110 },
-                            500
-                        );
+                    }else{
+                        $(this).find("#pf-amount,#pf-vamount").addClass('rerror');//  css({ "border-color":"red" });
+                        $('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
                         return false;
                     }
                     if (!validateEmail(email)) {
-                        $(this)
-                        .find("#pf-email")
-                        .addClass("rerror"); //.css({ "border-color":"red" });
-                        $("html,body").animate(
-                            { scrollTop: $(".rerror").offset().top - 110 },
-                            500
-                        );
+                        $(this).find("#pf-email").addClass('rerror');//.css({ "border-color":"red" });
+                        $('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
                         return false;
+                        stop = true;
                     }
-
-                    $(this)
-                    .find("input, select, text, textarea")
-                    .filter("[required]")
-                    .filter(
+                    $(this).find("input, select, textarea").filter("[required]").filter(
                         function () {
-                            return this.value === "";
-                        }
-                    )
-                    .each(
+                            return this.value == ''; }
+                    ).each(
                         function () {
-                            $(this).addClass("rerror");
-                            requiredFieldIsInvalid = true;
+                            $(this).addClass('rerror');
+                            $('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+                            return false;
+                            stop = true;
                         }
                     );
+                    if($('#pf-agreement').length) {
+                        if($("#pf-agreement").is(':checked')) {
+                            stop = false;
+                        }else{
+                            $("#pf-agreementicon").addClass('rerror');
+                            stop = true;
+                        }
+                        if (stop) {
+                            $('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
+                            return false;
 
-                    if ($("#pf-agreement").length && !$("#pf-agreement").is(":checked")) {
-                        $("#pf-agreementicon").addClass("rerror");
-                        requiredFieldIsInvalid = true;
+                        }
+                
                     }
-
-                    if (requiredFieldIsInvalid) {
-                        $("html,body").animate(
-                            { scrollTop: $(".rerror").offset().top - 110 },
-                            500
-                        );
+                    if (stop) {
+                        $('html,body').animate({ scrollTop: $('.rerror').offset().top - 110 }, 500);
                         return false;
+
                     }
+
+
 
                     var self = $(this);
                     var $form = $(this);
 
-                    $.blockUI({ message: "Please wait..." });
+                    $.blockUI({ message: 'Please wait...' });
 
                     var formdata = new FormData(this);
 
                     $.ajax(
                         {
-                            url: $form.attr("action"),
+                            url: $form.attr('action'),
                             type: "POST",
                             data: formdata,
-                            mimeTypes: "multipart/form-data",
+                            mimeTypes:"multipart/form-data",
                             contentType: false,
                             cache: false,
                             processData: false,
-                            dataType: "JSON",
+                            dataType:"JSON",
                             success: function (data) {
                                 $.unblockUI();
-                                if (data.result == "success") {
-                                    var names = data.name.split(" ");
+                                if (data.result == 'success') {
+                                    var names = data.name.split(' ');
                                     var firstName = names[0] || "";
                                     var lastName = names[1] || "";
-                                    var quantity = data.quantity;
+                                    var quantity =data.quantity;
                                     // console.log(firstName+ " - "+lastName);
-                                    if (data.plan == "none" || data.plan == "" || data.plan == "no") {
+                                    if (data.plan == 'none' || data.plan == ''  || data.plan == 'no' ) {
                                         var handler = PaystackPop.setup(
                                             {
                                                 key: settings.key,
@@ -290,69 +335,47 @@
                                                 amount: data.total,
                                                 firstname: firstName,
                                                 lastname: lastName,
-                                                currency: data.currency,
-                                                subaccount: data.subaccount,
-                                                bearer: data.txnbearer,
-                                                transaction_charge: data.transaction_charge,
+                                                subaccount:data.subaccount,
+                                                bearer:data.txnbearer,
+                                                transaction_charge:data.transaction_charge,
                                                 ref: data.code,
-                                                metadata: { custom_fields: data.custom_fields },
+                                                metadata: {'custom_fields': data.custom_fields},
                                                 callback: function (response) {
-                                                    $.blockUI({ message: "Please wait..." });
+                                                    $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr("action"),
-                                                        {
-                                                            action: "kkd_pff_paystack_confirm_payment",
-                                                            code: response.trxref,
-                                                            quantity: quantity
-                                                        },
-                                                        function (newdata) {
-                                                            data = JSON.parse(newdata);
-                                                            if (data.result == "success2") {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref,'quantity':quantity}, function (newdata) {
+                                                             data = JSON.parse(newdata);
+                                                            if (data.result == 'success2') {
                                                                 window.location.href = data.link;
                                                             }
-                                                            if (data.result == "success") {
-                                                                $(".paystack-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".paystack-form").offset().top - 110 },
-                                                                    500
-                                                                );
+                                                            if (data.result == 'success') {
+                                                                $('.paystack-form')[0].reset();
+                                                                $('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
 
-                                                                self.before("<pre>" + data.message + "</pre>");
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
+                                                                self.before('<pre>'+data.message+'</pre>');
+                                                                $(this).find("input, select, textarea").each(
                                                                     function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
+                                                                        $(this).css({ "border-color":"#d1d1d1","background-color":"#fff" });
                                                                     }
                                                                 );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
+                                                                $(".pf-txncharge").hide().html("NGN0").show().digits();
+                                                                $(".pf-txntotal").hide().html("NGN0").show().digits();
 
                                                                 $.unblockUI();
-                                                            } else {
-                                                                self.before("<pre>" + data.message + "</pre>");
+                                                            }else{
+                                                                self.before('<pre>'+data.message+'</pre>');
                                                                 $.unblockUI();
                                                             }
                                                         }
                                                     );
                                                 },
-                                                onClose: function () {}
+                                                onClose: function () {
+
+                                                }
                                             }
                                         );
-                                    } else {
+
+                                    }else{
                                         var handler = PaystackPop.setup(
                                             {
                                                 key: settings.key,
@@ -361,107 +384,89 @@
                                                 firstname: firstName,
                                                 lastname: lastName,
                                                 ref: data.code,
-                                                currency: data.currency,
-                                                subaccount: data.subaccount,
-                                                bearer: data.txnbearer,
-                                                transaction_charge: data.transaction_charge,
-                                                metadata: { custom_fields: data.custom_fields },
+                                                subaccount:data.subaccount,
+                                                bearer:data.txnbearer,
+                                                transaction_charge:data.transaction_charge,
+                                                metadata: {'custom_fields': data.custom_fields},
                                                 callback: function (response) {
-                                                    $.blockUI({ message: "Please wait..." });
+                                                    $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr("action"),
-                                                        {
-                                                            action: "kkd_pff_paystack_confirm_payment",
-                                                            code: response.trxref
-                                                        },
-                                                        function (newdata) {
-                                                            data = JSON.parse(newdata);
-                                                            if (data.result == "success2") {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function (newdata) {
+                                                             data = JSON.parse(newdata);
+                                                            if (data.result == 'success2') {
                                                                 window.location.href = data.link;
                                                             }
-                                                            if (data.result == "success") {
-                                                                $(".paystack-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".paystack-form").offset().top - 110 },
-                                                                    500
-                                                                );
+                                                            if (data.result == 'success') {
+                                                                $('.paystack-form')[0].reset();
+                                                                $('html,body').animate({ scrollTop: $('.paystack-form').offset().top - 110 }, 500);
 
-                                                                self.before("<pre>" + data.message + "</pre>");
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
+                                                                self.before('<pre>'+data.message+'</pre>');
+                                                                $(this).find("input, select, textarea").each(
                                                                     function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
+                                                                        $(this).css({ "border-color":"#d1d1d1","background-color":"#fff" });
                                                                     }
                                                                 );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
+                                                                $(".pf-txncharge").hide().html("NGN0").show().digits();
+                                                                $(".pf-txntotal").hide().html("NGN0").show().digits();
 
                                                                 $.unblockUI();
-                                                            } else {
-                                                                self.before("<pre>" + data.message + "</pre>");
+                                                            }else{
+                                                                self.before('<pre>'+data.message+'</pre>');
                                                                 $.unblockUI();
                                                             }
                                                         }
                                                     );
                                                 },
-                                                onClose: function () {}
+                                                onClose: function () {
+
+                                                }
                                             }
                                         );
                                     }
 
+
                                     handler.openIframe();
-                                } else {
+                                }else{
                                     alert(data.message);
                                 }
                             }
+
                         }
                     );
                 }
             );
-
-            $(".retry-form").on(
-                "submit", function (e) {
+            
+            
+            $('.retry-form').on(
+                'submit', function (e) {
+                
                     var self = $(this);
                     var $form = $(this);
                     e.preventDefault();
 
-                    $.blockUI({ message: "Please wait..." });
+                    $.blockUI({ message: 'Please wait...' });
 
                     var formdata = new FormData(this);
 
                     $.ajax(
                         {
-                            url: $form.attr("action"),
+                            url: $form.attr('action'),
                             type: "POST",
                             data: formdata,
-                            mimeTypes: "multipart/form-data",
+                            mimeTypes:"multipart/form-data",
                             contentType: false,
                             cache: false,
                             processData: false,
-                            dataType: "JSON",
+                            dataType:"JSON",
                             success: function (data) {
                                 $.unblockUI();
-                                if (data.result == "success") {
-                                    var names = data.name.split(" ");
+                                if (data.result == 'success') {
+                                    var names = data.name.split(' ');
                                     var firstName = names[0] || "";
                                     var lastName = names[1] || "";
-                                    var quantity = data.quantity;
+                                    var quantity =data.quantity;
                                     // console.log(firstName+ " - "+lastName);
-                                    if (data.plan == "none" || data.plan == "" || data.plan == "no") {
+                                    if (data.plan == 'none' || data.plan == ''  || data.plan == 'no' ) {
                                         var handler = PaystackPop.setup(
                                             {
                                                 key: settings.key,
@@ -470,68 +475,46 @@
                                                 firstname: firstName,
                                                 lastname: lastName,
                                                 ref: data.code,
-                                                currency: data.currency,
-                                                subaccount: data.subaccount,
-                                                bearer: data.txnbearer,
-                                                transaction_charge: data.transaction_charge,
-                                                metadata: { custom_fields: data.custom_fields },
+                                                subaccount:data.subaccount,
+                                                bearer:data.txnbearer,
+                                                transaction_charge:data.transaction_charge,
+                                                metadata: {'custom_fields': data.custom_fields},
                                                 callback: function (response) {
-                                                    $.blockUI({ message: "Please wait..." });
+                                                    $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr("action"),
-                                                        {
-                                                            action: "kkd_pff_paystack_rconfirm_payment",
-                                                            code: response.trxref,
-                                                            quantity: quantity
-                                                        },
-                                                        function (newdata) {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref,'quantity':quantity}, function (newdata) {
                                                             data = JSON.parse(newdata);
-                                                            if (data.result == "success2") {
+                                                            if (data.result == 'success2') {
                                                                 window.location.href = data.link;
                                                             }
-                                                            if (data.result == "success") {
-                                                                $(".retry-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".retry-form").offset().top - 110 },
-                                                                    500
-                                                                );
+                                                            if (data.result == 'success') {
+                                                                $('.retry-form')[0].reset();
+                                                                $('html,body').animate({ scrollTop: $('.retry-form').offset().top - 110 }, 500);
 
-                                                                self.before("<pre>" + data.message + "</pre>");
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
+                                                                self.before('<pre>'+data.message+'</pre>');
+                                                                $(this).find("input, select, textarea").each(
                                                                     function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
+                                                                        $(this).css({ "border-color":"#d1d1d1","background-color":"#fff" });
                                                                     }
                                                                 );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $("#submitbtn").remove();
+                                                                $(".pf-txncharge").hide().html("NGN0").show().digits();
+                                                                $(".pf-txntotal").hide().html("NGN0").show().digits();
+                                                                $('#submitbtn').remove();
                                                                 $.unblockUI();
-                                                            } else {
-                                                                self.before("<pre>" + data.message + "</pre>");
+                                                            }else{
+                                                                self.before('<pre>'+data.message+'</pre>');
                                                                 $.unblockUI();
                                                             }
                                                         }
                                                     );
                                                 },
-                                                onClose: function () {}
+                                                onClose: function () {
+
+                                                }
                                             }
                                         );
-                                    } else {
+
+                                    }else{
                                         var handler = PaystackPop.setup(
                                             {
                                                 key: settings.key,
@@ -540,75 +523,57 @@
                                                 firstname: firstName,
                                                 lastname: lastName,
                                                 ref: data.code,
-                                                currency: data.currency,
-                                                subaccount: data.subaccount,
-                                                bearer: data.txnbearer,
-                                                transaction_charge: data.transaction_charge,
-                                                metadata: { custom_fields: data.custom_fields },
+                                                subaccount:data.subaccount,
+                                                bearer:data.txnbearer,
+                                                transaction_charge:data.transaction_charge,
+                                                metadata: {'custom_fields': data.custom_fields},
                                                 callback: function (response) {
-                                                    $.blockUI({ message: "Please wait..." });
+                                                    $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr("action"),
-                                                        {
-                                                            action: "kkd_pff_paystack_rconfirm_payment",
-                                                            code: response.trxref
-                                                        },
-                                                        function (newdata) {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref}, function (newdata) {
                                                             data = JSON.parse(newdata);
-                                                            if (data.result == "success2") {
+                                                            if (data.result == 'success2') {
                                                                 window.location.href = data.link;
                                                             }
-                                                            if (data.result == "success") {
-                                                                $(".retry-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".retry-form").offset().top - 110 },
-                                                                    500
-                                                                );
+                                                            if (data.result == 'success') {
+                                                                $('.retry-form')[0].reset();
+                                                                $('html,body').animate({ scrollTop: $('.retry-form').offset().top - 110 }, 500);
 
-                                                                self.before("<pre>" + data.message + "</pre>");
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
+                                                                self.before('<pre>'+data.message+'</pre>');
+                                                                $(this).find("input, select, textarea").each(
                                                                     function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
+                                                                        $(this).css({ "border-color":"#d1d1d1","background-color":"#fff" });
                                                                     }
                                                                 );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $("#submitbtn").remove();
+                                                                $(".pf-txncharge").hide().html("NGN0").show().digits();
+                                                                $(".pf-txntotal").hide().html("NGN0").show().digits();
+                                                                $('#submitbtn').remove();
                                                                 $.unblockUI();
-                                                            } else {
-                                                                self.before("<pre>" + data.message + "</pre>");
+                                                            }else{
+                                                                self.before('<pre>'+data.message+'</pre>');
                                                                 $.unblockUI();
                                                             }
                                                         }
                                                     );
                                                 },
-                                                onClose: function () {}
+                                                onClose: function () {
+
+                                                }
                                             }
                                         );
                                     }
 
+
                                     handler.openIframe();
-                                } else {
+                                }else{
                                     alert(data.message);
                                 }
                             }
+
                         }
                     );
+            
+
                 }
             );
         }
