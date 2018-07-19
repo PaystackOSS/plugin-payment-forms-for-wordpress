@@ -1,10 +1,10 @@
 === Payment forms for Paystack ===
 Contributors: paystack, kendysond
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target,Naira,payments,verve,donation,church,NGO,form,contact form 7, form,
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 4.8.3
-Stable tag: 2.3.0
+Tested up to: 4.9.7
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,38 +52,53 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 
 == Installation ==
 
-= Automatic Installation =
-*    Login to your WordPress Admin area
-*    Go to "Plugins > Add New" from the left hand menu
-*    In the search box type __Payment forms for Paystack__
-*    From the search result you will see __Payment forms for Paystack__ click on __Install Now__ to install the plugin
-*    A popup window will ask you to confirm your wish to install the Plugin.
-*    After installation, activate the plugin.
-*    Open the settings page for Paystack Forms
-*    Configure your __Paystack Forms__ api key settings as instructed on the page.
-
-= Manual Installation =
-1.  Download the plugin zip file
-2.  Login to your WordPress Admin. Click on "Plugins > Add New" from the left hand menu.
-3.  Click on the "Upload" option, then click "Choose File" to select the zip file from your computer. Once selected, press "OK" and press the "Install Now" button.
-4.  Activate the plugin.
-5.  Under paystack forms, configure your api keys under api keys settings.
-6.  Click on paystack forms and create a form.
+= Minimum Requirements =
+ 
+* Confirm that your server can conclude a TLSv1.2 connection to Paystack's servers. More information about this requirement can be gleaned here: [TLS v1.2 requirement](https://developers.paystack.co/blog/tls-v12-requirement).
+* A Paystack account
+ 
+= Automatic installation =
+ 
+Automatic installation is the easiest option as WordPress handles the file transfers itself and you don’t need to leave your web browser. To do an automatic install of Payment Forms of Paystack, log in to your WordPress dashboard, navigate to the Plugins menu and click Add New.
+ 
+In the search field type “Payment Forms for Paystack” and click Search Plugins. Once you’ve found our payment plugin you can view details about it such as the point release, rating and description. Most importantly of course, you can install it by simply clicking “Install Now”.
+ 
+= Manual installation =
+ 
+The manual installation method involves downloading our payment plugin and uploading it to your webserver via your favourite FTP application. The WordPress codex contains [instructions on how to do this here](https://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation).
 7.  Paste the form shortcode on any page or widget.
+
+= Updating =
+ 
+Automatic updates should work like a charm; as always though, ensure you backup your site just in case.
 
 
 
 
 == Frequently Asked Questions ==
 
-= What Do I Need To Use The Plugin =
-
-1. You need to open a Paystack merchant account on [Paystack](https://paystack.com)
-
+= Where can I find help and documentation to understand Paystack? =
+ 
+You can find help and information on Paystack on our [Help Desk](https://paystack.com/help)
+ 
+= Where can I get support or talk to other users? =
+ 
+If you get stuck, you can ask for help in the [Payment forms for Paystack Plugin Forum](https://wordpress.org/support/plugin/payment-forms-for-paystack). You can also directly email support@paystack.com for assistance.
+ 
+= Payment Forms for Paystack is awesome! Can I contribute? =
+ 
+Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wordpress-payment-forms-for-paystack) :)
 
 
 
 == Changelog ==
+= 2.4.0 =
+* Add support for Ghanaian cedis
+= 2.3.2 =
+* Carry out validation for required fields
+* Exports now carry dates of transaction
+= 2.3.1 =
+* Change transaction fees feature to convenience fee
 = 2.3.0 =
 * Fix export where commas were breaking text fields into multiple columns
 * Fix upload fields using duplicate ID
@@ -145,33 +160,7 @@ You can also follow us on Twitter! **[@paystack](http://twitter.com/paystack)**
 *  Added option to redirect to page after payment.
 *  Add retry payment link to email invoice.
 *  Fixed pricing calculation.
-= 1.1.1 =
-*  Added country and Nigerian states automatic shortcode, added radio buttons, added form agreement checkbox.
-= 1.1.0 =
-*  Added quantity option for minimal selling of items in quantity.
-= 1.0.9 =
-*  Updated to use Paystack plans filter before plan creation.
-= 1.0.8 =
-*  Fixed DB Schema on Update.
-= 1.0.7 =
-*   Added Transfer of transaction charges to the customer.
-= 1.0.6 =
-*   Fixed optional plans.
-= 1.0.5 =
-*   Bug Fixes to processes.
-= 1.0.4 =
-*   Recurring Payment Added with Design overhaul.
-= 1.0.3 =
-*   Invoice and Receipt Emails, with ability to disable them.
-= 1.0.2 =
-*   Added SSL suport for loading scripts.
-= 1.0.1 =
-*   New input file shortcode. For frontend file upload.
-= 1.0.0 =
-*   First release
 
 == Screenshots ==
-
-
-
-== Other Notes ==
+1. Adding a new payment form.
+2. What customer sees for making payment.
