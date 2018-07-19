@@ -119,7 +119,7 @@ class Kkd_Pff_Paystack_Admin {
 		        'edit_item' => _x( 'Edit Paystack Form', 'paystack_form' ),
 		        'new_item' => _x( 'Paystack Form', 'paystack_form' ),
 				'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
-				'all_items' => _x( 'All Forms' ),
+				'all_items' => _x( 'All Forms', 'paystack_form' ),
 		        'search_items' => _x( 'Search Paystack Forms', 'paystack_form' ),
 		        'not_found' => _x( 'No Paystack Forms found', 'paystack_form' ),
 		        'not_found_in_trash' => _x( 'No Paystack Forms found in Trash', 'paystack_form' ),
