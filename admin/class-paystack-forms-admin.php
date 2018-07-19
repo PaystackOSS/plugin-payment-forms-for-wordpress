@@ -1,229 +1,242 @@
 <?php
 
-class Kkd_Pff_Paystack_Admin {
+class Kkd_Pff_Paystack_Admin
+{
 
-	private $plugin_name;
-	private $version;
-	public function __construct( $plugin_name, $version ) {
+    private $plugin_name;
+    private $version;
+    public function __construct( $plugin_name, $version ) 
+    {
 
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-		add_action('admin_menu' , 'kkd_pff_paystack_add_settings_page');
-		add_action( 'admin_init', 'kkd_pff_paystack_register_setting_page' );
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+        add_action('admin_menu', 'kkd_pff_paystack_add_settings_page');
+        add_action('admin_init', 'kkd_pff_paystack_register_setting_page');
 
-		function kkd_pff_paystack_add_settings_page() {
-			add_submenu_page('edit.php?post_type=paystack_form', 'Settings', 'Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
-		}
-		function kkd_pff_paystack_register_setting_page() {
-			register_setting( 'kkd-pff-paystack-settings-group', 'mode' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'tsk' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'tpk' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'lsk' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'lpk' );
+        function kkd_pff_paystack_add_settings_page() 
+        {
+            add_submenu_page('edit.php?post_type=paystack_form', 'Settings', 'Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
+        }
+        function kkd_pff_paystack_register_setting_page() 
+        {
+            register_setting('kkd-pff-paystack-settings-group', 'mode');
+            register_setting('kkd-pff-paystack-settings-group', 'tsk');
+            register_setting('kkd-pff-paystack-settings-group', 'tpk');
+            register_setting('kkd-pff-paystack-settings-group', 'lsk');
+            register_setting('kkd-pff-paystack-settings-group', 'lpk');
 
-			register_setting( 'kkd-pff-paystack-settings-group', 'prc' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'ths' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'adc' );
-			register_setting( 'kkd-pff-paystack-settings-group', 'cap' );
-		}
-		function kkd_pff_paystack_txncheck($name,$txncharge){
-			if ($name == $txncharge) {
-				$result = "selected";
-			}else{
-				$result = "";
-			}
-			return $result;
-		}
-		function kkd_pff_paystack_setting_page() {
-			?>
+            register_setting('kkd-pff-paystack-settings-group', 'prc');
+            register_setting('kkd-pff-paystack-settings-group', 'ths');
+            register_setting('kkd-pff-paystack-settings-group', 'adc');
+            register_setting('kkd-pff-paystack-settings-group', 'cap');
+        }
+        function kkd_pff_paystack_txncheck($name,$txncharge)
+        {
+            if ($name == $txncharge) {
+                $result = "selected";
+            }else{
+                $result = "";
+            }
+            return $result;
+        }
+        function kkd_pff_paystack_setting_page() 
+        {
+            ?>
             <div class="wrap">
-			<h1>Paystack Forms Settings</h1>
-			
-        		<!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
-				<h2>API Keys Settings</h2>
-        		<span>Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </span>
-			 <form method="post" action="options.php">
-				    <?php settings_fields( 'kkd-pff-paystack-settings-group' ); do_settings_sections( 'kkd-pff-paystack-settings-group' ); ?>
-				    <table class="form-table paystack_setting_page">
-								<tr valign="top">
-								<th scope="row">Mode</th>
+         <h1>Paystack Forms Settings</h1>
+            
+                <!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
+            <h2>API Keys Settings</h2>
+            <span>Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </span>
+            <form method="post" action="options.php">
+                    <?php settings_fields('kkd-pff-paystack-settings-group'); do_settings_sections('kkd-pff-paystack-settings-group'); ?>
+                    <table class="form-table paystack_setting_page">
+                                <tr valign="top">
+                                <th scope="row">Mode</th>
 
-								<td>
-									<select class="form-control" name="mode" id="parent_id">
-										<option value="test" <?php echo kkd_pff_paystack_txncheck('test',esc_attr( get_option('mode') )) ?>>Test Mode</option>
-										<option value="live" <?php echo kkd_pff_paystack_txncheck('live',esc_attr( get_option('mode') )) ?>>Live Mode</option>
-									</select>
-								</tr>
-								<tr valign="top">
-				        <th scope="row">Test Secret Key</th>
-				        <td>
-				        	<input type="text" name="tsk" value="<?php echo esc_attr( get_option('tsk') ); ?>" /></td>
-				        </tr>
+                                <td>
+                                    <select class="form-control" name="mode" id="parent_id">
+                                        <option value="test" <?php echo kkd_pff_paystack_txncheck('test', esc_attr(get_option('mode'))) ?>>Test Mode</option>
+                                        <option value="live" <?php echo kkd_pff_paystack_txncheck('live', esc_attr(get_option('mode'))) ?>>Live Mode</option>
+                                    </select>
+                                </tr>
+                                <tr valign="top">
+                        <th scope="row">Test Secret Key</th>
+                        <td>
+                            <input type="text" name="tsk" value="<?php echo esc_attr(get_option('tsk')); ?>" /></td>
+                        </tr>
 
-				        <tr valign="top">
-				        <th scope="row">Test Public Key</th>
-				        <td><input type="text" name="tpk" value="<?php echo esc_attr( get_option('tpk') ); ?>" /></td>
-				        </tr>
+                        <tr valign="top">
+                        <th scope="row">Test Public Key</th>
+                        <td><input type="text" name="tpk" value="<?php echo esc_attr(get_option('tpk')); ?>" /></td>
+                        </tr>
 
-				        <tr valign="top">
-				        <th scope="row">Live Secret Key</th>
-				        <td><input type="text" name="lsk" value="<?php echo esc_attr( get_option('lsk') ); ?>" /></td>
-				        </tr>
-								<tr valign="top">
-				        <th scope="row">Live Public Key</th>
-				        <td><input type="text" name="lpk" value="<?php echo esc_attr( get_option('lpk') ); ?>" /></td>
-				        </tr>
+                        <tr valign="top">
+                        <th scope="row">Live Secret Key</th>
+                        <td><input type="text" name="lsk" value="<?php echo esc_attr(get_option('lsk')); ?>" /></td>
+                        </tr>
+                                <tr valign="top">
+                        <th scope="row">Live Public Key</th>
+                        <td><input type="text" name="lpk" value="<?php echo esc_attr(get_option('lpk')); ?>" /></td>
+                        </tr>
 
-					</table>
+                    </table>
 
-					<table class="form-table paystack_setting_page">
+                    <table class="form-table paystack_setting_page">
                         
-						<hr>
+                        <hr>
 
-						<h2>Fees Settings</h2>
+                        <h2>Fees Settings</h2>
 
                         <tr valign="top">
                             <th scope="row">Percentage</th>
-                            <td><input type="text" name="prc" value="<?php echo esc_attr( get_option('prc', 1.5) ); ?>" /></td>
+                            <td><input type="text" name="prc" value="<?php echo esc_attr(get_option('prc', 1.5)); ?>" /></td>
                         </tr>
 
                         <tr valign="top">
                             <th scope="row">Threshold <br> <small>(amount above which Paystack adds the fixed amount below)</small></th>
-                            <td><input type="text" name="ths" value="<?php echo esc_attr( get_option('ths', 2500) ); ?>" /></td>
+                            <td><input type="text" name="ths" value="<?php echo esc_attr(get_option('ths', 2500)); ?>" /></td>
                         </tr>
 
                         <tr valign="top">
                             <th scope="row">Additional Charge <br> <small> (amount added to percentage fee when transaction amount is above threshold) </small></th>
-                            <td><input type="text" name="adc" value="<?php echo esc_attr( get_option('adc', 100) ); ?>" /></td>
+                            <td><input type="text" name="adc" value="<?php echo esc_attr(get_option('adc', 100)); ?>" /></td>
                         </tr>
 
                         <tr valign="top">
                             <th scope="row">Cap <br> <small> (maximum charge paystack can charge on your transactions)</small></th>
-                            <td><input type="text" name="cap" value="<?php echo esc_attr( get_option('cap', 2000) ); ?>" /></td>
+                            <td><input type="text" name="cap" value="<?php echo esc_attr(get_option('cap', 2000)); ?>" /></td>
                         </tr>
-				    </table>
+                    </table>
 
-			    <?php submit_button(); ?>
+        <?php submit_button(); ?>
 
-			</form>
+         </form>
             </div>
-			 <?php
-		}
-		add_action( 'init', 'register_kkd_pff_paystack' );
-		function register_kkd_pff_paystack() {
+                <?php
+        }
+        add_action('init', 'register_kkd_pff_paystack');
+        function register_kkd_pff_paystack() 
+        {
 
-		    $labels = array(
-		        'name' => _x( 'Paystack Forms', 'paystack_form' ),
-		        'singular_name' => _x( 'Paystack Form', 'paystack_form' ),
-		        'add_new' => _x( 'Add New', 'paystack_form' ),
-		        'add_new_item' => _x( 'Add Paystack Form', 'paystack_form' ),
-		        'edit_item' => _x( 'Edit Paystack Form', 'paystack_form' ),
-		        'new_item' => _x( 'Paystack Form', 'paystack_form' ),
-				'view_item' => _x( 'View Paystack Form', 'paystack_form' ),
-				'all_items' => _x( 'All Forms', 'paystack_form' ),
-		        'search_items' => _x( 'Search Paystack Forms', 'paystack_form' ),
-		        'not_found' => _x( 'No Paystack Forms found', 'paystack_form' ),
-		        'not_found_in_trash' => _x( 'No Paystack Forms found in Trash', 'paystack_form' ),
-		        'parent_item_colon' => _x( 'Parent Paystack Form:', 'paystack_form' ),
-		        'menu_name' => _x( 'Paystack Forms', 'paystack_form' ),
-		    );
+            $labels = array(
+             'name' => _x('Paystack Forms', 'paystack_form'),
+             'singular_name' => _x('Paystack Form', 'paystack_form'),
+             'add_new' => _x('Add New', 'paystack_form'),
+             'add_new_item' => _x('Add Paystack Form', 'paystack_form'),
+             'edit_item' => _x('Edit Paystack Form', 'paystack_form'),
+             'new_item' => _x('Paystack Form', 'paystack_form'),
+            'view_item' => _x('View Paystack Form', 'paystack_form'),
+            'all_items' => _x('All Forms', 'paystack_form'),
+             'search_items' => _x('Search Paystack Forms', 'paystack_form'),
+             'not_found' => _x('No Paystack Forms found', 'paystack_form'),
+             'not_found_in_trash' => _x('No Paystack Forms found in Trash', 'paystack_form'),
+             'parent_item_colon' => _x('Parent Paystack Form:', 'paystack_form'),
+             'menu_name' => _x('Paystack Forms', 'paystack_form'),
+            );
 
-		    $args = array(
-		        'labels' => $labels,
-		        'hierarchical' => true,
-		        'description' => 'Paystack Forms filterable by genre',
-		        'supports' => array( 'title', 'editor'),
-		        'public' => true,
-		        'show_ui' => true,
-		        'show_in_menu' => true,
-		        'menu_position' => 5,
-		        'menu_icon' => plugins_url('../images/logo.png', __FILE__),
-		        'show_in_nav_menus' => true,
-		        'publicly_queryable' => true,
-		        'exclude_from_search' => false,
-		        'has_archive' => false,
-		        'query_var' => true,
-		        'can_export' => true,
-		        'rewrite' => false,
-		        'comments' => false,
-		        'capability_type' => 'post'
-		    );
-		    register_post_type( 'paystack_form', $args );
-		}
-		add_filter('user_can_richedit', 'kkd_pff_paystack_disable_wyswyg');
+            $args = array(
+                'labels' => $labels,
+                'hierarchical' => true,
+                'description' => 'Paystack Forms filterable by genre',
+                'supports' => array( 'title', 'editor'),
+                'public' => true,
+                'show_ui' => true,
+                'show_in_menu' => true,
+                'menu_position' => 5,
+                'menu_icon' => plugins_url('../images/logo.png', __FILE__),
+                'show_in_nav_menus' => true,
+                'publicly_queryable' => true,
+                'exclude_from_search' => false,
+                'has_archive' => false,
+                'query_var' => true,
+                'can_export' => true,
+                'rewrite' => false,
+                'comments' => false,
+                'capability_type' => 'post'
+            );
+            register_post_type('paystack_form', $args);
+        }
+        add_filter('user_can_richedit', 'kkd_pff_paystack_disable_wyswyg');
 
-		function kkd_pff_paystack_add_view_payments($actions, $post){
+        function kkd_pff_paystack_add_view_payments($actions, $post)
+        {
 
-		    if(get_post_type() === 'paystack_form'){
-					unset($actions['view']);
-					unset($actions['quick edit']);
-		        $url = add_query_arg(
-		            array(
-		              'post_id' => $post->ID,
-		              'action' => 'submissions',
-		            )
-		          );
-		    $actions['export'] = '<a href="' . admin_url('admin.php?page=submissions&form='.$post->ID) . '" target="_blank" >View Payments</a>';
-		    }
-		    return $actions;
-		}
-		add_filter( 'page_row_actions', 'kkd_pff_paystack_add_view_payments', 10, 2 );
-
-
-		function kkd_pff_paystack_remove_fullscreen( $qtInit ) {
-				$qtInit['buttons'] = 'fullscreen';
-				return $qtInit;
-		}
-		function kkd_pff_paystack_disable_wyswyg( $default ){
-	    global $post_type, $_wp_theme_features;
+            if(get_post_type() === 'paystack_form') {
+                unset($actions['view']);
+                unset($actions['quick edit']);
+                $url = add_query_arg(
+                    array(
+                      'post_id' => $post->ID,
+                      'action' => 'submissions',
+                    )
+                );
+                $actions['export'] = '<a href="' . admin_url('admin.php?page=submissions&form='.$post->ID) . '" target="_blank" >View Payments</a>';
+            }
+            return $actions;
+        }
+        add_filter('page_row_actions', 'kkd_pff_paystack_add_view_payments', 10, 2);
 
 
-	    if ($post_type == 'paystack_form') {
-	        echo "<style>#edit-slug-box,#message p > a{display:none;}</style>";
-	      add_action("admin_print_footer_scripts", "kkd_pff_paystack_shortcode_button_script");
-	      add_filter( 'user_can_richedit' , '__return_false', 50 );
-	      add_action( 'wp_dashboard_setup', 'kkd_pff_paystack_remove_dashboard_widgets' );
-				remove_action( 'media_buttons', 'media_buttons' );
-				remove_meta_box( 'postimagediv','post','side' );
-				add_filter('quicktags_settings', 'kkd_pff_paystack_remove_fullscreen');
-			}
+        function kkd_pff_paystack_remove_fullscreen( $qtInit ) 
+        {
+            $qtInit['buttons'] = 'fullscreen';
+            return $qtInit;
+        }
+        function kkd_pff_paystack_disable_wyswyg( $default )
+        {
+            global $post_type, $_wp_theme_features;
 
-	    return $default;
-	  }
-	  function kkd_pff_paystack_remove_dashboard_widgets() {
-	  	remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );   // Right Now
-	  	remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' ); // Recent Comments
-	  	remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );  // Incoming Links
-	  	remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );   // Plugins
-	  	remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );  // Quick Press
-	  	remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );  // Recent Drafts
-	  	remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );   // WordPress blog
-	  	remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );   // Other WordPress News
-	  	// use 'dashboard-network' as the second parameter to remove widgets from a network dashboard.
-	  }
-	  add_filter( 'manage_edit-paystack_form_columns', 'kkd_pff_paystack_edit_dashboard_header_columns' ) ;
 
-	  function kkd_pff_paystack_edit_dashboard_header_columns( $columns ) {
+            if ($post_type == 'paystack_form') {
+                echo "<style>#edit-slug-box,#message p > a{display:none;}</style>";
+                add_action("admin_print_footer_scripts", "kkd_pff_paystack_shortcode_button_script");
+                add_filter('user_can_richedit', '__return_false', 50);
+                add_action('wp_dashboard_setup', 'kkd_pff_paystack_remove_dashboard_widgets');
+                remove_action('media_buttons', 'media_buttons');
+                remove_meta_box('postimagediv', 'post', 'side');
+                add_filter('quicktags_settings', 'kkd_pff_paystack_remove_fullscreen');
+            }
 
-	  	$columns = array(
-	  		'cb' => '<input type="checkbox" />',
-	  		'title' => __( 'Name' ),
-			'shortcode' => __( 'Shortcode' ),
-	  		'payments' => __( 'Payments' ),
-	  		'date' => __( 'Date' )
-	  	);
+            return $default;
+        }
+        function kkd_pff_paystack_remove_dashboard_widgets() 
+        {
+            remove_meta_box('dashboard_right_now', 'dashboard', 'normal');   // Right Now
+            remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal'); // Recent Comments
+            remove_meta_box('dashboard_incoming_links', 'dashboard', 'normal');  // Incoming Links
+            remove_meta_box('dashboard_plugins', 'dashboard', 'normal');   // Plugins
+            remove_meta_box('dashboard_quick_press', 'dashboard', 'side');  // Quick Press
+            remove_meta_box('dashboard_recent_drafts', 'dashboard', 'side');  // Recent Drafts
+            remove_meta_box('dashboard_primary', 'dashboard', 'side');   // WordPress blog
+            remove_meta_box('dashboard_secondary', 'dashboard', 'side');   // Other WordPress News
+            // use 'dashboard-network' as the second parameter to remove widgets from a network dashboard.
+        }
+        add_filter('manage_edit-paystack_form_columns', 'kkd_pff_paystack_edit_dashboard_header_columns');
 
-	  	return $columns;
-	  }
-		add_action( 'manage_paystack_form_posts_custom_column', 'kkd_pff_paystack_dashboard_table_data', 10, 2 );
+        function kkd_pff_paystack_edit_dashboard_header_columns( $columns ) 
+        {
 
-		function kkd_pff_paystack_dashboard_table_data( $column, $post_id ) {
-			global $post,$wpdb;
-			$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+            $columns = array(
+            'cb' => '<input type="checkbox" />',
+            'title' => __('Name'),
+            'shortcode' => __('Shortcode'),
+            'payments' => __('Payments'),
+            'date' => __('Date')
+            );
 
-			switch( $column ) {
-				case 'shortcode' :
-					echo '<span class="shortcode">
+            return $columns;
+        }
+        add_action('manage_paystack_form_posts_custom_column', 'kkd_pff_paystack_dashboard_table_data', 10, 2);
+
+        function kkd_pff_paystack_dashboard_table_data( $column, $post_id ) 
+        {
+            global $post,$wpdb;
+            $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+
+            switch( $column ) {
+            case 'shortcode' :
+                echo '<span class="shortcode">
 					<input type="text" class="large-text code" value="[pff-paystack id=&quot;'.$post_id.'&quot;]"
 					readonly="readonly" onfocus="this.select();"></span>';
 
