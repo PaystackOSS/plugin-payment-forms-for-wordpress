@@ -15,7 +15,6 @@
 .wrapper {
     margin:0 auto;
     outline:none;
-    padding:40px 15px;
     -webkit-box-sizing:content-box;
     -moz-box-sizing:content-box;
     box-sizing:content-box;
@@ -24,6 +23,11 @@
 
 .wrapper-640 { max-width:640px; }
 
+#paystack-form {
+    padding:40px 15px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
 
 #pf-form.j-forms {
      /*max-width:640px;*/

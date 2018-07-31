@@ -34,7 +34,7 @@ class Kkd_Pff_Paystack_Admin
         {
             if ($name == $txncharge) {
                 $result = "selected";
-            }else{
+            } else {
                 $result = "";
             }
             return $result;
@@ -162,7 +162,7 @@ class Kkd_Pff_Paystack_Admin
         function kkd_pff_paystack_add_view_payments($actions, $post)
         {
 
-            if(get_post_type() === 'paystack_form') {
+            if (get_post_type() === 'paystack_form') {
                 unset($actions['view']);
                 unset($actions['quick edit']);
                 $url = add_query_arg(
@@ -171,7 +171,7 @@ class Kkd_Pff_Paystack_Admin
                       'action' => 'submissions',
                     )
                 );
-                $actions['export'] = '<a href="' . admin_url('admin.php?page=submissions&form='.$post->ID) . '" target="_blank" >View Payments</a>';
+                $actions['export'] = '<a href="' . admin_url('admin.php?page=submissions&form='.$post->ID) . '" >View Payments</a>';
             }
             return $actions;
         }
@@ -690,6 +690,19 @@ class Kkd_Pff_Paystack_Admin
 
     }
 
+    /**
+     * Add settings action link to the plugins page.
+     *
+     * @since    1.0.0
+     */
+    public function add_action_links( $links ) 
+    {
+        $settings_link = array(
+            '<a href="' . admin_url('edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php') . '">' . __('Settings', $this->plugin_name) . '</a>',
+        );
+        return array_merge($settings_link, $links);
+    }
+
 }
 
 add_action('admin_menu', 'kkd_pff_paystack_register_newpage');
@@ -698,6 +711,7 @@ function kkd_pff_paystack_register_newpage()
     add_menu_page('paystack', 'paystack', 'administrator', 'submissions', 'kkd_pff_paystack_payment_submissions');
     remove_menu_page('submissions');
 }
+
 function kkd_pff_paystack_payment_submissions()
 {
     $id = $_GET['form'];
@@ -771,7 +785,7 @@ function Kkd_pff_export_excel()
             foreach ($new as $key => $item) {
                 $csv_output .= Kkd_pff_prep_csv_data($item->display_name).",";
             }
-        }else{
+        } else {
             if (count($new) > 0) {
                 foreach ($new as $key => $item) {
                     $csv_output .= Kkd_pff_prep_csv_data($key).",";
@@ -784,7 +798,7 @@ function Kkd_pff_export_excel()
             $newkey = $key+1;
             if ($dbdata->txn_code_2 != "") {
                 $txn_code = $dbdata->txn_code_2;
-            }else{
+            } else {
                 $txn_code = $dbdata->txn_code;
             }
             $csv_output .= Kkd_pff_prep_csv_data($newkey).",";
@@ -798,7 +812,7 @@ function Kkd_pff_export_excel()
                 foreach ($new as $key => $item) {
                     $csv_output .= Kkd_pff_prep_csv_data($item->value).",";
                 }
-            }else{
+            } else {
                 if (count($new) > 0) {
                     foreach ($new as $key => $item) {
                         $csv_output .= Kkd_pff_prep_csv_data($item).",";
@@ -820,6 +834,7 @@ function Kkd_pff_export_excel()
     
     // Handle request then generate response using echo or leaving PHP and using HTML
 }
+
 class Kkd_Pff_Paystack_Wp_List_Table
 {
     public function __construct()
@@ -844,7 +859,7 @@ class Kkd_Pff_Paystack_Wp_List_Table
 }
 
 
-if(! class_exists('WP_List_Table') ) {
+if (! class_exists('WP_List_Table') ) {
     include_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 function format_data($data)
@@ -855,12 +870,12 @@ function format_data($data)
         foreach ($new as $key => $item) {
             if ($item->type == 'text') {
                 $text.= '<b>'.$item->display_name.": </b> ".$item->value."<br />";
-            }else{
+            } else {
                 $text.= '<b>'.$item->display_name.": </b>  <a target='_blank' href='".$item->value."'>link</a><br />";
             }
 
         }
-    }else{
+    } else {
         $text = '';
         if (count($new) > 0) {
             foreach ($new as $key => $item) {
@@ -889,7 +904,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
             $newkey = $key+1;
             if ($dbdata->txn_code_2 != "") {
                 $txn_code = $dbdata->txn_code_2;
-            }else{
+            } else {
                 $txn_code = $dbdata->txn_code;
             }
             $data[] = array(
@@ -922,6 +937,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
         $rows = count($alldbdata);
         return $rows;
     }
+    
     public function get_columns()
     {
          $columns = array(

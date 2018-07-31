@@ -343,8 +343,8 @@ function KkdPffPaystackFee()
                                                 callback: function (response) {
                                                     $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref,'quantity':quantity}, function (newdata) {
-                                                             data = JSON.parse(newdata);
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.reference,'quantity':quantity}, function (newdata) {
+                                                            data = JSON.parse(newdata);
                                                             if (data.result == 'success2') {
                                                                 window.location.href = data.link;
                                                             }
@@ -391,7 +391,7 @@ function KkdPffPaystackFee()
                                                 callback: function (response) {
                                                     $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.trxref}, function (newdata) {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_confirm_payment','code':response.reference}, function (newdata) {
                                                              data = JSON.parse(newdata);
                                                             if (data.result == 'success2') {
                                                                 window.location.href = data.link;
@@ -482,7 +482,7 @@ function KkdPffPaystackFee()
                                                 callback: function (response) {
                                                     $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref,'quantity':quantity}, function (newdata) {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.reference,'quantity':quantity}, function (newdata) {
                                                             data = JSON.parse(newdata);
                                                             if (data.result == 'success2') {
                                                                 window.location.href = data.link;
@@ -530,7 +530,7 @@ function KkdPffPaystackFee()
                                                 callback: function (response) {
                                                     $.blockUI({ message: 'Please wait...' });
                                                     $.post(
-                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.trxref}, function (newdata) {
+                                                        $form.attr('action'), {'action':'kkd_pff_paystack_rconfirm_payment','code':response.reference}, function (newdata) {
                                                             data = JSON.parse(newdata);
                                                             if (data.result == 'success2') {
                                                                 window.location.href = data.link;

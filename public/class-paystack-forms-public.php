@@ -786,6 +786,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 
             }
             if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
+                echo '<div id="paystack-form">';
                 if ($hidetitle != 1) {
                     echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
                      
@@ -945,11 +946,11 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '</div>';
 
                 echo '</div>
-			</form>';
-            }else{
+            </form>';
+                echo '</div>';
+            } else {
                 echo "<h5>You must be logged in to make payment</h5>";
             }
-
         }
     }
 
