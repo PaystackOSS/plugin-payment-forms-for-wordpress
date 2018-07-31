@@ -677,17 +677,16 @@ class Kkd_Pff_Paystack_Admin
         add_action('save_post', 'kkd_pff_paystack_save_data', 1, 2);
     }
 
-    public function enqueue_styles() 
+    public function enqueue_styles($hook) 
     {
-
+        if ($hook != 'toplevel_page_submissions') {
+            return;
+        }
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/paystack-forms-admin.css', array(), $this->version, 'all');
-
     }
     public function enqueue_scripts() 
     {
-
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/paystack-forms-admin.js', array( 'jquery' ), $this->version, false);
-
     }
 
     /**
