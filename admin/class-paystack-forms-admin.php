@@ -664,12 +664,13 @@ class Kkd_Pff_Paystack_Admin
                 if($post->post_type == 'revision' ) { return; // Don't store custom data twice
                 }
                 $value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
-                if(get_post_meta($post->ID, $key, false)) { // If the custom field already has a value
+                if (get_post_meta($post->ID, $key, false)) { // If the custom field already has a value
                     update_post_meta($post->ID, $key, $value);
                 } else { // If the custom field doesn't have a value
                     add_post_meta($post->ID, $key, $value);
                 }
-                if(!$value) { delete_post_meta($post->ID, $key); // Delete if blank
+                if (!$value) { 
+                    delete_post_meta($post->ID, $key); // Delete if blank
                 }
             }
 
@@ -679,7 +680,7 @@ class Kkd_Pff_Paystack_Admin
 
     public function enqueue_styles($hook) 
     {
-        if ($hook != 'toplevel_page_submissions') {
+        if ($hook != 'toplevel_page_submissions' && $hook != 'paystack_form_page_class-paystack-forms-admin') {
             return;
         }
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/paystack-forms-admin.css', array(), $this->version, 'all');
