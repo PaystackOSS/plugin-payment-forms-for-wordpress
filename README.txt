@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
 Tested up to: 4.9.7
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.0.2 =
+* Fix CSS for API Settings page.
 = 3.0.0 =
 * Add a panel for charging convenience fee
 * Remove bug where plugin was causing a padding on sites
