@@ -291,7 +291,7 @@
                           500
                         );
 
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-success">' + data.message + '</div>');
                         $(this)
                           .find("input, select, textarea")
                           .each(function() {
@@ -313,7 +313,7 @@
 
                         $.unblockUI();
                       } else {
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-danger">' + data.message + '</div>');
                         $.unblockUI();
                       }
                     }
@@ -354,7 +354,7 @@
                           500
                         );
 
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-success">' + data.message + '</div>');
                         $(this)
                           .find("input, select, textarea")
                           .each(function() {
@@ -376,7 +376,7 @@
 
                         $.unblockUI();
                       } else {
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-danger">' + data.message + '</div>');
                         $.unblockUI();
                       }
                     }
@@ -454,7 +454,7 @@
                           500
                         );
 
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-success">' + data.message + '</div>');
                         $(this)
                           .find("input, select, textarea")
                           .each(function() {
@@ -476,7 +476,7 @@
                         $("#submitbtn").remove();
                         $.unblockUI();
                       } else {
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-danger">' + data.message + '</div>');
                         $.unblockUI();
                       }
                     }
@@ -517,7 +517,7 @@
                           500
                         );
 
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-success">' + data.message + '</div>');
                         $(this)
                           .find("input, select, textarea")
                           .each(function() {
@@ -539,7 +539,7 @@
                         $("#submitbtn").remove();
                         $.unblockUI();
                       } else {
-                        self.before("<pre>" + data.message + "</pre>");
+                        self.before('<div class="alert-danger">' + data.message + '</div>');
                         $.unblockUI();
                       }
                     }

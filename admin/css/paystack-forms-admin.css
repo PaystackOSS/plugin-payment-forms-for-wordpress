@@ -411,3 +411,25 @@ ul.config-error li a.external {
 .wp-list-table .column-amount { width: 10%; }
 .wp-list-table .column-txn_code { width: 15%; }
 .wp-list-table .column-date { width: 10%; }
+
+.alert-success {
+	color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+	position: relative;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
+
+.alert-danger {
+	color: #721c24;
+    background-color: #f8d7da;
+	border-color: #f5c6cb;
+	position: relative;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
