@@ -2,9 +2,11 @@
 
 # Payment Forms for Paystack
 
-Welcome to the Paysment Forms for Paystack repository on GitHub. Here you can browse the source, look at open issues and keep track of development. 
+Welcome to the Payment Forms for Paystack repository on GitHub. 
 
-If you are a developer, you can join our Developer Community on [Slack](https://slack.paystack.com).
+The **Payment Forms for Paystack** plugin allows merchants to create forms with multiple input fields where they can have customers pay before submission. It also works with recurring payments.
+
+Here you can browse the source, look at open issues and keep track of development. 
 
 ## Installation
 
@@ -16,11 +18,15 @@ If you are a developer, you can join our Developer Community on [Slack](https://
 * [Paystack Helpdesk](https://paystack.com/help)
 
 ## Support
-This repository is not suitable for general Paystack support. Please use the issue tracker for bug reports and feature requests directly related to this plugin. For general support, you can reach out by 
+ For bug reports and feature requests directly related to this plugin, please use the [issue tracker](https://github.com/PaystackHQ/paystack-payment-forms-for-wordpress/issues). 
 
-* sending a message from [our website](https://paystack.com/contact).
-* posting an issues on the plugin [support forum](https://wordpress.org/support/plugin/payment-forms-for-paystack).
+For questions related to using the plugin, please post an inquiry to the plugin [support forum](https://wordpress.org/support/plugin/payment-forms-for-paystack).
+
+For general support or questions about your Paystack account, you can reach out by sending a message from [our website](https://paystack.com/contact).
+
+## Community
+If you are a developer, please join our Developer Community on [Slack](https://slack.paystack.com).
 
 ## Contributing to Payment Forms for Paystack
 
-If you have a patch or have stumbled upon an issue with the Paystack Gateway for Payment Forms for Paystack plugin, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/PaystackHQ/wordpress-payment-forms-for-paystack/blob/master/.github/CONTRIBUTING.md) for more information how you can do this.
+If you have a patch or have stumbled upon an issue with the Paystack Gateway for Paid Membership Pro plugin, you can contribute this back to the code. Please read our [contributor guidelines](https://github.com/PaystackHQ/wordpress-payment-forms-for-paystack/blob/master/.github/CONTRIBUTING.md) for more information how you can do this.
