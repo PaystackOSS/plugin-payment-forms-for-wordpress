@@ -1,10 +1,10 @@
 === Payment Forms for Paystack ===
-Contributors: paystack, kendysond
+Contributors: paystack, kendysond, steveamaza
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 4.9.7
-Stable tag: 3.0.3
+Tested up to: 5.0
+Stable tag: 3.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.1.0 =
+* Fix issue where quantified payments with minimum amounts not working for payments.
+* Add biannual plan options to the plugin.
 = 3.0.3 =
 * Fix JS revert where required fields were not being validated.
 = 3.0.2 =

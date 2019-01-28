@@ -3,14 +3,14 @@
   Plugin Name:  Payment Forms for Paystack
   Plugin URI:   https://github.com/PaystackHQ/Wordpress-Payment-forms-for-Paystack
   Description:  Payment Forms for Paystack allows you create forms that will be used to bill clients for goods and services via Paystack.
-  Version:      3.0.3
+  Version:      3.1.0
   Author:       Paystack
   Author URI:   http://paystack.com
   License:      GPL-2.0+
   License URI:  http://www.gnu.org/licenses/gpl-2.0.txt
 */
 // If this file is called directly, abort.
-if (! defined('WPINC') ) {
+if (! defined('WPINC')) {
     die;
 }
 define('KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url(__FILE__));
@@ -27,7 +27,7 @@ add_action('wp_print_styles', 'kkd_pff_paystack_enqueueStylesFix', 100);
 /**
  * force plugins to load scripts with SSL if page is SSL
  */
-function kkd_pff_paystack_enqueueScriptsFix() 
+function kkd_pff_paystack_enqueueScriptsFix()
 {
     if (!is_admin()) {
         if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
@@ -44,7 +44,7 @@ function kkd_pff_paystack_enqueueScriptsFix()
 /**
  * force plugins to load styles with SSL if page is SSL
  */
-function kkd_pff_paystack_enqueueStylesFix() 
+function kkd_pff_paystack_enqueueStylesFix()
 {
     if (!is_admin()) {
         if (!empty($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != "off")) {
@@ -60,7 +60,7 @@ function kkd_pff_paystack_enqueueStylesFix()
 
 
 
-function kkd_pff_paystack_activate_paystack_forms() 
+function kkd_pff_paystack_activate_paystack_forms()
 {
     include_once plugin_dir_path(__FILE__) . 'includes/class-paystack-forms-activator.php';
     Kkd_Pff_Paystack_Activator::activate();
@@ -71,18 +71,16 @@ register_activation_hook(__FILE__, 'kkd_pff_paystack_activate_paystack_forms');
 
 require plugin_dir_path(__FILE__) . 'includes/class-paystack-forms.php';
 
-function kkd_pff_paystack_run_paystack_forms() 
+function kkd_pff_paystack_run_paystack_forms()
 {
-
     $plugin = new Kkd_Pff_Paystack();
     $plugin->run();
-
 }
 kkd_pff_paystack_run_paystack_forms();
 
 function kkd_pff_paystack_shortcode_button_script()
 {
-    if(wp_script_is("quicktags")) {
+    if (wp_script_is("quicktags")) {
         ?>
       <script type="text/javascript">
 
@@ -192,14 +190,14 @@ function kkd_pff_paystack_shortcode_button_script()
 // }
 
 add_action('init', 'kkd_pff_init');
-function kkd_pff_init() 
+function kkd_pff_init()
 {
     add_rewrite_rule('^paystackinvoice$', 'index.php?kkd_pff_stats=true', 'top');
 }
 
 // But WordPress has a whitelist of variables it allows, so we must put it on that list
 add_action('query_vars', 'kkd_pff_query_vars');
-function kkd_pff_query_vars( $query_vars )
+function kkd_pff_query_vars($query_vars)
 {
     $query_vars[] = 'kkd_pff_stats';
     return $query_vars;
@@ -209,9 +207,9 @@ function kkd_pff_query_vars( $query_vars )
 // This example checks very early in the process:
 // if the variable is set, we include our page and stop execution after it
 add_action('parse_request', 'kkd_pff_parse_request');
-function kkd_pff_parse_request( &$wp )
+function kkd_pff_parse_request(&$wp)
 {
-    if (array_key_exists('kkd_pff_stats', $wp->query_vars) ) {
+    if (array_key_exists('kkd_pff_stats', $wp->query_vars)) {
         include dirname(__FILE__) . '/includes/paystack-invoice.php';
         exit();
     }

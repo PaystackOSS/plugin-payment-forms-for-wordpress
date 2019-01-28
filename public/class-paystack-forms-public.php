@@ -785,7 +785,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 echo' required>
 				 </div>
-			 </div>';
+			     </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Email <span>*</span></label>
 				 <div class="input">
@@ -797,7 +797,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 echo' required>
 				 </div>
-			 </div>';
+			     </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Amount ('.$currency;
                 if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
@@ -822,7 +822,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                                 </div>';
                         }
                     } elseif ($recur == 'optional') {
-                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
+                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="'.$amount.'" required/>';
                     } else {
                         if ($amount == 0) {
                             echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
@@ -857,7 +857,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
-                if (recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
                     // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
                     echo
                     '<div class="span12 unit">
@@ -877,12 +877,14 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 if ($recur == 'optional') {
                     echo '<div class="span12 unit">
-			 				 <label class="label">Recuring Payment</label>
+			 				 <label class="label">Recurring Payment</label>
 			 				 <div class="select">
 			 					 <select class="form-control" name="pf-interval" >
 			 						 <option value="no">None</option>
+			 						 <option value="daily">Daily</option>
 			 						 <option value="weekly">Weekly</option>
-			 						 <option value="monthly">Monthly</option>
+                                     <option value="monthly">Monthly</option>
+                                     <option value="biannually">Biannually</option>
 			 						 <option value="annually">Annually</option>
 			 					 </select>
 			 					 <i></i>

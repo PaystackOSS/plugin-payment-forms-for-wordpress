@@ -873,12 +873,14 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 if ($recur == 'optional') {
                     echo '<div class="span12 unit">
-			 				 <label class="label">Recuring Payment</label>
+			 				 <label class="label">Recurring Payment</label>
 			 				 <div class="select">
 			 					 <select class="form-control" name="pf-interval" >
 			 						 <option value="no">None</option>
+			 						 <option value="daily">Daily</option>
 			 						 <option value="weekly">Weekly</option>
 			 						 <option value="monthly">Monthly</option>
+			 						 <option value="biannually">Biannually</option>
 			 						 <option value="annually">Annually</option>
 			 					 </select>
 			 					 <i></i>

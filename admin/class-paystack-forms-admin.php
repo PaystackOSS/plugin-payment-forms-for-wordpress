@@ -485,7 +485,7 @@ class Kkd_Pff_Paystack_Admin
                 $recurplan = '';
             }
             // Echo out the field
-            echo '<p>Reccuring Payment:</p>';
+            echo '<p>Recurring Payment:</p>';
             echo '<select class="form-control" name="_recur" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no', $recur).'>None</option>
 							<option value="optional" '.kkd_pff_paystack_txncheck('optional', $recur).'>Optional Recurring</option>
@@ -507,6 +507,7 @@ class Kkd_Pff_Paystack_Admin
             $usequantity = get_post_meta($post->ID, '_usequantity', true);
             $quantity = get_post_meta($post->ID, '_quantity', true);
             $quantityunit = get_post_meta($post->ID, '_quantityunit', true);
+            $recur = get_post_meta($post->ID, '_recur', true);
 
             if ($usequantity == "") {
                 $usequantity = 'no';
@@ -517,12 +518,20 @@ class Kkd_Pff_Paystack_Admin
             if ($quantityunit == "") {
                 $quantityunit = 'Quantity';
             }
+
             // Echo out the field
             echo '<small>Allow your users pay in multiple quantity</small><p>Quantified Payment:</p>';
-            echo '<select class="form-control" name="_usequantity" style="width:100%;">
+            if ($recur != "no") {
+                echo '<select disabled class="form-control" name="_usequantity" style="width:100%;">
 				<option value="no" '.kkd_pff_paystack_txncheck('no', $usequantity).'>No</option>
 				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $usequantity).'>Yes</option>
-			 </select>';
+			    </select>';
+            } else {
+                echo '<select class="form-control" name="_usequantity" style="width:100%;">
+				<option value="no" '.kkd_pff_paystack_txncheck('no', $usequantity).'>No</option>
+				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $usequantity).'>Yes</option>
+			    </select>';
+            }
             echo '<p>Max payable quantity:</p>';
             echo '<input type="number" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
 			<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
