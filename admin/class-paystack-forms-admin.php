@@ -524,7 +524,6 @@ class Kkd_Pff_Paystack_Admin
             if ($recur != "no") {
                 echo '<select disabled class="form-control" name="_usequantity" style="width:100%;">
 				<option value="no" '.kkd_pff_paystack_txncheck('no', $usequantity).'>No</option>
-				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $usequantity).'>Yes</option>
 			    </select>';
             } else {
                 echo '<select class="form-control" name="_usequantity" style="width:100%;">
