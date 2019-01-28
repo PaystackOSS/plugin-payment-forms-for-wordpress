@@ -857,7 +857,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
-                if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                if (recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
                     // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
                     echo
                     '<div class="span12 unit">
@@ -867,7 +867,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                             <select class="form-control" id="pf-quantity" name="pf-quantity" >';
                     $max = $quantity+1;
                     for ($i=1; $i < $max; $i++) {
-                        echo  ' <option value="'.$i.'">'.$i.'</ption>';
+                        echo  ' <option value="'.$i.'">'.$i.'</option>';
                     }
                     echo  '</select>
                             <i></i>
