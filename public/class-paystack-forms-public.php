@@ -6,23 +6,18 @@ require_once ABSPATH . "wp-admin" . '/includes/media.php';
 
 class Kkd_Pff_Paystack_Public
 {
-
     private $plugin_name;
     private $version;
 
-    public function __construct( $plugin_name, $version ) 
+    public function __construct($plugin_name, $version)
     {
-
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-
     }
-    public function enqueue_styles() 
+    public function enqueue_styles()
     {
-
         wp_enqueue_style($this->plugin_name.'1', plugin_dir_url(__FILE__) . 'css/pff-paystack-style.css', array(), $this->version, 'all');
         wp_enqueue_style($this->plugin_name.'2', plugin_dir_url(__FILE__) . 'css/font-awesome.min.css', array(), $this->version, 'all');
-
     }
 
     public static function fetchPublicKey()
@@ -46,7 +41,7 @@ class Kkd_Pff_Paystack_Public
         return $ret;
     }
 
-    public function enqueue_scripts() 
+    public function enqueue_scripts()
     {
         wp_enqueue_script('blockUI', plugin_dir_url(__FILE__) . 'js/jquery.blockUI.min.js', array( 'jquery' ), $this->version, true, true);
         wp_enqueue_script('jQuery_UI', plugin_dir_url(__FILE__) . 'js/jquery.ui.min.js', array( 'jquery' ), $this->version, true, true);
@@ -54,9 +49,7 @@ class Kkd_Pff_Paystack_Public
         wp_enqueue_script('Paystack');
         wp_enqueue_script('paystack_frontend', plugin_dir_url(__FILE__) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, true, true);
         wp_localize_script('paystack_frontend', 'settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey(), 'fee'=>Kkd_Pff_Paystack_Public::fetchFeeSettings()), $this->version, true, true);
-
     }
-
 }
 
 define('KKD_PFF_PAYSTACK_PERCENTAGE', 0.015);
@@ -78,7 +71,6 @@ function kkd_pff_paystack_add_paystack_charge($amount)
         $charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
     } else {
         $charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
-
     }
     // echo $charge;
     if ($charge > 2000) {
@@ -95,27 +87,26 @@ function kkd_pff_paystack_add_paystack_charge($amount)
 }
 
 add_filter("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
-function kkd_pff_paystack_mail_content_type() 
+function kkd_pff_paystack_mail_content_type()
 {
     return "text/html";
 }
 add_filter("wp_mail_from_name", "kkd_pff_paystack_mail_from_name");
-function kkd_pff_paystack_mail_from_name() 
+function kkd_pff_paystack_mail_from_name()
 {
     $name = get_option('blogname');
     return $name;
 }
 
 
-function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code)
+function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
 {
     //  echo date('F j,Y');
     $user_email = stripslashes($email);
 
     $email_subject = "Payment Invoice for ".$currency.' '.number_format($amount);
 
-    ob_start();
-    ?>
+    ob_start(); ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html>
     <head>
@@ -185,7 +176,7 @@ function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code)
     <tbody>
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#888">
-    <small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo date('F j,Y');?></small>
+    <small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo date('F j,Y'); ?></small>
     <h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php  echo $name; ?></h6>
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php  echo $email; ?></p>
     </td>
@@ -218,7 +209,7 @@ function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code)
     <tbody>
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-    <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">You're getting this email because <br />you tried making a payment to <?php echo get_option('blogname');?>.</p>
+    <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">You're getting this email because <br />you tried making a payment to <?php echo get_option('blogname'); ?>.</p>
     <table class="primary_btn" align="center" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;clear:both;margin:0 auto">
     <tbody>
     <tr>
@@ -252,7 +243,7 @@ function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code)
     <tbody>
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#b3b3b5;padding-bottom:0;padding-top:16px">
-    <strong><?php echo get_option('blogname');?></strong><br>
+    <strong><?php echo get_option('blogname'); ?></strong><br>
     </td>
     </tr>
     </tbody>
@@ -288,9 +279,8 @@ function kkd_pff_paystack_send_invoice($currency,$amount,$name,$email,$code)
     $headers = array( 'Reply-To: ' . $admin_email,"From: $website <$admin_email>" . "\r\n");
     $headers = "From: ".$website."<$admin_email>" . "\r\n";
     wp_mail($user_email, $email_subject, $message, $headers);
-
 }
-function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,$metadata)
+function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $code, $metadata)
 {
     //  echo date('F j,Y');
     $user_email = stripslashes($email);
@@ -300,8 +290,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
 
     $email_subject =$subject;
 
-    ob_start();
-    ?>
+    ob_start(); ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html>
     <head>
@@ -392,20 +381,18 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
         foreach ($new as $key => $item) {
             if ($item->type == 'text') {
                 echo $item->display_name."<strong>  :".$item->value."</strong><br>";
-            }else{
+            } else {
                 echo $item->display_name."<strong>  : <a target='_blank' href='".$item->value."'>link</a></strong><br>";
             }
-
         }
-    }else{
+    } else {
         $text = '';
         if (count($new) > 0) {
             foreach ($new as $key => $item) {
                 echo $key."<strong>  :".$item."</strong><br />";
             }
         }
-    }
-    ?>
+    } ?>
         Transaction code: <strong> <?php echo $code; ?></strong><br>
     </p>
     </td>
@@ -432,7 +419,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
     <small style="font-size:86%;font-weight:normal"><strong>Notice</strong><br>
-    You're getting this email because you've made a payment of <?php $currency.' '.number_format($amount); ?> to <a href="<?php echo get_bloginfo('url') ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo get_option('blogname');?></a>.</small>
+    You're getting this email because you've made a payment of <?php $currency.' '.number_format($amount); ?> to <a href="<?php echo get_bloginfo('url') ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo get_option('blogname'); ?></a>.</small>
     </td>
     </tr>
     </tbody>
@@ -454,7 +441,7 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
     <tbody>
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#b3b3b5;padding-bottom:0;padding-top:16px">
-    <strong><?php echo get_option('blogname');?></strong><br>
+    <strong><?php echo get_option('blogname'); ?></strong><br>
     </td>
     </tr>
     </tbody>
@@ -489,9 +476,8 @@ function kkd_pff_paystack_send_receipt($id,$currency,$amount,$name,$email,$code,
     $headers = array( 'Reply-To: ' . $admin_email,"From: $website <$admin_email>" . "\r\n");
     $headers = "From: ".$website."<$admin_email>" . "\r\n";
     wp_mail($user_email, $email_subject, $message, $headers);
-
 }
-function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,$code,$metadata)
+function kkd_pff_paystack_send_receipt_owner($id, $currency, $amount, $name, $email, $code, $metadata)
 {
     //  echo date('F j,Y');
     $user_email = stripslashes($email);
@@ -501,8 +487,7 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
 
     $email_subject =$subject;
 
-    ob_start();
-    ?>
+    ob_start(); ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html>
     <head>
@@ -590,20 +575,18 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
         foreach ($new as $key => $item) {
             if ($item->type == 'text') {
                 echo $item->display_name."<strong>  :".$item->value."</strong><br>";
-            }else{
+            } else {
                 echo $item->display_name."<strong>  : <a target='_blank' href='".$item->value."'>link</a></strong><br>";
             }
-
         }
-    }else{
+    } else {
         $text = '';
         if (count($new) > 0) {
             foreach ($new as $key => $item) {
                 echo $key."<strong>  :".$item."</strong><br />";
             }
         }
-    }
-    ?>
+    } ?>
         Transaction code: <strong> <?php echo $code; ?></strong><br>
     </p>
     </td>
@@ -630,7 +613,7 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
     <small style="font-size:86%;font-weight:normal"><strong>Notice</strong><br>
-    You're getting this email because someone made a payment of <?php $currency.' '.number_format($amount); ?> to <a href="<?php echo get_bloginfo('url') ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo get_option('blogname');?></a>.</small>
+    You're getting this email because someone made a payment of <?php $currency.' '.number_format($amount); ?> to <a href="<?php echo get_bloginfo('url') ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo get_option('blogname'); ?></a>.</small>
     </td>
     </tr>
     </tbody>
@@ -652,7 +635,7 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
     <tbody>
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#b3b3b5;padding-bottom:0;padding-top:16px">
-    <strong><?php echo get_option('blogname');?></strong><br>
+    <strong><?php echo get_option('blogname'); ?></strong><br>
     </td>
     </tr>
     </tbody>
@@ -687,14 +670,13 @@ function kkd_pff_paystack_send_receipt_owner($id,$currency,$amount,$name,$email,
     // $headers = array("From: $website <$admin_email>" . "\r\n");
     $headers = "From: ".$website."<$admin_email>" . "\r\n";
     wp_mail($admin_email, $email_subject, $message, $headers);
-
 }
 function kkd_pff_paystack_fetch_plan($code)
 {
     $mode =  esc_attr(get_option('mode'));
     if ($mode == 'test') {
         $key = esc_attr(get_option('tsk'));
-    }else{
+    } else {
         $key = esc_attr(get_option('lsk'));
     }
     $paystack_url = 'https://api.paystack.co/plan/' . $code;
@@ -706,13 +688,12 @@ function kkd_pff_paystack_fetch_plan($code)
     'timeout'    => 60
     );
     $request = wp_remote_get($paystack_url, $args);
-    if(! is_wp_error($request)) {
+    if (! is_wp_error($request)) {
         $paystack_response = json_decode(wp_remote_retrieve_body($request));
-
     }
     return $paystack_response;
 }
-function kkd_pff_paystack_form_shortcode($atts) 
+function kkd_pff_paystack_form_shortcode($atts)
 {
     ob_start();
 
@@ -723,21 +704,22 @@ function kkd_pff_paystack_form_shortcode($atts)
     $lname = $current_user->user_lastname;
     if ($fname == '' && $lname == '') {
         $fullname = '';
-    }else{
+    } else {
         $fullname = $fname.' '.$lname;
     }
     extract(
         shortcode_atts(
             array(
             'id' => 0,
-            ), $atts
+            ),
+            $atts
         )
     );
     $pk = Kkd_Pff_Paystack_Public::fetchPublicKey();
     if (!$pk) {
         $settingslink = get_admin_url().'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php';
         echo "<h5>You must set your Paystack API keys first <a href='".$settingslink."'>settings</a></h5>";
-    } else if ($id != 0) {
+    } elseif ($id != 0) {
         $obj = get_post($id);
         if ($obj->post_type == 'paystack_form') {
             $amount = get_post_meta($id, '_amount', true);
@@ -783,13 +765,11 @@ function kkd_pff_paystack_form_shortcode($atts)
                         $showbtn = false;
                     }
                 }
-
             }
             if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
                 echo '<div id="paystack-form">';
                 if ($hidetitle != 1) {
                     echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
-                     
                 }
                 echo '<form version="'.KKD_PFF_PAYSTACK_VERSION.'" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
@@ -805,7 +785,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 echo' required>
 				 </div>
-			 </div>';
+			     </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Email <span>*</span></label>
 				 <div class="input">
@@ -817,7 +797,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 echo' required>
 				 </div>
-			 </div>';
+			     </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Amount ('.$currency;
                 if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
@@ -842,7 +822,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                                 </div>';
                         }
                     } elseif ($recur == 'optional') {
-                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required/>';
+                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="'.$amount.'" required/>';
                     } else {
                         if ($amount == 0) {
                             echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
@@ -861,13 +841,12 @@ function kkd_pff_paystack_form_shortcode($atts)
 			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
 			 				 	 	<input type="hidden"  id="pf-amount" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
-                             $max = $quantity+1;
+                            $max = $quantity+1;
                             foreach ($paymentoptions as $key => $paymentoption) {
-                                list($a,$b) = explode(':', $paymentoption);
+                                list($a, $b) = explode(':', $paymentoption);
                                 echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.'('.number_format($b).')</option>';
                             }
                             echo '</select> <i></i> </div>';
-                            
                         }
                     }
                 }
@@ -878,19 +857,19 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
-                if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
                     // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
-                    echo 
+                    echo
                     '<div class="span12 unit">
                         <label class="label">' . $quantityunit . '</label>
                         <div class="select">
                             <input type="hidden" value="'.$amount.'" id="pf-qamount"/>
                             <select class="form-control" id="pf-quantity" name="pf-quantity" >';
-                            $max = $quantity+1;
+                    $max = $quantity+1;
                     for ($i=1; $i < $max; $i++) {
-                        echo  ' <option value="'.$i.'">'.$i.'</ption>';
+                        echo  ' <option value="'.$i.'">'.$i.'</option>';
                     }
-                            echo  '</select>
+                    echo  '</select>
                             <i></i>
                         </div>
                     </div>';
@@ -898,29 +877,30 @@ function kkd_pff_paystack_form_shortcode($atts)
 
                 if ($recur == 'optional') {
                     echo '<div class="span12 unit">
-			 				 <label class="label">Recuring Payment</label>
+			 				 <label class="label">Recurring Payment</label>
 			 				 <div class="select">
 			 					 <select class="form-control" name="pf-interval" >
 			 						 <option value="no">None</option>
+			 						 <option value="daily">Daily</option>
 			 						 <option value="weekly">Weekly</option>
-			 						 <option value="monthly">Monthly</option>
+                                     <option value="monthly">Monthly</option>
+                                     <option value="biannually">Biannually</option>
 			 						 <option value="annually">Annually</option>
 			 					 </select>
 			 					 <i></i>
 			 				 </div>
 			 			 </div>';
-                }elseif($recur == 'plan') {
+                } elseif ($recur == 'plan') {
                     if ($showbtn) {
                         echo '<input type="hidden" name="pf-plancode" value="' . $recurplan. '" />';
                         echo '<div class="span12 unit">
 									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$plan->data->name.' '.$plan->data->interval. ' recuring payment - '.$plan->data->currency.' '.number_format($planamount).'</label>
 								</div>';
-                    }else{
+                    } else {
                         echo '<div class="span12 unit">
 								 <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">'.$planerrorcode.'</label>
 							 </div>';
                     }
-
                 }
 
 
@@ -960,14 +940,15 @@ function kkd_pff_paystack_form_shortcode($atts)
 }
 add_shortcode('pff-paystack', 'kkd_pff_paystack_form_shortcode');
 
-function kkd_pff_paystack_datepicker_shortcode($atts) 
+function kkd_pff_paystack_datepicker_shortcode($atts)
 {
     extract(
         shortcode_atts(
             array(
             'name' => 'Title',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -987,14 +968,15 @@ function kkd_pff_paystack_datepicker_shortcode($atts)
 add_shortcode('datepicker', 'kkd_pff_paystack_datepicker_shortcode');
 
 
-function kkd_pff_paystack_text_shortcode($atts) 
+function kkd_pff_paystack_text_shortcode($atts)
 {
     extract(
         shortcode_atts(
             array(
             'name' => 'Title',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -1012,7 +994,7 @@ function kkd_pff_paystack_text_shortcode($atts)
     return $code;
 }
 add_shortcode('text', 'kkd_pff_paystack_text_shortcode');
-function kkd_pff_paystack_select_shortcode($atts) 
+function kkd_pff_paystack_select_shortcode($atts)
 {
     extract(
         shortcode_atts(
@@ -1020,7 +1002,8 @@ function kkd_pff_paystack_select_shortcode($atts)
             'name' => 'Title',
             'options' => '',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -1046,7 +1029,7 @@ function kkd_pff_paystack_select_shortcode($atts)
     return $code;
 }
 add_shortcode('select', 'kkd_pff_paystack_select_shortcode');
-function kkd_pff_paystack_radio_shortcode($atts) 
+function kkd_pff_paystack_radio_shortcode($atts)
 {
     extract(
         shortcode_atts(
@@ -1054,7 +1037,8 @@ function kkd_pff_paystack_radio_shortcode($atts)
             'name' => 'Title',
             'options' => '',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -1088,7 +1072,7 @@ function kkd_pff_paystack_radio_shortcode($atts)
     return $code;
 }
 add_shortcode('radio', 'kkd_pff_paystack_radio_shortcode');
-function kkd_pff_paystack_checkbox_shortcode($atts) 
+function kkd_pff_paystack_checkbox_shortcode($atts)
 {
     extract(
         shortcode_atts(
@@ -1096,7 +1080,8 @@ function kkd_pff_paystack_checkbox_shortcode($atts)
             'name' => 'Title',
             'options' => '',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -1161,14 +1146,15 @@ function kkd_pff_paystack_checkbox_shortcode($atts)
     return $code;
 }
 add_shortcode('checkbox', 'kkd_pff_paystack_checkbox_shortcode');
-function kkd_pff_paystack_textarea_shortcode($atts) 
+function kkd_pff_paystack_textarea_shortcode($atts)
 {
     extract(
         shortcode_atts(
             array(
             'name' => 'Title',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
     $code = '<div class="span12 unit">
@@ -1186,14 +1172,15 @@ function kkd_pff_paystack_textarea_shortcode($atts)
     return $code;
 }
 add_shortcode('textarea', 'kkd_pff_paystack_textarea_shortcode');
-function kkd_pff_paystack_input_shortcode($atts) 
+function kkd_pff_paystack_input_shortcode($atts)
 {
     extract(
         shortcode_atts(
             array(
             'name' => 'Title',
             'required' => '0',
-            ), $atts
+            ),
+            $atts
         )
     );
 
@@ -1254,11 +1241,11 @@ function kkd_pff_paystack_generate_code()
 
     return $code;
 }
-function kkd_pff_paystack_get_the_user_ip() 
+function kkd_pff_paystack_get_the_user_ip()
 {
-    if (! empty($_SERVER['HTTP_CLIENT_IP']) ) {
+    if (! empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (! empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
+    } elseif (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
     } else {
         $ip = $_SERVER['REMOTE_ADDR'];
@@ -1268,7 +1255,7 @@ function kkd_pff_paystack_get_the_user_ip()
 
 add_action('wp_ajax_kkd_pff_paystack_submit_action', 'kkd_pff_paystack_submit_action');
 add_action('wp_ajax_nopriv_kkd_pff_paystack_submit_action', 'kkd_pff_paystack_submit_action');
-function kkd_pff_paystack_submit_action() 
+function kkd_pff_paystack_submit_action()
 {
     if (trim($_POST['pf-pemail']) == '') {
         $response['result'] = 'failed';
@@ -1324,13 +1311,13 @@ function kkd_pff_paystack_submit_action()
     $quantity = 1;
     $usequantity = get_post_meta($_POST["pf-id"], '_usequantity', true);
 
-    if(($recur == 'no') && ($formamount != 0)) {
+    if (($recur == 'no') && ($formamount != 0)) {
         $amount = (int)str_replace(' ', '', $formamount);
     }
     if ($minimum == 1 && $formamount != 0) {
         if ($originalamount < $formamount) {
             $amount = $formamount;
-        }else{
+        } else {
             $amount = $originalamount;
         }
     }
@@ -1338,7 +1325,7 @@ function kkd_pff_paystack_submit_action()
         $paymentoptions = explode(',', $variableamount);
         if (count($paymentoptions) > 0) {
             foreach ($paymentoptions as $key => $paymentoption) {
-                list($a,$b) = explode(':', $paymentoption);
+                list($a, $b) = explode(':', $paymentoption);
                 if ($variablename == $a) {
                     $amount = $b;
                 }
@@ -1364,14 +1351,14 @@ function kkd_pff_paystack_submit_action()
     }
     $maxFileSize = $filelimit * 1024 * 1024;
 
-    if(!empty($_FILES)) {
+    if (!empty($_FILES)) {
         foreach ($_FILES as $keyname => $value) {
             if ($value['size'] > 0) {
                 if ($value['size'] > $maxFileSize) {
                     $response['result'] = 'failed';
                     $response['message'] = 'Max upload size is '.$filelimit."MB";
                     exit(json_encode($response));
-                }else{
+                } else {
                     $attachment_id = media_handle_upload($keyname, $_POST["pf-id"]);
                     $url = wp_get_attachment_url($attachment_id);
                     $fixedmetadata[] =  array(
@@ -1381,7 +1368,7 @@ function kkd_pff_paystack_submit_action()
                     'value' => $url
                     );
                 }
-            }else{
+            } else {
                 $fixedmetadata[] =  array(
                 'display_name' => ucwords(str_replace("_", " ", $keyname)),
                 'variable_name' => $keyname,
@@ -1389,11 +1376,10 @@ function kkd_pff_paystack_submit_action()
                 'value' => 'No file Uploaded'
                 );
             }
-
         }
     }
     $plancode = 'none';
-    if($recur != 'no') {
+    if ($recur != 'no') {
         if ($recur == 'optional') {
             $interval = $_POST['pf-interval'];
             if ($interval != 'no') {
@@ -1401,7 +1387,7 @@ function kkd_pff_paystack_submit_action()
                 $mode =  esc_attr(get_option('mode'));
                 if ($mode == 'test') {
                     $key = esc_attr(get_option('tsk'));
-                }else{
+                } else {
                     $key = esc_attr(get_option('lsk'));
                 }
                 $koboamount = $amount*100;
@@ -1419,7 +1405,7 @@ function kkd_pff_paystack_submit_action()
                 );
                 // Check if plan exist
                 $checkrequest = wp_remote_get($check_url, $checkargs);
-                if(!is_wp_error($checkrequest)) {
+                if (!is_wp_error($checkrequest)) {
                     $response = json_decode(wp_remote_retrieve_body($checkrequest));
                     if ($response->meta->total >= 1) {
                         $plan = $response->data[0];
@@ -1430,7 +1416,7 @@ function kkd_pff_paystack_submit_action()
                         'type' => 'text',
                         'value' => $plan->interval
                         );
-                    }else{
+                    } else {
                         //Create Plan
                         $body = array(
                         'name'                        => $currency.number_format($originalamount).' ['.$currency.number_format($amount).'] - '.$interval,
@@ -1444,7 +1430,7 @@ function kkd_pff_paystack_submit_action()
                         );
 
                         $request = wp_remote_post($paystack_url, $args);
-                        if(! is_wp_error($request)) {
+                        if (! is_wp_error($request)) {
                             $paystack_response = json_decode(wp_remote_retrieve_body($request));
                             $plancode    = $paystack_response->data->plan_code;
                             $fixedmetadata[] =  array(
@@ -1453,21 +1439,18 @@ function kkd_pff_paystack_submit_action()
                             'type' => 'text',
                             'value' => $paystack_response->data->interval
                             );
-
                         }
                     }
-
                 }
-
             }
-        }else{
+        } else {
             //Use Plan Code
             $plancode = $_POST['pf-plancode'];
             unset($metadata['pf-plancode']);
         }
     }
 
-    if($plancode != 'none') {
+    if ($plancode != 'none') {
         $fixedmetadata[] =  array(
         'display_name' => 'Plan',
         'variable_name' => 'Plan',
@@ -1500,7 +1483,6 @@ function kkd_pff_paystack_submit_action()
         // $insert['txn_code'] = $code;
         // $insert['plan'] = $exist[0]->plan;
         $wpdb->update($table, array( 'txn_code' => $code,'plan' =>$insert['plan']), array('id'=>$exist[0]->id));
-                            
     } else {
         $wpdb->insert(
             $table,
@@ -1554,35 +1536,35 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata)
              'type' => 'text',
              'value' => $value
             );
-        }elseif ($key == 'pf-plancode') {
+        } elseif ($key == 'pf-plancode') {
             $custom_fields[] =  array(
             'display_name' => 'Plan',
             'variable_name' => 'Plan',
              'type' => 'text',
              'value' => $value
             );
-        }elseif ($key == 'pf-vname') {
+        } elseif ($key == 'pf-vname') {
             $custom_fields[] =  array(
             'display_name' => 'Payment Option',
             'variable_name' => 'Payment Option',
              'type' => 'text',
              'value' => $value
             );
-        }elseif ($key == 'pf-interval') {
+        } elseif ($key == 'pf-interval') {
             $custom_fields[] =  array(
             'display_name' => 'Plan Interval',
             'variable_name' => 'Plan Interval',
              'type' => 'text',
              'value' => $value
             );
-        }elseif ($key == 'pf-quantity') {
+        } elseif ($key == 'pf-quantity') {
             $custom_fields[] =  array(
             'display_name' => 'Quantity',
             'variable_name' => 'Quantity',
              'type' => 'text',
              'value' => $value
             );
-        }else{
+        } else {
             $custom_fields[] =  array(
             'display_name' => ucwords(str_replace("_", " ", $key)),
             'variable_name' => $key,
@@ -1590,7 +1572,6 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata)
              'value' => $value
             );
         }
-
     }
     return $custom_fields;
 }
@@ -1598,7 +1579,7 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata)
 add_action('wp_ajax_kkd_pff_paystack_confirm_payment', 'kkd_pff_paystack_confirm_payment');
 add_action('wp_ajax_nopriv_kkd_pff_paystack_confirm_payment', 'kkd_pff_paystack_confirm_payment');
 
-function kkd_pff_paystack_confirm_payment() 
+function kkd_pff_paystack_confirm_payment()
 {
     if (trim($_POST['code']) == '') {
         $response['error'] = true;
@@ -1611,7 +1592,6 @@ function kkd_pff_paystack_confirm_payment()
     $code = $_POST['code'];
     $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
     if (array_key_exists("0", $record)) {
-
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);
         $recur = get_post_meta($payment_array->post_id, '_recur', true);
@@ -1625,7 +1605,7 @@ function kkd_pff_paystack_confirm_payment()
         if ($minimum == 1 && $amount != 0) {
             if ($payment_array->amount < $formamount) {
                 $amount = $formamount;
-            }else{
+            } else {
                 $amount = $payment_array->amount;
             }
         }
@@ -1633,7 +1613,7 @@ function kkd_pff_paystack_confirm_payment()
         $mode =  esc_attr(get_option('mode'));
         if ($mode == 'test') {
             $key = esc_attr(get_option('tsk'));
-        }else{
+        } else {
             $key = esc_attr(get_option('lsk'));
         }
         $paystack_url = 'https://api.paystack.co/transaction/verify/' . $code;
@@ -1645,9 +1625,9 @@ function kkd_pff_paystack_confirm_payment()
         'timeout'    => 60
         );
         $request = wp_remote_get($paystack_url, $args);
-        if(! is_wp_error($request) && 200 == wp_remote_retrieve_response_code($request) ) {
+        if (! is_wp_error($request) && 200 == wp_remote_retrieve_response_code($request)) {
             $paystack_response = json_decode(wp_remote_retrieve_body($request));
-            if ('success' == $paystack_response->data->status ) {
+            if ('success' == $paystack_response->data->status) {
                 $customer_code = $paystack_response->data->customer->customer_code;
                 $amount_paid    = $paystack_response->data->amount / 100;
                 $paystack_ref     = $paystack_response->data->reference;
@@ -1657,28 +1637,25 @@ function kkd_pff_paystack_confirm_payment()
                     $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                     $message = $thankyou;
                     $result = "success";
-                }else {
+                } else {
                     if ($amount == 0 || $usevariableamount == 1) {
                         $wpdb->update($table, array( 'paid' => 1,'amount' =>$amount_paid, 'paid_at' => $paid_at), array('txn_code'=>$paystack_ref));
                         $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                         $message = $thankyou;
                         $result = "success";
-                        // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
-                    }else{
+                    // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+                    } else {
                         $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
                         if ($usequantity == 'no') {
                             $oamount = (int)str_replace(' ', '', $amount);
-                        }else{
+                        } else {
                             $quantity = $_POST["quantity"];
                             $unitamount = (int)str_replace(' ', '', $amount);
                             $oamount = $quantity*$unitamount;
-    
                         }
                         if ($txncharge == 'customer') {
-
                             if ($minimum == 0 && $amount != 0) {
                                 $oamount = kkd_pff_paystack_add_paystack_charge($oamount);
-                                        
                             }
                         }
 
@@ -1686,7 +1663,7 @@ function kkd_pff_paystack_confirm_payment()
                         // if ($txncharge == 'customer') {
                         //     $amount = kkd_pff_paystack_add_paystack_charge($amount);
                         // }
-                        if($oamount !=  $amount_paid ) {
+                        if ($oamount !=  $amount_paid) {
                             // echo $oamount. ' - '.$amount_paid;
                             $message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
                             $result = "failed";
@@ -1698,20 +1675,17 @@ function kkd_pff_paystack_confirm_payment()
                         }
                     }
                 }
-
             } else {
                 $message = "Transaction Failed/Invalid Code";
                 $result = "failed";
             }
-
-        }else{
+        } else {
             $message = "Payment Verifiction Failed";
             $result = "failed";
         }
-    }else{
+    } else {
         $message = "Payment Verification Failed.";
         $result = "failed";
-
     }
 
     if ($result == 'success') {
@@ -1722,7 +1696,7 @@ function kkd_pff_paystack_confirm_payment()
             $mode =  esc_attr(get_option('mode'));
             if ($mode == 'test') {
                 $key = esc_attr(get_option('tsk'));
-            }else{
+            } else {
                 $key = esc_attr(get_option('lsk'));
             }
             //Create Plan
@@ -1747,24 +1721,20 @@ function kkd_pff_paystack_confirm_payment()
             );
 
             $request = wp_remote_post($paystack_url, $args);
-            if(! is_wp_error($request)) {
+            if (! is_wp_error($request)) {
                 $paystack_response = json_decode(wp_remote_retrieve_body($request));
                 $plancode    = $paystack_response->data->subscription_code;
                 // $message.= $message.'Subscribed<br>'.$plancode.'sssss';
-
-
             }
         }
         
         $sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
-        if($sendreceipt == 'yes') {
+        if ($sendreceipt == 'yes') {
             $decoded = json_decode($payment_array->metadata);
             $fullname = $decoded[0]->value;
             kkd_pff_paystack_send_receipt($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
             kkd_pff_paystack_send_receipt_owner($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
-
         }
-
     }
     $response = array(
      'result' => $result,
@@ -1784,7 +1754,7 @@ function kkd_pff_paystack_confirm_payment()
 
 add_action('wp_ajax_kkd_pff_paystack_retry_action', 'kkd_pff_paystack_retry_action');
 add_action('wp_ajax_nopriv_kkd_pff_paystack_retry_action', 'kkd_pff_paystack_retry_action');
-function kkd_pff_paystack_retry_action() 
+function kkd_pff_paystack_retry_action()
 {
     if (trim($_POST['code']) == '') {
         $response['result'] = 'failed';
@@ -1823,7 +1793,6 @@ function kkd_pff_paystack_retry_action()
                 $fullname = $nvalue->value;
             }
         }
-
     }
     if ($subaccount == "" || !isset($subaccount)) {
         $subaccount = null;
@@ -1854,7 +1823,7 @@ function kkd_pff_paystack_retry_action()
 add_action('wp_ajax_kkd_pff_paystack_rconfirm_payment', 'kkd_pff_paystack_rconfirm_payment');
 add_action('wp_ajax_nopriv_kkd_pff_paystack_rconfirm_payment', 'kkd_pff_paystack_rconfirm_payment');
 
-function kkd_pff_paystack_rconfirm_payment() 
+function kkd_pff_paystack_rconfirm_payment()
 {
     if (trim($_POST['code']) == '') {
         $response['error'] = true;
@@ -1867,7 +1836,6 @@ function kkd_pff_paystack_rconfirm_payment()
     $code = $_POST['code'];
     $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code_2 = '".$code."')");
     if (array_key_exists("0", $record)) {
-
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);
         $recur = get_post_meta($payment_array->post_id, '_recur', true);
@@ -1879,7 +1847,7 @@ function kkd_pff_paystack_rconfirm_payment()
         $mode =  esc_attr(get_option('mode'));
         if ($mode == 'test') {
             $key = esc_attr(get_option('tsk'));
-        }else{
+        } else {
             $key = esc_attr(get_option('lsk'));
         }
         $paystack_url = 'https://api.paystack.co/transaction/verify/' . $code;
@@ -1891,9 +1859,9 @@ function kkd_pff_paystack_rconfirm_payment()
         'timeout'    => 60
         );
         $request = wp_remote_get($paystack_url, $args);
-        if(! is_wp_error($request) && 200 == wp_remote_retrieve_response_code($request) ) {
+        if (! is_wp_error($request) && 200 == wp_remote_retrieve_response_code($request)) {
             $paystack_response = json_decode(wp_remote_retrieve_body($request));
-            if ('success' == $paystack_response->data->status ) {
+            if ('success' == $paystack_response->data->status) {
                 $amount_paid    = $paystack_response->data->amount / 100;
                 $paystack_ref     = $paystack_response->data->reference;
                 if ($recur == 'optional' || $recur == 'plan') {
@@ -1901,19 +1869,18 @@ function kkd_pff_paystack_rconfirm_payment()
                     $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                     $message = $thankyou;
                     $result = "success";
-                }else{
-
+                } else {
                     if ($amount == 0) {
                         $wpdb->update($table, array( 'paid' => 1,'amount' =>$amount_paid, 'paid_at' => $paid_at), array('txn_code_2'=>$paystack_ref));
                         $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                         $message = $thankyou;
                         $result = "success";
-                        // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
-                    }else{
+                    // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+                    } else {
                         $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
                         if ($usequantity == 'no') {
                             $amount = (int)str_replace(' ', '', $amount);
-                        }else{
+                        } else {
                             $quantity = $_POST["quantity"];
                             $unitamount = (int)str_replace(' ', '', $amount);
                             $amount = $quantity*$unitamount;
@@ -1923,11 +1890,10 @@ function kkd_pff_paystack_rconfirm_payment()
                         if ($txncharge == 'customer') {
                             $amount = kkd_pff_paystack_add_paystack_charge($amount);
                         }
-                        if($amount !=  $amount_paid ) {
+                        if ($amount !=  $amount_paid) {
                             $message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($amount)."</b>";
                             $result = "failed";
-                        }else{
-
+                        } else {
                             $wpdb->update($table, array( 'paid' => 1, 'paid_at' => $paid_at), array('txn_code_2'=>$paystack_ref));
                             $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                             $message = $thankyou;
@@ -1935,29 +1901,24 @@ function kkd_pff_paystack_rconfirm_payment()
                         }
                     }
                 }
-
-            }else {
+            } else {
                 $message = "Transaction Failed/Invalid Code";
                 $result = "failed";
             }
-
         }
-    }else{
+    } else {
         $message = "Payment Verification Failed.";
         $result = "failed";
-
     }
 
     if ($result == 'success') {
         $sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
-        if($sendreceipt == 'yes') {
+        if ($sendreceipt == 'yes') {
             $decoded = json_decode($payment_array->metadata);
             $fullname = $decoded[0]->value;
             kkd_pff_paystack_send_receipt($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
             kkd_pff_paystack_send_receipt_owner($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
-            
         }
-
     }
     $response = array(
      'result' => $result,

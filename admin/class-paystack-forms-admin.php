@@ -2,22 +2,20 @@
 
 class Kkd_Pff_Paystack_Admin
 {
-
     private $plugin_name;
     private $version;
-    public function __construct( $plugin_name, $version ) 
+    public function __construct($plugin_name, $version)
     {
-
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         add_action('admin_menu', 'kkd_pff_paystack_add_settings_page');
         add_action('admin_init', 'kkd_pff_paystack_register_setting_page');
 
-        function kkd_pff_paystack_add_settings_page() 
+        function kkd_pff_paystack_add_settings_page()
         {
             add_submenu_page('edit.php?post_type=paystack_form', 'Settings', 'Settings', 'edit_posts', basename(__FILE__), 'kkd_pff_paystack_setting_page');
         }
-        function kkd_pff_paystack_register_setting_page() 
+        function kkd_pff_paystack_register_setting_page()
         {
             register_setting('kkd-pff-paystack-settings-group', 'mode');
             register_setting('kkd-pff-paystack-settings-group', 'tsk');
@@ -30,7 +28,7 @@ class Kkd_Pff_Paystack_Admin
             register_setting('kkd-pff-paystack-settings-group', 'adc');
             register_setting('kkd-pff-paystack-settings-group', 'cap');
         }
-        function kkd_pff_paystack_txncheck($name,$txncharge)
+        function kkd_pff_paystack_txncheck($name, $txncharge)
         {
             if ($name == $txncharge) {
                 $result = "selected";
@@ -39,17 +37,18 @@ class Kkd_Pff_Paystack_Admin
             }
             return $result;
         }
-        function kkd_pff_paystack_setting_page() 
+        function kkd_pff_paystack_setting_page()
         {
             ?>
             <div class="wrap">
          <h1>Paystack Forms Settings</h1>
             
-                <!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff";?></code></pre></strong></h4> -->
+                <!-- <h4>Optional: To avoid situations where bad network makes it impossible to verify transactions, set your webhook URL <a href="https://dashboard.paystack.co/#/settings/developer">here</a> to the URL below<strong style="color: red"><pre><code><?php echo admin_url("admin-ajax.php") . "?action=kkd_paystack_pff"; ?></code></pre></strong></h4> -->
             <h2>API Keys Settings</h2>
             <span>Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a> </span>
             <form method="post" action="options.php">
-                    <?php settings_fields('kkd-pff-paystack-settings-group'); do_settings_sections('kkd-pff-paystack-settings-group'); ?>
+                    <?php settings_fields('kkd-pff-paystack-settings-group');
+            do_settings_sections('kkd-pff-paystack-settings-group'); ?>
                     <table class="form-table paystack_setting_page">
                                 <tr valign="top">
                                 <th scope="row">Mode</th>
@@ -116,9 +115,8 @@ class Kkd_Pff_Paystack_Admin
                 <?php
         }
         add_action('init', 'register_kkd_pff_paystack');
-        function register_kkd_pff_paystack() 
+        function register_kkd_pff_paystack()
         {
-
             $labels = array(
              'name' => _x('Paystack Forms', 'paystack_form'),
              'singular_name' => _x('Paystack Form', 'paystack_form'),
@@ -161,7 +159,6 @@ class Kkd_Pff_Paystack_Admin
 
         function kkd_pff_paystack_add_view_payments($actions, $post)
         {
-
             if (get_post_type() === 'paystack_form') {
                 unset($actions['view']);
                 unset($actions['quick edit']);
@@ -178,12 +175,12 @@ class Kkd_Pff_Paystack_Admin
         add_filter('page_row_actions', 'kkd_pff_paystack_add_view_payments', 10, 2);
 
 
-        function kkd_pff_paystack_remove_fullscreen( $qtInit ) 
+        function kkd_pff_paystack_remove_fullscreen($qtInit)
         {
             $qtInit['buttons'] = 'fullscreen';
             return $qtInit;
         }
-        function kkd_pff_paystack_disable_wyswyg( $default )
+        function kkd_pff_paystack_disable_wyswyg($default)
         {
             global $post_type, $_wp_theme_features;
 
@@ -200,7 +197,7 @@ class Kkd_Pff_Paystack_Admin
 
             return $default;
         }
-        function kkd_pff_paystack_remove_dashboard_widgets() 
+        function kkd_pff_paystack_remove_dashboard_widgets()
         {
             remove_meta_box('dashboard_right_now', 'dashboard', 'normal');   // Right Now
             remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal'); // Recent Comments
@@ -214,9 +211,8 @@ class Kkd_Pff_Paystack_Admin
         }
         add_filter('manage_edit-paystack_form_columns', 'kkd_pff_paystack_edit_dashboard_header_columns');
 
-        function kkd_pff_paystack_edit_dashboard_header_columns( $columns ) 
+        function kkd_pff_paystack_edit_dashboard_header_columns($columns)
         {
-
             $columns = array(
             'cb' => '<input type="checkbox" />',
             'title' => __('Name'),
@@ -229,13 +225,13 @@ class Kkd_Pff_Paystack_Admin
         }
         add_action('manage_paystack_form_posts_custom_column', 'kkd_pff_paystack_dashboard_table_data', 10, 2);
 
-        function kkd_pff_paystack_dashboard_table_data( $column, $post_id ) 
+        function kkd_pff_paystack_dashboard_table_data($column, $post_id)
         {
             global $post,$wpdb;
             $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 
-            switch( $column ) {
-            case 'shortcode' :
+            switch ($column) {
+            case 'shortcode':
                 echo '<span class="shortcode">
 					<input type="text" class="large-text code" value="[pff-paystack id=&quot;'.$post_id.'&quot;]"
 					readonly="readonly" onfocus="this.select();"></span>';
@@ -248,16 +244,15 @@ class Kkd_Pff_Paystack_Admin
 
                 echo '<u><a href="'.admin_url('admin.php?page=submissions&form='.$post_id) .'">'. $num.'</a></u>';
                 break;
-            default :
+            default:
                 break;
             }
         }
         add_filter('default_content', 'kkd_pff_paystack_editor_content', 10, 2);
 
-        function kkd_pff_paystack_editor_content( $content, $post ) 
+        function kkd_pff_paystack_editor_content($content, $post)
         {
-
-            switch( $post->post_type ) {
+            switch ($post->post_type) {
             case 'paystack_form':
                 $content = '[text name="Phone Number"]';
                 break;
@@ -269,19 +264,16 @@ class Kkd_Pff_Paystack_Admin
             return $content;
         }
         /////
-        function kkd_pff_paystack_editor_help_metabox( $post ) 
+        function kkd_pff_paystack_editor_help_metabox($post)
         {
-
             do_meta_boxes(null, 'custom-metabox-holder', $post);
         }
         add_action('edit_form_after_title', 'kkd_pff_paystack_editor_help_metabox');
         
-        function kkd_pff_paystack_editor_help_metabox_details( $post ) 
+        function kkd_pff_paystack_editor_help_metabox_details($post)
         {
             echo '<input type="hidden" name="eventmeta_noncename" id="eventmeta_noncename" value="' .
-            wp_create_nonce(plugin_basename(__FILE__)) . '" />';
-
-            ?>
+            wp_create_nonce(plugin_basename(__FILE__)) . '" />'; ?>
          <div class="awesome-meta-admin">
           Email and Full Name field is added automatically, no need to include that.<br /><br />
           To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
@@ -294,7 +286,7 @@ class Kkd_Pff_Paystack_Admin
 
         <?php
         }
-        function kkd_pff_paystack_editor_shortcode_details( $post ) 
+        function kkd_pff_paystack_editor_shortcode_details($post)
         {
             ?>
          <p class="description">
@@ -308,9 +300,8 @@ class Kkd_Pff_Paystack_Admin
         }
 
         add_action('add_meta_boxes', 'kkd_pff_paystack_editor_add_extra_metaboxes');
-        function kkd_pff_paystack_editor_add_extra_metaboxes() 
+        function kkd_pff_paystack_editor_add_extra_metaboxes()
         {
-
             if ($_GET['action'] == 'edit') {
                 add_meta_box('kkd_pff_paystack_editor_help_shortcode', 'Paste shortcode on preferred page', 'kkd_pff_paystack_editor_shortcode_details', 'paystack_form', 'custom-metabox-holder');
             }
@@ -322,11 +313,10 @@ class Kkd_Pff_Paystack_Admin
             add_meta_box('kkd_pff_paystack_editor_add_agreement_data', 'Agreement checkbox', 'kkd_pff_paystack_editor_add_agreement_data', 'paystack_form', 'side', 'default');
             add_meta_box('kkd_pff_paystack_editor_add_subaccount_data', 'Sub Account', 'kkd_pff_paystack_editor_add_subaccount_data', 'paystack_form', 'side', 'default');
             add_meta_box('kkd_pff_paystack_editor_add_startdateplan_data', '*Special: Subscribe to plan after time', 'kkd_pff_paystack_editor_add_startdateplan_data', 'paystack_form', 'side', 'default');
-            
         }
 
 
-        function kkd_pff_paystack_editor_add_form_data() 
+        function kkd_pff_paystack_editor_add_form_data()
         {
             global $post;
 
@@ -348,32 +338,42 @@ class Kkd_Pff_Paystack_Admin
             $variableamount = get_post_meta($post->ID, '_variableamount', true);
             $hidetitle = get_post_meta($post->ID, '_hidetitle', true);
 
-            if ($amount == "") {$amount = 0;
+            if ($amount == "") {
+                $amount = 0;
             }
-            if ($filelimit == "") {$filelimit = 2;
+            if ($filelimit == "") {
+                $filelimit = 2;
             }
-            if ($paybtn == "") {$paybtn = 'Pay';
+            if ($paybtn == "") {
+                $paybtn = 'Pay';
             }
-            if ($successmsg == "") {$successmsg = 'Thank you for paying!';
+            if ($successmsg == "") {
+                $successmsg = 'Thank you for paying!';
             }
-            if ($currency == "") {$currency = 'NGN';
+            if ($currency == "") {
+                $currency = 'NGN';
             }
-            if ($txncharge == "") {$txncharge = 'merchant';
+            if ($txncharge == "") {
+                $txncharge = 'merchant';
             }
-            if ($minimum == "") {$minimum = 0;
+            if ($minimum == "") {
+                $minimum = 0;
             }
-            if ($usevariableamount == "") {$usevariableamount = 0;
+            if ($usevariableamount == "") {
+                $usevariableamount = 0;
             }
-            if ($hidetitle == "") {$hidetitle = 0;
+            if ($hidetitle == "") {
+                $hidetitle = 0;
             }
-            if ($variableamount == "") {$variableamount = '';
+            if ($variableamount == "") {
+                $variableamount = '';
             }
             // Echo out the field
             
                 
             if ($hidetitle == 1) {
                 echo '<label><input name="_hidetitle" type="checkbox" value="1" checked> Hide the form title </label>';
-            }else{
+            } else {
                 echo '<label><input name="_hidetitle" type="checkbox" value="1" > Hide the form title </label>';
             }
             echo "<br>";
@@ -388,14 +388,14 @@ class Kkd_Pff_Paystack_Admin
             echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
             if ($minimum == 1) {
                 echo '<br><label><input name="_minimum" type="checkbox" value="1" checked> Make amount minimum payable </label>';
-            }else{
+            } else {
                 echo '<br><label><input name="_minimum" type="checkbox" value="1"> Make amount minimum payable </label>';
             }
             echo '<p>Variable Dropdown Amount:<code><label>Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," </code></label></p>';
             echo '<input type="text" name="_variableamount" value="' . $variableamount  . '" class="widefat " />';
             if ($usevariableamount == 1) {
                 echo '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> Use dropdown amount option </label>';
-            }else{
+            } else {
                 echo '<br><label><input name="_usevariableamount" type="checkbox" value="1" > Use dropdown amount option </label>';
             }
             echo '<p>Pay button Description:</p>';
@@ -417,9 +417,8 @@ class Kkd_Pff_Paystack_Admin
             echo '<input ttype="number" name="_filelimit" value="' . $filelimit  . '" class="widefat  pf-number" />';
             echo '<p>Redirect to page link after payment(keep blank to use normal success message):</p>';
             echo '<input ttype="text" name="_redirect" value="' . $redirect  . '" class="widefat" />';
-
         }
-        function kkd_pff_paystack_editor_add_email_data() 
+        function kkd_pff_paystack_editor_add_email_data()
         {
             global $post;
 
@@ -434,15 +433,20 @@ class Kkd_Pff_Paystack_Admin
             $sendreceipt = get_post_meta($post->ID, '_sendreceipt', true);
             $sendinvoice = get_post_meta($post->ID, '_sendinvoice', true);
 
-            if ($subject == "") {$subject = 'Thank you for your payment';
+            if ($subject == "") {
+                $subject = 'Thank you for your payment';
             }
-            if ($sendreceipt == "") {$sendreceipt = 'yes';
+            if ($sendreceipt == "") {
+                $sendreceipt = 'yes';
             }
-            if ($sendinvoice == "") {$sendinvoice = 'yes';
+            if ($sendinvoice == "") {
+                $sendinvoice = 'yes';
             }
-            if ($heading == "") {$heading = "We've received your payment";
+            if ($heading == "") {
+                $heading = "We've received your payment";
             }
-            if ($message == "") {$message = 'Your payment was received and we appreciate it.';
+            if ($message == "") {
+                $message = 'Your payment was received and we appreciate it.';
             }
             // Echo out the field
             echo '<p>Send an invoices when a payment is attempted:</p>';
@@ -461,9 +465,8 @@ class Kkd_Pff_Paystack_Admin
             echo '<input type="text" name="_heading" value="' . $heading  . '" class="widefat" />';
             echo '<p>Email Body/Message:</p>';
             echo '<textarea rows="6"  name="_message"  class="widefat" >'.$message.'</textarea>';
-
         }
-        function kkd_pff_paystack_editor_add_recur_data() 
+        function kkd_pff_paystack_editor_add_recur_data()
         {
             global $post;
 
@@ -475,12 +478,14 @@ class Kkd_Pff_Paystack_Admin
             $recur = get_post_meta($post->ID, '_recur', true);
             $recurplan = get_post_meta($post->ID, '_recurplan', true);
 
-            if ($recur == "") {$recur = 'no';
+            if ($recur == "") {
+                $recur = 'no';
             }
-            if ($recurplan == "") {$recurplan = '';
+            if ($recurplan == "") {
+                $recurplan = '';
             }
             // Echo out the field
-            echo '<p>Reccuring Payment:</p>';
+            echo '<p>Recurring Payment:</p>';
             echo '<select class="form-control" name="_recur" style="width:100%;">
 							<option value="no" '.kkd_pff_paystack_txncheck('no', $recur).'>None</option>
 							<option value="optional" '.kkd_pff_paystack_txncheck('optional', $recur).'>Optional Recurring</option>
@@ -489,9 +494,8 @@ class Kkd_Pff_Paystack_Admin
             echo '<p>Paystack Recur Plan code:</p>';
             echo '<input type="text" name="_recurplan" value="' . $recurplan  . '" class="widefat" />
 				<small>Plan amount must match amount on extra form description.</small>';
-
         }
-        function kkd_pff_paystack_editor_add_quantity_data() 
+        function kkd_pff_paystack_editor_add_quantity_data()
         {
             global $post;
 
@@ -503,28 +507,38 @@ class Kkd_Pff_Paystack_Admin
             $usequantity = get_post_meta($post->ID, '_usequantity', true);
             $quantity = get_post_meta($post->ID, '_quantity', true);
             $quantityunit = get_post_meta($post->ID, '_quantityunit', true);
+            $recur = get_post_meta($post->ID, '_recur', true);
 
-            if ($usequantity == "") {$usequantity = 'no';
+            if ($usequantity == "") {
+                $usequantity = 'no';
             }
-            if ($quantity == "") {$quantity = '10';
+            if ($quantity == "") {
+                $quantity = '10';
             }
-            if ($quantityunit == "") {$quantityunit = 'Quantity';
+            if ($quantityunit == "") {
+                $quantityunit = 'Quantity';
             }
+
             // Echo out the field
             echo '<small>Allow your users pay in multiple quantity</small><p>Quantified Payment:</p>';
-            echo '<select class="form-control" name="_usequantity" style="width:100%;">
+            if ($recur != "no") {
+                echo '<select disabled class="form-control" name="_usequantity" style="width:100%;">
+				<option value="no" '.kkd_pff_paystack_txncheck('no', $usequantity).'>No</option>
+			    </select>';
+            } else {
+                echo '<select class="form-control" name="_usequantity" style="width:100%;">
 				<option value="no" '.kkd_pff_paystack_txncheck('no', $usequantity).'>No</option>
 				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $usequantity).'>Yes</option>
-			 </select>';
+			    </select>';
+            }
             echo '<p>Max payable quantity:</p>';
             echo '<input type="number" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
 			<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
             echo '<p>Unit of quantity:</p>';
             echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
 			<small>What is the unit of this quantity? Default is <code>Quantity</code>.</small>';
-
         }
-        function kkd_pff_paystack_editor_add_agreement_data() 
+        function kkd_pff_paystack_editor_add_agreement_data()
         {
             global $post;
 
@@ -536,9 +550,11 @@ class Kkd_Pff_Paystack_Admin
             $useagreement = get_post_meta($post->ID, '_useagreement', true);
             $agreementlink = get_post_meta($post->ID, '_agreementlink', true);
 
-            if ($useagreement == "") {$useagreement = 'no';
+            if ($useagreement == "") {
+                $useagreement = 'no';
             }
-            if ($agreementlink  == "") {$agreementlink = '';
+            if ($agreementlink  == "") {
+                $agreementlink = '';
             }
             // Echo out the field
             echo '<p>Use agreement checkbox:</p>';
@@ -548,9 +564,8 @@ class Kkd_Pff_Paystack_Admin
 			</select>';
             echo '<p>Agreement Page Link:</p>';
             echo '<input type="text" name="_agreementlink" value="' . $agreementlink  . '" class="widefat" />';
-
         }
-        function kkd_pff_paystack_editor_add_subaccount_data() 
+        function kkd_pff_paystack_editor_add_subaccount_data()
         {
             global $post;
 
@@ -564,9 +579,11 @@ class Kkd_Pff_Paystack_Admin
             $merchantamount = get_post_meta($post->ID, '_merchantamount', true);
 
     
-            if ($subaccount  == "") {$subaccount = '';
+            if ($subaccount  == "") {
+                $subaccount = '';
             }
-            if ($merchantamount  == "") {$merchantamount = '';
+            if ($merchantamount  == "") {
+                $merchantamount = '';
             }
             echo '<p>Sub Account code:</p>';
             echo '<input type="text" name="_subaccount" value="' . $subaccount  . '" class="widefat" />';
@@ -577,9 +594,8 @@ class Kkd_Pff_Paystack_Admin
 			</select>';
             echo '<p>Merchant Amount:</p>';
             echo '<input type="text" name="_merchantamount" value="' . $merchantamount . '" class="widefat" />';
-          
         }
-        function kkd_pff_paystack_editor_add_startdateplan_data() 
+        function kkd_pff_paystack_editor_add_startdateplan_data()
         {
             global $post;
 
@@ -594,11 +610,14 @@ class Kkd_Pff_Paystack_Admin
             $enabled = get_post_meta($post->ID, '_startdate_enabled', true);
             
         
-            if ($days  == "") {$days = '';
+            if ($days  == "") {
+                $days = '';
             }
-            if ($plan  == "") {$plan = '';
+            if ($plan  == "") {
+                $plan = '';
             }
-            if ($enabled  == "") {$enabled = 0;
+            if ($enabled  == "") {
+                $enabled = 0;
             }
             echo '<p>Number of days:</p>';
             echo '<input type="number" name="_startdate_days" value="' . $days  . '" class="widefat  pf-number" />';
@@ -606,14 +625,13 @@ class Kkd_Pff_Paystack_Admin
             echo '<input type="text" name="_startdate_plan_code" value="' . $plan . '" class="widefat" />';
             if ($enabled == 1) {
                 echo '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1" checked> Enable </label></p>';
-            }else{
+            } else {
                 echo '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1"> Enable </label></p>';
             }
         }
     
-        function kkd_pff_paystack_save_data($post_id, $post) 
+        function kkd_pff_paystack_save_data($post_id, $post)
         {
-
             if (!wp_verify_nonce(@$_POST['eventmeta_noncename'], plugin_basename(__FILE__))) {
                 return $post->ID;
             }
@@ -662,7 +680,8 @@ class Kkd_Pff_Paystack_Admin
             $form_meta['_startdate_enabled'] = $_POST['_startdate_enabled'];
             
             foreach ($form_meta as $key => $value) { // Cycle through the $form_meta array!
-                if($post->post_type == 'revision' ) { return; // Don't store custom data twice
+                if ($post->post_type == 'revision') {
+                    return; // Don't store custom data twice
                 }
                 $value = implode(',', (array)$value); // If $value is an array, make it a CSV (unlikely)
                 if (get_post_meta($post->ID, $key, false)) { // If the custom field already has a value
@@ -670,23 +689,22 @@ class Kkd_Pff_Paystack_Admin
                 } else { // If the custom field doesn't have a value
                     add_post_meta($post->ID, $key, $value);
                 }
-                if (!$value) { 
+                if (!$value) {
                     delete_post_meta($post->ID, $key); // Delete if blank
                 }
             }
-
         }
         add_action('save_post', 'kkd_pff_paystack_save_data', 1, 2);
     }
 
-    public function enqueue_styles($hook) 
+    public function enqueue_styles($hook)
     {
         if ($hook != 'toplevel_page_submissions' && $hook != 'paystack_form_page_class-paystack-forms-admin') {
             return;
         }
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/paystack-forms-admin.css', array(), $this->version, 'all');
     }
-    public function enqueue_scripts() 
+    public function enqueue_scripts()
     {
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/paystack-forms-admin.js', array( 'jquery' ), $this->version, false);
     }
@@ -696,14 +714,13 @@ class Kkd_Pff_Paystack_Admin
      *
      * @since    1.0.0
      */
-    public function add_action_links( $links ) 
+    public function add_action_links($links)
     {
         $settings_link = array(
             '<a href="' . admin_url('edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php') . '">' . __('Settings', $this->plugin_name) . '</a>',
         );
         return array_merge($settings_link, $links);
     }
-
 }
 
 add_action('admin_menu', 'kkd_pff_paystack_register_newpage');
@@ -725,21 +742,21 @@ function kkd_pff_paystack_payment_submissions()
         $txncharge = get_post_meta($id, '_txncharge', true);
 
         $exampleListTable = new Kkd_Pff_Paystack_Payments_List_Table();
-        $data = $exampleListTable->prepare_items();
-        
-        ?>
+        $data = $exampleListTable->prepare_items(); ?>
       <div id="welcome-panel" class="welcome-panel">
       <div class="welcome-panel-content">
        <h1 style="margin: 0px;"><?php echo $obj->post_title; ?> Payments </h1>
                 <p class="about-description">All payments made for this form</p>
-                <?php if ($data > 0) { ?>
+                <?php if ($data > 0) {
+            ?>
                     
                 <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
                   <input type="hidden" name="action" value="kkd_pff_export_excel">
                   <input type="hidden" name="form_id" value="<?php echo $id; ?>">
                   <button type="submit"  class="button button-primary button-hero load-customize" >Export Data to Excel</button>
                 </form>
-                <?php } ?>
+                <?php
+        } ?>
                 
                 <br><br>
       </div>
@@ -749,7 +766,6 @@ function kkd_pff_paystack_payment_submissions()
         <?php $exampleListTable->display(); ?>
       </div>
         <?php
-
     }
 }
 add_action('admin_post_kkd_pff_export_excel', 'Kkd_pff_export_excel');
@@ -759,7 +775,7 @@ function Kkd_pff_prep_csv_data($item)
     return '"'.str_replace('"', '""', $item).'"';
 }
 
-function Kkd_pff_export_excel() 
+function Kkd_pff_export_excel()
 {
     global $wpdb;
     
@@ -849,8 +865,7 @@ class Kkd_Pff_Paystack_Wp_List_Table
     public function list_table_page()
     {
         $exampleListTable = new Example_List_Table();
-        $exampleListTable->prepare_items($data);
-        ?>
+        $exampleListTable->prepare_items($data); ?>
      <div class="wrap">
             <div id="icon-users" class="icon32"></div>
             <?php $exampleListTable->display(); ?>
@@ -860,7 +875,7 @@ class Kkd_Pff_Paystack_Wp_List_Table
 }
 
 
-if (! class_exists('WP_List_Table') ) {
+if (! class_exists('WP_List_Table')) {
     include_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 function format_data($data)
@@ -874,7 +889,6 @@ function format_data($data)
             } else {
                 $text.= '<b>'.$item->display_name.": </b>  <a target='_blank' href='".$item->value."'>link</a><br />";
             }
-
         }
     } else {
         $text = '';
@@ -929,7 +943,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
             array(
             'total_items' => $totalItems,
             'per_page'    => $perPage
-            ) 
+            )
         );
         $data = array_slice($data, (($currentPage-1)*$perPage), $perPage);
         $this->_column_headers = array($columns, $hidden, $sortable);
@@ -941,7 +955,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
     
     public function get_columns()
     {
-         $columns = array(
+        $columns = array(
            'id'  => '#',
            'email' => 'Email',
            'amount' => 'Amount',
@@ -949,7 +963,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
            'metadata' => 'Data',
            'date'  => 'Date'
          );
-         return $columns;
+        return $columns;
     }
     /**
      * Define which columns are hidden
@@ -971,7 +985,6 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
      */
     private function table_data($data)
     {
-
         return $data;
     }
     /**
@@ -982,9 +995,9 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
      *
      * @return Mixed
      */
-    public function column_default( $item, $column_name )
+    public function column_default($item, $column_name)
     {
-        switch( $column_name ) {
+        switch ($column_name) {
         case 'id':
         case 'email':
         case 'amount':
@@ -997,23 +1010,23 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
         }
     }
 
-     /**
-      * Allows you to sort the data by the variables set in the $_GET
-      *
-      * @return Mixed
-      */
-    private function sort_data( $a, $b )
+    /**
+     * Allows you to sort the data by the variables set in the $_GET
+     *
+     * @return Mixed
+     */
+    private function sort_data($a, $b)
     {
         $orderby = 'date';
         $order = 'desc';
-        if(!empty($_GET['orderby'])) {
+        if (!empty($_GET['orderby'])) {
             $orderby = $_GET['orderby'];
         }
-        if(!empty($_GET['order'])) {
+        if (!empty($_GET['order'])) {
             $order = $_GET['order'];
         }
         $result = strcmp($a[$orderby], $b[$orderby]);
-        if($order === 'asc') {
+        if ($order === 'asc') {
             return $result;
         }
         return -$result;
