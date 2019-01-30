@@ -1289,7 +1289,8 @@ function kkd_pff_paystack_submit_action()
     // echo '<pre>';
     // print_r($_POST);
 
-    $fixedmetadata = kkd_pff_paystack_meta_as_custom_fields($metadata);
+    $untouchedmetadata = kkd_pff_paystack_meta_as_custom_fields($metadata);
+    $fixedmetadata = [];
     // print_r($fixedmetadata );
     $filelimit = get_post_meta($_POST["pf-id"], '_filelimit', true);
     $currency = get_post_meta($_POST["pf-id"], '_currency', true);
@@ -1459,6 +1460,9 @@ function kkd_pff_paystack_submit_action()
         );
     }
 
+    $fixedmetadata = json_decode(json_encode($fixedmetadata, JSON_NUMERIC_CHECK), true);
+    $fixedmetadata = array_merge($untouchedmetadata, $fixedmetadata);
+
     $insert =  array(
     'post_id' => strip_tags($_POST["pf-id"], ""),
     'email' => strip_tags($_POST["pf-pemail"], ""),
@@ -1516,9 +1520,7 @@ function kkd_pff_paystack_submit_action()
     'txnbearer' => $txnbearer,
     'transaction_charge' => $transaction_charge
     );
-    // print_r($response);
-    echo json_encode($response, JSON_NUMERIC_CHECK);
-
+    echo json_encode($response);
     die();
 }
 
@@ -1569,7 +1571,7 @@ function kkd_pff_paystack_meta_as_custom_fields($metadata)
             'display_name' => ucwords(str_replace("_", " ", $key)),
             'variable_name' => $key,
              'type' => 'text',
-             'value' => $value
+             'value' => (string)$value
             );
         }
     }
