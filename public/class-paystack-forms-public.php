@@ -854,7 +854,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                     echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
                 }
 
-                echo '<br /><span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
+                echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
                 if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
@@ -872,9 +872,16 @@ function kkd_pff_paystack_form_shortcode($atts)
                     echo  '</select>
                             <i></i>
                         </div>
+                    </div>
+                    <div class="span12 unit">
+                        <label class="label">Total ('.$currency;
+                    echo') <span>*</span></label>
+                        <div class="input">
+                	        <input type="text" id="pf-total" name="pf-total" placeholder="" value="" disabled>
+                        </div>
                     </div>';
                 }
-
+                
                 if ($recur == 'optional') {
                     echo '<div class="span12 unit">
 			 				 <label class="label">Recurring Payment</label>
@@ -1334,10 +1341,10 @@ function kkd_pff_paystack_submit_action()
         }
     }
     $fixedmetadata[] =  array(
-    'display_name' => 'Unit Price',
-    'variable_name' => 'Unit_Price',
-    'type' => 'text',
-    'value' => $currency.number_format($amount)
+        'display_name' => 'Unit Price',
+        'variable_name' => 'Unit_Price',
+        'type' => 'text',
+        'value' => $currency.number_format($amount)
     );
     if ($usequantity != 'no') {
         $quantity = $_POST["pf-quantity"];
@@ -1396,13 +1403,13 @@ function kkd_pff_paystack_submit_action()
                 $paystack_url = 'https://api.paystack.co/plan';
                 $check_url = 'https://api.paystack.co/plan?amount='.$koboamount.'&interval='.$interval;
                 $headers = array(
-                'Content-Type'    => 'application/json',
-                'Authorization' => 'Bearer ' . $key
+                    'Content-Type'    => 'application/json',
+                    'Authorization' => 'Bearer ' . $key
                 );
 
                 $checkargs = array(
-                'headers'    => $headers,
-                'timeout'    => 60
+                    'headers'    => $headers,
+                    'timeout'    => 60
                 );
                 // Check if plan exist
                 $checkrequest = wp_remote_get($check_url, $checkargs);
@@ -1412,22 +1419,22 @@ function kkd_pff_paystack_submit_action()
                         $plan = $response->data[0];
                         $plancode = $plan->plan_code;
                         $fixedmetadata[] =  array(
-                        'display_name' => 'Plan Interval',
-                        'variable_name' => 'Plan Interval',
-                        'type' => 'text',
-                        'value' => $plan->interval
+                            'display_name' => 'Plan Interval',
+                            'variable_name' => 'Plan Interval',
+                            'type' => 'text',
+                            'value' => $plan->interval
                         );
                     } else {
                         //Create Plan
                         $body = array(
-                        'name'                        => $currency.number_format($originalamount).' ['.$currency.number_format($amount).'] - '.$interval,
-                        'amount'                    => $koboamount,
-                        'interval'        => $interval
+                            'name'     => $currency.number_format($originalamount).' ['.$currency.number_format($amount).'] - '.$interval,
+                            'amount'   => $koboamount,
+                            'interval' => $interval
                         );
                         $args = array(
-                        'body'        => json_encode($body),
-                        'headers'    => $headers,
-                        'timeout'    => 60
+                            'body'     => json_encode($body),
+                            'headers'  => $headers,
+                            'timeout'  => 60
                         );
 
                         $request = wp_remote_post($paystack_url, $args);
@@ -1464,14 +1471,14 @@ function kkd_pff_paystack_submit_action()
     $fixedmetadata = array_merge($untouchedmetadata, $fixedmetadata);
 
     $insert =  array(
-    'post_id' => strip_tags($_POST["pf-id"], ""),
-    'email' => strip_tags($_POST["pf-pemail"], ""),
-    'user_id' => strip_tags($_POST["pf-user_id"], ""),
-    'amount' => strip_tags($amount, ""),
-    'plan' => strip_tags($plancode, ""),
-    'ip' => kkd_pff_paystack_get_the_user_ip(),
-    'txn_code' => $code,
-    'metadata' => json_encode($fixedmetadata)
+        'post_id' => strip_tags($_POST["pf-id"], ""),
+        'email' => strip_tags($_POST["pf-pemail"], ""),
+        'user_id' => strip_tags($_POST["pf-user_id"], ""),
+        'amount' => strip_tags($amount, ""),
+        'plan' => strip_tags($plancode, ""),
+        'ip' => kkd_pff_paystack_get_the_user_ip(),
+        'txn_code' => $code,
+        'metadata' => json_encode($fixedmetadata)
     );
     $exist = $wpdb->get_results(
         "SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
@@ -1507,18 +1514,18 @@ function kkd_pff_paystack_submit_action()
 
     $amount = floatval($insert['amount'])*100;
     $response = array(
-    'result' => 'success',
-    'code' => $insert['txn_code'],
-         'plan' => $insert['plan'],
-         'quantity' => $quantity,
-         'email' => $insert['email'],
-         'name' => $fullname,
-         'total' => round($amount),
-         'currency' => $currency,
-    'custom_fields' => $fixedmetadata,
-    'subaccount' => $subaccount,
-    'txnbearer' => $txnbearer,
-    'transaction_charge' => $transaction_charge
+        'result' => 'success',
+        'code' => $insert['txn_code'],
+        'plan' => $insert['plan'],
+        'quantity' => $quantity,
+        'email' => $insert['email'],
+        'name' => $fullname,
+        'total' => round($amount),
+        'currency' => $currency,
+        'custom_fields' => $fixedmetadata,
+        'subaccount' => $subaccount,
+        'txnbearer' => $txnbearer,
+        'transaction_charge' => $transaction_charge
     );
     echo json_encode($response);
     die();
