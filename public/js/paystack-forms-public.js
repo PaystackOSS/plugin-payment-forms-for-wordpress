@@ -109,12 +109,14 @@ function KkdPffPaystackFee() {
         if ($("#pf-minimum-hidden").length) {
           var min_amount = Number($("#pf-minimum-hidden").val());
           var amt = Number($("#pf-amount").val());
-          if (amt < min_amount) {
+          if (min_amount> 0 && amt < min_amount) {
             $("#pf-min-val-warn").text(
               "Amount cannot be less than the minimum amount"
             );
+            return false;
           } else {
             $("#pf-min-val-warn").text("");
+            $("#pf-amount").removeClass("rerror");
           }
         }
       }
@@ -162,19 +164,15 @@ function KkdPffPaystackFee() {
       };
   
       function calculateTotal() {
-        if ($("#pf-vamount").length) {
-          var amountField = $("#pf-vamount");
-        } else {
-          var amountField = $("#pf-qamount");
-        }
-        var unit = amountField.val();
+        var unit = $("#pf-amount").val();
         var quant = $("#pf-quantity").val();
-  
+        var newvalue = unit * quant;
+        
         if (quant == "" || quant == null) {
           quant = 1;
+        } else {
+            $("#pf-total").val(newvalue);
         }
-        var newvalue = unit * quant;
-        $("#pf-amount").val(newvalue);
       }
       function calculateFees(transaction_amount) {
         setTimeout(function() {
@@ -239,11 +237,11 @@ function KkdPffPaystackFee() {
           }
         }
       });
-      $("#pf-quantity,#pf-vamount").on("change", function() {
+      $("#pf-quantity,#pf-vamount, #pf-amount").on("change", function() {
         calculateTotal();
-  
         calculateFees();
       });
+      
       function validateEmail(email) {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
@@ -282,6 +280,16 @@ function KkdPffPaystackFee() {
                 if (!validateEmail(email)) {
                     $(this)
                         .find("#pf-email")
+                        .addClass("rerror"); //.css({ "border-color":"red" });
+                    $("html,body").animate(
+                        { scrollTop: $(".rerror").offset().top - 110 },
+                        500
+                    );
+                    return false;
+                }
+                if(checkMinimumVal() == false){
+                    $(this)
+                        .find("#pf-amount")
                         .addClass("rerror"); //.css({ "border-color":"red" });
                     $("html,body").animate(
                         { scrollTop: $(".rerror").offset().top - 110 },
@@ -674,4 +682,3 @@ function KkdPffPaystackFee() {
         );
     });
   })(jQuery);
-  
