@@ -857,7 +857,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
-                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                if ($recur == 'no' && $usequantity == 'yes') {  //&& ($usevariableamount == 1 || $amount != 0)) { //Commented out because the frontend stops transactions of 0 amount to go through
                     // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
                     echo
                     '<div class="span12 unit">
