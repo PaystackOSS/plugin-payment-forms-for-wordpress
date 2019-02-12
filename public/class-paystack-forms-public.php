@@ -1346,7 +1346,7 @@ function kkd_pff_paystack_submit_action()
         'type' => 'text',
         'value' => $currency.number_format($amount)
     );
-    if ($usequantity != 'no') {
+    if ($usequantity == 'yes') {
         $quantity = $_POST["pf-quantity"];
         $unitamount = (int)str_replace(' ', '', $amount);
         $amount = $quantity*$unitamount;
@@ -1812,18 +1812,18 @@ function kkd_pff_paystack_retry_action()
         $transaction_charge = null;
     }
     $response = array(
-         'result' => 'success',
-         'code' => $newcode,
-         'plan' => $plan,
-         'quantity' => $quantity,
-         'email' => $dbdata->email,
-         'name' => $fullname,
-         'total' => $dbdata->amount*100,
-         'custom_fields' => $fixedmetadata,
-         'currency' => $currency,
-    'subaccount' => $subaccount,
-    'txnbearer' => $txnbearer,
-    'transaction_charge' => $transaction_charge
+        'result' => 'success',
+        'code' => $newcode,
+        'plan' => $plan,
+        'quantity' => $quantity,
+        'email' => $dbdata->email,
+        'name' => $fullname,
+        'total' => $dbdata->amount*100,
+        'custom_fields' => $fixedmetadata,
+        'currency' => $currency,
+        'subaccount' => $subaccount,
+        'txnbearer' => $txnbearer,
+        'transaction_charge' => $transaction_charge
     );
     echo json_encode($response);
 
