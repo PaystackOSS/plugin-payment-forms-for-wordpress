@@ -844,7 +844,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                             $max = $quantity+1;
                             foreach ($paymentoptions as $key => $paymentoption) {
                                 list($a, $b) = explode(':', $paymentoption);
-                                echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.'('.number_format($b).')</option>';
+                                echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.' - '.$currency.' '.number_format($b).'</option>';
                             }
                             echo '</select> <i></i> </div>';
                         }
@@ -857,7 +857,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
 				</div>
 			 </div>';
-                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                if ($recur == 'no' && $usequantity == 'yes') {  //&& ($usevariableamount == 1 || $amount != 0)) { //Commented out because the frontend stops transactions of 0 amount to go through
                     // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
                     echo
                     '<div class="span12 unit">
@@ -1314,7 +1314,6 @@ function kkd_pff_paystack_submit_action()
     $usevariableamount = get_post_meta($_POST["pf-id"], '_usevariableamount', true);
     $amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
     $variablename = $_POST["pf-vname"];
-    // pf-vname
     $originalamount = $amount;
     $quantity = 1;
     $usequantity = get_post_meta($_POST["pf-id"], '_usequantity', true);
@@ -1346,7 +1345,8 @@ function kkd_pff_paystack_submit_action()
         'type' => 'text',
         'value' => $currency.number_format($amount)
     );
-    if ($usequantity == 'yes') {
+    if ($usequantity === 'yes' && !(($recur === 'optional') || ($recur === 'plan'))) {
+        print_r($recur);
         $quantity = $_POST["pf-quantity"];
         $unitamount = (int)str_replace(' ', '', $amount);
         $amount = $quantity*$unitamount;
