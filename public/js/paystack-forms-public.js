@@ -89,7 +89,6 @@ function KkdPffPaystackFee() {
           nextText: '<i class="fa fa-caret-right"></i>'
         });
       });
-      var international_card = false;
       if ($("#pf-vamount").length) {
         var amountField = $("#pf-vamount");
         calculateTotal();
@@ -164,7 +163,12 @@ function KkdPffPaystackFee() {
       };
   
       function calculateTotal() {
-        var unit = $("#pf-amount").val();
+        var unit;
+        if ($("#pf-vamount").length) {
+            unit = $("#paystack-form").find("#pf-vamount").val();
+        } else {
+            unit = $("#pf-amount").val();
+        }
         var quant = $("#pf-quantity").val();
         var newvalue = unit * quant;
         
@@ -237,7 +241,7 @@ function KkdPffPaystackFee() {
           }
         }
       });
-      $("#pf-quantity,#pf-vamount, #pf-amount").on("change", function() {
+      $("#pf-quantity, #pf-vamount, #pf-amount").on("change", function() {
         calculateTotal();
         calculateFees();
       });
@@ -263,9 +267,15 @@ function KkdPffPaystackFee() {
                 var email = $(this)
                     .find("#pf-email")
                     .val();
-                var amount = $(this)
+                var amount;
+                if ($("#pf-vamount").length) {
+                    amount = $("#paystack-form").find("#pf-vamount").val();
+                    calculateTotal();
+                } else {
+                    amount = $(this)
                     .find("#pf-amount")
                     .val();
+                } 
                 if (Number(amount) > 0) {
                 } else {
                     $(this)

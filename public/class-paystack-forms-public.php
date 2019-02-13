@@ -844,7 +844,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                             $max = $quantity+1;
                             foreach ($paymentoptions as $key => $paymentoption) {
                                 list($a, $b) = explode(':', $paymentoption);
-                                echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.'('.number_format($b).')</option>';
+                                echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.' - '.$currency.' '.number_format($b).'</option>';
                             }
                             echo '</select> <i></i> </div>';
                         }
@@ -1314,7 +1314,6 @@ function kkd_pff_paystack_submit_action()
     $usevariableamount = get_post_meta($_POST["pf-id"], '_usevariableamount', true);
     $amount = (int)str_replace(' ', '', $_POST["pf-amount"]);
     $variablename = $_POST["pf-vname"];
-    // pf-vname
     $originalamount = $amount;
     $quantity = 1;
     $usequantity = get_post_meta($_POST["pf-id"], '_usequantity', true);
