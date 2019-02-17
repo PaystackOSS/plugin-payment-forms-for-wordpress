@@ -1346,7 +1346,6 @@ function kkd_pff_paystack_submit_action()
         'value' => $currency.number_format($amount)
     );
     if ($usequantity === 'yes' && !(($recur === 'optional') || ($recur === 'plan'))) {
-        print_r($recur);
         $quantity = $_POST["pf-quantity"];
         $unitamount = (int)str_replace(' ', '', $amount);
         $amount = $quantity*$unitamount;
