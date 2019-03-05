@@ -777,6 +777,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
                 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
                 echo '<input type="hidden" name="pf-recur" value="' . $recur. '" />';
+                echo '<input type="hidden" name="pf-currency" id="pf-currency" value="' . $currency. '" />';
                 echo '<div class="span12 unit">
 				 <label class="label">Full Name <span>*</span></label>
 				 <div class="input">
@@ -851,7 +852,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                     }
                 }
                 if ($txncharge != 'merchant' && $recur != 'plan') {
-                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total: <b  class="pf-txntotal"></b></small>';
                 }
 
                 echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
