@@ -1,13 +1,25 @@
 function KkdPffPaystackFee() {
-    this.DEFAULT_PERCENTAGE = 0.015;
-    this.DEFAULT_ADDITIONAL_CHARGE = 10000;
-    this.DEFAULT_THRESHOLD = 250000;
-    this.DEFAULT_CAP = 200000;
-  
+
+  this.DEFAULT_PERCENTAGE = 0.015;
+  this.DEFAULT_ADDITIONAL_CHARGE = 10000;
+  this.DEFAULT_THRESHOLD = 250000;
+  this.DEFAULT_CAP = 200000;
+
+  this.__initialize = function(){
+
     this.percentage = this.DEFAULT_PERCENTAGE;
     this.additional_charge = this.DEFAULT_ADDITIONAL_CHARGE;
     this.threshold = this.DEFAULT_THRESHOLD;
     this.cap = this.DEFAULT_CAP;
+
+    if(window && window.KKD_PAYSTACK_CHARGE_SETTINGS){
+      this.percentage = window.KKD_PAYSTACK_CHARGE_SETTINGS.percentage;
+      this.additional_charge = window.KKD_PAYSTACK_CHARGE_SETTINGS.additional_charge;
+      this.threshold = window.KKD_PAYSTACK_CHARGE_SETTINGS.threshold;
+      this.cap = window.KKD_PAYSTACK_CHARGE_SETTINGS.cap;
+    }
+
+  } 
   
     this.chargeDivider = 0;
     this.crossover = 0;
@@ -35,6 +47,7 @@ function KkdPffPaystackFee() {
     };
   
     this.__setup = function() {
+      this.__initialize();
       this.chargeDivider = this.__chargeDivider();
       this.crossover = this.__crossover();
       this.flatlinePlusCharge = this.__flatlinePlusCharge();
@@ -182,6 +195,7 @@ function KkdPffPaystackFee() {
         setTimeout(function() {
           transaction_amount = transaction_amount || parseInt(amountField.val());
           var currency = $("#pf-currency").val();
+          var quant = $("#pf-quantity").val();
           if ($("#pf-vamount").length) {
             var name = $("#pf-vamount option:selected").attr("data-name");
             $("#pf-vname").val(name);
@@ -208,14 +222,22 @@ function KkdPffPaystackFee() {
           }
           $(".pf-txncharge")
             .hide()
-            .html(currency + fees.toFixed(2))
+            .html(currency + " " + fees.toFixed(2))
             .show()
             .digits();
+          if(quant){
           $(".pf-txntotal")
             .hide()
-            .html(currency + total.toFixed(2))
+            .html(currency + " " + total.toFixed(2) + " X " + quant)
             .show()
             .digits();
+          } else {
+          $(".pf-txntotal")
+            .hide()
+            .html(currency + " " + total.toFixed(2))
+            .show()
+            .digits();
+          }
         }, 100);
       }
   
