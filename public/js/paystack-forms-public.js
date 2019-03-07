@@ -1,13 +1,25 @@
 function KkdPffPaystackFee() {
-    this.DEFAULT_PERCENTAGE = 0.015;
-    this.DEFAULT_ADDITIONAL_CHARGE = 10000;
-    this.DEFAULT_THRESHOLD = 250000;
-    this.DEFAULT_CAP = 200000;
-  
+
+  this.DEFAULT_PERCENTAGE = 0.015;
+  this.DEFAULT_ADDITIONAL_CHARGE = 10000;
+  this.DEFAULT_THRESHOLD = 250000;
+  this.DEFAULT_CAP = 200000;
+
+  this.__initialize = function(){
+
     this.percentage = this.DEFAULT_PERCENTAGE;
     this.additional_charge = this.DEFAULT_ADDITIONAL_CHARGE;
     this.threshold = this.DEFAULT_THRESHOLD;
     this.cap = this.DEFAULT_CAP;
+
+    if(window && window.KKD_PAYSTACK_CHARGE_SETTINGS){
+      this.percentage = window.KKD_PAYSTACK_CHARGE_SETTINGS.percentage;
+      this.additional_charge = window.KKD_PAYSTACK_CHARGE_SETTINGS.additional_charge;
+      this.threshold = window.KKD_PAYSTACK_CHARGE_SETTINGS.threshold;
+      this.cap = window.KKD_PAYSTACK_CHARGE_SETTINGS.cap;
+    }
+
+  } 
   
     this.chargeDivider = 0;
     this.crossover = 0;
@@ -35,6 +47,7 @@ function KkdPffPaystackFee() {
     };
   
     this.__setup = function() {
+      this.__initialize();
       this.chargeDivider = this.__chargeDivider();
       this.crossover = this.__crossover();
       this.flatlinePlusCharge = this.__flatlinePlusCharge();
@@ -181,6 +194,8 @@ function KkdPffPaystackFee() {
       function calculateFees(transaction_amount) {
         setTimeout(function() {
           transaction_amount = transaction_amount || parseInt(amountField.val());
+          var currency = $("#pf-currency").val();
+          var quant = $("#pf-quantity").val();
           if ($("#pf-vamount").length) {
             var name = $("#pf-vamount option:selected").attr("data-name");
             $("#pf-vname").val(name);
@@ -201,18 +216,20 @@ function KkdPffPaystackFee() {
             obj.withThreshold(settings.fee.ths);
             obj.withCap(settings.fee.cap);
             obj.withPercentage(settings.fee.prc);
-  
+            if(quant){
+              transaction_amount = transaction_amount * quant;
+            }
             var total = obj.addFor(transaction_amount * 100) / 100;
             var fees = total - transaction_amount;
           }
           $(".pf-txncharge")
             .hide()
-            .html("NGN" + fees.toFixed(2))
+            .html(currency + " " + fees.toFixed(2))
             .show()
             .digits();
           $(".pf-txntotal")
             .hide()
-            .html("NGN" + total.toFixed(2))
+            .html(currency + " " + total.toFixed(2))
             .show()
             .digits();
         }, 100);
@@ -250,266 +267,266 @@ function KkdPffPaystackFee() {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
       }
-        $(".paystack-form").on(
-            "submit", function (e) {
-                var requiredFieldIsInvalid = false;
-                e.preventDefault();
-  
-                $("#pf-agreementicon").removeClass("rerror");
-  
-                $(this)
-                    .find("input, select, textarea")
-                    .each(
-                        function () {
-                            $(this).removeClass("rerror"); //.css({ "border-color":"#d1d1d1" });
-                        }
-                    );
-                var email = $(this)
-                    .find("#pf-email")
-                    .val();
-                var amount;
-                if ($("#pf-vamount").length) {
-                    amount = $("#paystack-form").find("#pf-vamount").val();
-                    calculateTotal();
-                } else {
-                    amount = $(this)
-                    .find("#pf-amount")
-                    .val();
-                } 
-                if (Number(amount) > 0) {
-                } else {
-                    $(this)
-                        .find("#pf-amount,#pf-vamount")
-                        .addClass("rerror"); //  css({ "border-color":"red" });
-                    $("html,body").animate(
-                        { scrollTop: $(".rerror").offset().top - 110 },
-                        500
-                    );
-                    return false;
-                }
-                if (!validateEmail(email)) {
-                    $(this)
-                        .find("#pf-email")
-                        .addClass("rerror"); //.css({ "border-color":"red" });
-                    $("html,body").animate(
-                        { scrollTop: $(".rerror").offset().top - 110 },
-                        500
-                    );
-                    return false;
-                }
-                if(checkMinimumVal() == false){
-                    $(this)
-                        .find("#pf-amount")
-                        .addClass("rerror"); //.css({ "border-color":"red" });
-                    $("html,body").animate(
-                        { scrollTop: $(".rerror").offset().top - 110 },
-                        500
-                    );
-                    return false;
-                }
-  
-                $(this)
-                    .find("input, select, text, textarea")
-                    .filter("[required]")
-                    .filter(
-                        function () {
-                            return this.value === "";
-                        }
-                    )
-                    .each(
-                        function () {
-                            $(this).addClass("rerror");
-                            requiredFieldIsInvalid = true;
-                        }
-                    );
-  
-                if ($("#pf-agreement").length && !$("#pf-agreement").is(":checked")) {
-                    $("#pf-agreementicon").addClass("rerror");
-                    requiredFieldIsInvalid = true;
-                }
-  
-                if (requiredFieldIsInvalid) {
-                    $("html,body").animate(
-                        { scrollTop: $(".rerror").offset().top - 110 },
-                        500
-                    );
-                    return false;
-                }
-  
-                var self = $(this);
-                var $form = $(this);
-  
-                $.blockUI({ message: "Please wait..." });
-  
-                var formdata = new FormData(this);
-  
-                $.ajax(
-                    {
-                        url: $form.attr("action"),
-                        type: "POST",
-                        data: formdata,
-                        mimeTypes: "multipart/form-data",
-                        contentType: false,
-                        cache: false,
-                        processData: false,
-                        dataType: "JSON",
-                        success: function (data) {
-                            $.unblockUI();
-                            if (data.result == "success") {
-                                var names = data.name.split(" ");
-                                var firstName = names[0] || "";
-                                var lastName = names[1] || "";
-                                var quantity = data.quantity;
-                                // console.log(firstName+ " - "+lastName);
-                                if (data.plan == "none" || data.plan == "" || data.plan == "no") {
-                                    var handler = PaystackPop.setup(
-                                        {
-                                            key: settings.key,
-                                            email: data.email,
-                                            amount: data.total,
-                                            firstname: firstName,
-                                            lastname: lastName,
-                                            currency: data.currency,
-                                            subaccount: data.subaccount,
-                                            bearer: data.txnbearer,
-                                            transaction_charge: data.transaction_charge,
-                                            ref: data.code,
-                                            metadata: { custom_fields: data.custom_fields },
-                                            callback: function (response) {
-                                                $.blockUI({ message: "Please wait..." });
-                                                $.post(
-                                                    $form.attr("action"),
-                                                    {
-                                                        action: "kkd_pff_paystack_confirm_payment",
-                                                        code: response.trxref,
-                                                        quantity: quantity
-                                                    },
-                                                    function (newdata) {
-                                                        data = JSON.parse(newdata);
-                                                        if (data.result == "success2") {
-                                                            window.location.href = data.link;
-                                                        }
-                                                        if (data.result == "success") {
-                                                            $(".paystack-form")[0].reset();
-                                                            $("html,body").animate(
-                                                                { scrollTop: $(".paystack-form").offset().top - 110 },
-                                                                500
-                                                            );
-  
-                                                            self.before('<div class="alert-success">' + data.message + '</div>');
-                                                            $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
-                                                                    function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
-                                                                    }
-                                                                );
-                                                            $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                            $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-  
-                                                            $.unblockUI();
-                                                        } else {
-                                                            self.before('<div class="alert-danger">' + data.message + '</div>');
-                                                            $.unblockUI();
-                                                        }
-                                                    }
-                                                );
-                                            },
-                                            onClose: function () { }
-                                        }
-                                    );
-                                } else {
-                                    var handler = PaystackPop.setup(
-                                        {
-                                            key: settings.key,
-                                            email: data.email,
-                                            plan: data.plan,
-                                            firstname: firstName,
-                                            lastname: lastName,
-                                            ref: data.code,
-                                            currency: data.currency,
-                                            subaccount: data.subaccount,
-                                            bearer: data.txnbearer,
-                                            transaction_charge: data.transaction_charge,
-                                            metadata: { custom_fields: data.custom_fields },
-                                            callback: function (response) {
-                                                $.blockUI({ message: "Please wait..." });
-                                                $.post(
-                                                    $form.attr("action"),
-                                                    {
-                                                        action: "kkd_pff_paystack_confirm_payment",
-                                                        code: response.trxref
-                                                    },
-                                                    function (newdata) {
-                                                        data = JSON.parse(newdata);
-                                                        if (data.result == "success2") {
-                                                            window.location.href = data.link;
-                                                        }
-                                                        if (data.result == "success") {
-                                                            $(".paystack-form")[0].reset();
-                                                            $("html,body").animate(
-                                                                { scrollTop: $(".paystack-form").offset().top - 110 },
-                                                                500
-                                                            );
-  
-                                                            self.before('<div class="alert-success">' + data.message + '</div>');
-                                                            $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
-                                                                    function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                            }
-                                                                        );
-                                                                    }
-                                                                );
-                                                            $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                            $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-  
-                                                            $.unblockUI();
-                                                        } else {
-                                                            self.before('<div class="alert-danger">' + data.message + '</div>');
-                                                            $.unblockUI();
-                                                        }
-                                                    }
-                                                );
-                                            },
-                                            onClose: function () { }
-                                        }
-                                    );
-                                }
-  
-                                handler.openIframe();
-                            } else {
-                                alert(data.message);
-                            }
-                        }
-                    }
-                );
-            }
+      $(".paystack-form").on(
+          "submit", function (e) {
+              var requiredFieldIsInvalid = false;
+              e.preventDefault();
+
+              $("#pf-agreementicon").removeClass("rerror");
+
+              $(this)
+                  .find("input, select, textarea")
+                  .each(
+                      function () {
+                          $(this).removeClass("rerror"); //.css({ "border-color":"#d1d1d1" });
+                      }
+                  );
+              var email = $(this)
+                  .find("#pf-email")
+                  .val();
+              var amount;
+              if ($("#pf-vamount").length) {
+                  amount = $("#paystack-form").find("#pf-vamount").val();
+                  calculateTotal();
+              } else {
+                  amount = $(this)
+                  .find("#pf-amount")
+                  .val();
+              } 
+              if (Number(amount) > 0) {
+              } else {
+                  $(this)
+                      .find("#pf-amount,#pf-vamount")
+                      .addClass("rerror"); //  css({ "border-color":"red" });
+                  $("html,body").animate(
+                      { scrollTop: $(".rerror").offset().top - 110 },
+                      500
+                  );
+                  return false;
+              }
+              if (!validateEmail(email)) {
+                  $(this)
+                      .find("#pf-email")
+                      .addClass("rerror"); //.css({ "border-color":"red" });
+                  $("html,body").animate(
+                      { scrollTop: $(".rerror").offset().top - 110 },
+                      500
+                  );
+                  return false;
+              }
+              if(checkMinimumVal() == false){
+                  $(this)
+                      .find("#pf-amount")
+                      .addClass("rerror"); //.css({ "border-color":"red" });
+                  $("html,body").animate(
+                      { scrollTop: $(".rerror").offset().top - 110 },
+                      500
+                  );
+                  return false;
+              }
+
+              $(this)
+                  .find("input, select, text, textarea")
+                  .filter("[required]")
+                  .filter(
+                      function () {
+                          return this.value === "";
+                      }
+                  )
+                  .each(
+                      function () {
+                          $(this).addClass("rerror");
+                          requiredFieldIsInvalid = true;
+                      }
+                  );
+
+              if ($("#pf-agreement").length && !$("#pf-agreement").is(":checked")) {
+                  $("#pf-agreementicon").addClass("rerror");
+                  requiredFieldIsInvalid = true;
+              }
+
+              if (requiredFieldIsInvalid) {
+                  $("html,body").animate(
+                      { scrollTop: $(".rerror").offset().top - 110 },
+                      500
+                  );
+                  return false;
+              }
+
+              var self = $(this);
+              var $form = $(this);
+
+              $.blockUI({ message: "Please wait..." });
+
+              var formdata = new FormData(this);
+
+              $.ajax(
+                  {
+                      url: $form.attr("action"),
+                      type: "POST",
+                      data: formdata,
+                      mimeTypes: "multipart/form-data",
+                      contentType: false,
+                      cache: false,
+                      processData: false,
+                      dataType: "JSON",
+                      success: function (data) {
+                          $.unblockUI();
+                          if (data.result == "success") {
+                              var names = data.name.split(" ");
+                              var firstName = names[0] || "";
+                              var lastName = names[1] || "";
+                              var quantity = data.quantity;
+                              // console.log(firstName+ " - "+lastName);
+                              if (data.plan == "none" || data.plan == "" || data.plan == "no") {
+                                  var handler = PaystackPop.setup(
+                                      {
+                                          key: settings.key,
+                                          email: data.email,
+                                          amount: data.total,
+                                          firstname: firstName,
+                                          lastname: lastName,
+                                          currency: data.currency,
+                                          subaccount: data.subaccount,
+                                          bearer: data.txnbearer,
+                                          transaction_charge: data.transaction_charge,
+                                          ref: data.code,
+                                          metadata: { custom_fields: data.custom_fields },
+                                          callback: function (response) {
+                                              $.blockUI({ message: "Please wait..." });
+                                              $.post(
+                                                  $form.attr("action"),
+                                                  {
+                                                      action: "kkd_pff_paystack_confirm_payment",
+                                                      code: response.trxref,
+                                                      quantity: quantity
+                                                  },
+                                                  function (newdata) {
+                                                      data = JSON.parse(newdata);
+                                                      if (data.result == "success2") {
+                                                          window.location.href = data.link;
+                                                      }
+                                                      if (data.result == "success") {
+                                                          $(".paystack-form")[0].reset();
+                                                          $("html,body").animate(
+                                                              { scrollTop: $(".paystack-form").offset().top - 110 },
+                                                              500
+                                                          );
+
+                                                          self.before('<div class="alert-success">' + data.message + '</div>');
+                                                          $(this)
+                                                              .find("input, select, textarea")
+                                                              .each(
+                                                                  function () {
+                                                                      $(this).css(
+                                                                          {
+                                                                              "border-color": "#d1d1d1",
+                                                                              "background-color": "#fff"
+                                                                          }
+                                                                      );
+                                                                  }
+                                                              );
+                                                          $(".pf-txncharge")
+                                                              .hide()
+                                                              .html("NGN0")
+                                                              .show()
+                                                              .digits();
+                                                          $(".pf-txntotal")
+                                                              .hide()
+                                                              .html("NGN0")
+                                                              .show()
+                                                              .digits();
+
+                                                          $.unblockUI();
+                                                      } else {
+                                                          self.before('<div class="alert-danger">' + data.message + '</div>');
+                                                          $.unblockUI();
+                                                      }
+                                                  }
+                                              );
+                                          },
+                                          onClose: function () { }
+                                      }
+                                  );
+                              } else {
+                                  var handler = PaystackPop.setup(
+                                      {
+                                          key: settings.key,
+                                          email: data.email,
+                                          plan: data.plan,
+                                          firstname: firstName,
+                                          lastname: lastName,
+                                          ref: data.code,
+                                          currency: data.currency,
+                                          subaccount: data.subaccount,
+                                          bearer: data.txnbearer,
+                                          transaction_charge: data.transaction_charge,
+                                          metadata: { custom_fields: data.custom_fields },
+                                          callback: function (response) {
+                                              $.blockUI({ message: "Please wait..." });
+                                              $.post(
+                                                  $form.attr("action"),
+                                                  {
+                                                      action: "kkd_pff_paystack_confirm_payment",
+                                                      code: response.trxref
+                                                  },
+                                                  function (newdata) {
+                                                      data = JSON.parse(newdata);
+                                                      if (data.result == "success2") {
+                                                          window.location.href = data.link;
+                                                      }
+                                                      if (data.result == "success") {
+                                                          $(".paystack-form")[0].reset();
+                                                          $("html,body").animate(
+                                                              { scrollTop: $(".paystack-form").offset().top - 110 },
+                                                              500
+                                                          );
+
+                                                          self.before('<div class="alert-success">' + data.message + '</div>');
+                                                          $(this)
+                                                              .find("input, select, textarea")
+                                                              .each(
+                                                                  function () {
+                                                                      $(this).css(
+                                                                          {
+                                                                              "border-color": "#d1d1d1",
+                                                                              "background-color": "#fff"
+                                                                          }
+                                                                      );
+                                                                  }
+                                                              );
+                                                          $(".pf-txncharge")
+                                                              .hide()
+                                                              .html("NGN0")
+                                                              .show()
+                                                              .digits();
+                                                          $(".pf-txntotal")
+                                                              .hide()
+                                                              .html("NGN0")
+                                                              .show()
+                                                              .digits();
+
+                                                          $.unblockUI();
+                                                      } else {
+                                                          self.before('<div class="alert-danger">' + data.message + '</div>');
+                                                          $.unblockUI();
+                                                      }
+                                                  }
+                                              );
+                                          },
+                                          onClose: function () { }
+                                      }
+                                  );
+                              }
+
+                              handler.openIframe();
+                          } else {
+                              alert(data.message);
+                          }
+                      }
+                  }
+              );
+          }
         );
   
         $(".retry-form").on(

@@ -62,28 +62,82 @@ define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval((KKD_PFF_PAYSTACK_CROSSOVER_T
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval((KKD_PFF_PAYSTACK_LOCAL_CAP-KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE)/KKD_PFF_PAYSTACK_PERCENTAGE));
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - KKD_PFF_PAYSTACK_LOCAL_CAP);
 
+class Kkd_Pff_Paystack_PaystackCharge
+{
+    public $percentage;
+    public $additional_charge;
+    public $crossover_total;
+    public $cap;
+
+    public $charge_divider;
+    public $crossover;
+    public $flatline_plus_charge;
+    public $flatline;
+
+    public function __construct($percentage = 0.015, $additional_charge = 10000, $crossover_total = 250000, $cap = 200000)
+    {
+        $this->percentage = $percentage;
+        $this->additional_charge = $additional_charge;
+        $this->crossover_total = $crossover_total;
+        $this->cap = $cap;
+        $this->__setup();
+    }
+
+    private function __setup()
+    {
+        $this->charge_divider = $this->__charge_divider();
+        $this->crossover = $this->__crossover();
+        $this->flatline_plus_charge = $this->__flatline_plus_charge();
+        $this->flatline = $this->__flatline();
+    }
+
+    private function __charge_divider()
+    {
+        return floatval(1 - $this->percentage);
+    }
+
+    private function __crossover()
+    {
+        return ceil(($this->crossover_total * $this->charge_divider) - $this->additional_charge);
+    }
+
+    private function __flatline_plus_charge()
+    {
+        return floor(($this->cap - $this->additional_charge) / $this->percentage);
+    }
+
+    private function __flatline()
+    {
+        return $this->flatline_plus_charge - $this->cap;
+    }
+
+    public function add_for_kobo($amountinkobo)
+    {
+        if ($amountinkobo > $this->flatline) {
+            return $amountinkobo + $this->cap;
+        } elseif ($amountinkobo > $this->crossover) {
+            return ceil(($amountinkobo + $this->additional_charge) / $this->charge_divider);
+        } else {
+            return ceil($amountinkobo / $this->charge_divider);
+        }
+    }
+
+    public function add_for_ngn($amountinngn)
+    {
+        return $this->add_for_kobo(ceil($amountinngn * 100)) / 100;
+    }
+}
+
 function kkd_pff_paystack_add_paystack_charge($amount)
 {
-    // $amountinkobo = $amount; // * 100;
-    $charge = 0;
-    $amount = intval($amount);
-    if ($amount <= 2500) {
-        $charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE);
-    } else {
-        $charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
-    }
-    // echo $charge;
-    if ($charge > 2000) {
-        $charge = 2000;
-    }
-    $amount += $charge;
-    return $amount;
-    // if ($amountinkobo > KKD_PFF_PAYSTACK_FLATLINE_AMOUNT)
-    //     return ($amountinkobo + KKD_PFF_PAYSTACK_LOCAL_CAP)/100;
-    // elseif ($amountinkobo > KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT)
-    //     return (intval(($amountinkobo + KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE) / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
-    // else
-    //     return (intval($amountinkobo / KKD_PFF_PAYSTACK_CHARGE_DIVIDER))/100;
+    $feeSettings = Kkd_Pff_Paystack_Public::fetchFeeSettings();
+    $pc = new Kkd_Pff_Paystack_PaystackCharge(
+        $feeSettings['prc'],
+        $feeSettings['adc'],
+        $feeSettings['ths'],
+        $feeSettings['cap']
+    );
+    return $pc->add_for_ngn($amount);
 }
 
 add_filter("wp_mail_content_type", "kkd_pff_paystack_mail_content_type");
@@ -777,6 +831,14 @@ function kkd_pff_paystack_form_shortcode($atts)
                 echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
                 echo '<input type="hidden" name="pf-user_id" value="' . $user_id. '" />';
                 echo '<input type="hidden" name="pf-recur" value="' . $recur. '" />';
+                echo '<input type="hidden" name="pf-currency" id="pf-currency" value="' . $currency. '" />';
+                $feeSettings = Kkd_Pff_Paystack_Public::fetchFeeSettings();
+                echo '<script>window.KKD_PAYSTACK_CHARGE_SETTINGS={
+                    percentage:'.$feeSettings['prc'].',
+                    additional_charge:'.$feeSettings['adc'].',
+                    threshold:'.$feeSettings['ths'].',
+                    cap:'.$feeSettings['cap'].'
+                }</script>';
                 echo '<div class="span12 unit">
 				 <label class="label">Full Name <span>*</span></label>
 				 <div class="input">
@@ -794,10 +856,9 @@ function kkd_pff_paystack_form_shortcode($atts)
                 if ($loggedin == 'yes') {
                     echo 'readonly ';
                 }
-
                 echo' required>
 				 </div>
-			     </div>';
+                 </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Amount ('.$currency;
                 if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
@@ -850,8 +911,8 @@ function kkd_pff_paystack_form_shortcode($atts)
                         }
                     }
                 }
-                if ($txncharge != 'merchant' && $recur != 'plan') {
-                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+                if ($txncharge != 'merchant' && $recur != 'plan' && $usequantity!=="yes") {
+                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total: <b  class="pf-txntotal"></b></small>';
                 }
 
                 echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
@@ -877,11 +938,14 @@ function kkd_pff_paystack_form_shortcode($atts)
                         <label class="label">Total ('.$currency;
                     echo') <span>*</span></label>
                         <div class="input">
-                	        <input type="text" id="pf-total" name="pf-total" placeholder="" value="" disabled>
-                        </div>
+                            <input type="text" id="pf-total" name="pf-total" placeholder="" value="" disabled>';
+                    if ($txncharge != 'merchant' && $recur != 'plan') {
+                        echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total: <b  class="pf-txntotal"></b></small>';
+                    }
+                    echo '</div>
                     </div>';
                 }
-                
+
                 if ($recur == 'optional') {
                     echo '<div class="span12 unit">
 			 				 <label class="label">Recurring Payment</label>
