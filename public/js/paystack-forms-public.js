@@ -216,7 +216,9 @@ function KkdPffPaystackFee() {
             obj.withThreshold(settings.fee.ths);
             obj.withCap(settings.fee.cap);
             obj.withPercentage(settings.fee.prc);
-  
+            if(quant){
+              transaction_amount = transaction_amount * quant;
+            }
             var total = obj.addFor(transaction_amount * 100) / 100;
             var fees = total - transaction_amount;
           }
@@ -225,19 +227,11 @@ function KkdPffPaystackFee() {
             .html(currency + " " + fees.toFixed(2))
             .show()
             .digits();
-          if(quant){
-          $(".pf-txntotal")
-            .hide()
-            .html(currency + " " + total.toFixed(2) + " X " + quant)
-            .show()
-            .digits();
-          } else {
           $(".pf-txntotal")
             .hide()
             .html(currency + " " + total.toFixed(2))
             .show()
             .digits();
-          }
         }, 100);
       }
   
