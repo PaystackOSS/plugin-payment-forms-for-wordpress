@@ -131,7 +131,7 @@ class Kkd_Pff_Paystack_PaystackCharge
 function kkd_pff_paystack_add_paystack_charge($amount)
 {
     $feeSettings = Kkd_Pff_Paystack_Public::fetchFeeSettings();
-    $pc = new PaystackCharge(
+    $pc = new Kkd_Pff_Paystack_PaystackCharge(
         $feeSettings['prc'],
         $feeSettings['adc'],
         $feeSettings['ths'],
