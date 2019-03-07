@@ -80,11 +80,10 @@ class Kkd_Pff_Paystack_Admin
                         </tr>
 
                     </table>
-
-                    <table class="form-table paystack_setting_page">
-                        
-                        <hr>
-
+                    
+                    <hr>
+                    
+                    <table class="form-table paystack_setting_page" id="paystack_setting_fees">
                         <h2>Fees Settings</h2>
 
                         <tr valign="top">
@@ -400,12 +399,14 @@ class Kkd_Pff_Paystack_Admin
             }
             echo '<p>Pay button Description:</p>';
             echo '<input type="text" name="_paybtn" value="' . $paybtn  . '" class="widefat" />';
-            echo '<p>Add Convenience Fee:</p>';
+            echo '<p>Add Extra Charge:</p>';
             echo '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
 								<option value="merchant"'.kkd_pff_paystack_txncheck('merchant', $txncharge).'>No, do not add</option>
 								<option value="customer" '.kkd_pff_paystack_txncheck('customer', $txncharge).'>Yes, add it</option>
 							</select>
-						<br><small>This adds an estimate of Paystack transaction local fee to the transaction amount. This cushions the effect of the fees on the merchant</small>';
+                        <br><small>This allows you include an extra charge to cushion the effect of the transaction fee. <a href="';
+            echo get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees";
+            echo '"><em>Configure</em></a></small>';
             echo '<p>User logged In:</p>';
             echo '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 								<option value="no" '.kkd_pff_paystack_txncheck('no', $loggedin).'>User must not be logged in</option>
