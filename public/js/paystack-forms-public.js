@@ -212,10 +212,10 @@ function KkdPffPaystackFee() {
           } else {
             var obj = new KkdPffPaystackFee();
   
-            obj.withAdditionalCharge(settings.fee.adc);
-            obj.withThreshold(settings.fee.ths);
-            obj.withCap(settings.fee.cap);
-            obj.withPercentage(settings.fee.prc);
+            obj.withAdditionalCharge(kkd_pff_settings.fee.adc);
+            obj.withThreshold(kkd_pff_settings.fee.ths);
+            obj.withCap(kkd_pff_settings.fee.cap);
+            obj.withPercentage(kkd_pff_settings.fee.prc);
             if(quant){
               transaction_amount = transaction_amount * quant;
             }
@@ -381,7 +381,7 @@ function KkdPffPaystackFee() {
                               if (data.plan == "none" || data.plan == "" || data.plan == "no") {
                                   var handler = PaystackPop.setup(
                                       {
-                                          key: settings.key,
+                                          key: kkd_pff_settings.key,
                                           email: data.email,
                                           amount: data.total,
                                           firstname: firstName,
@@ -451,7 +451,7 @@ function KkdPffPaystackFee() {
                               } else {
                                   var handler = PaystackPop.setup(
                                       {
-                                          key: settings.key,
+                                          key: kkd_pff_settings.key,
                                           email: data.email,
                                           plan: data.plan,
                                           firstname: firstName,
@@ -560,7 +560,7 @@ function KkdPffPaystackFee() {
                                 if (data.plan == "none" || data.plan == "" || data.plan == "no") {
                                     var handler = PaystackPop.setup(
                                         {
-                                            key: settings.key,
+                                            key: kkd_pff_settings.key,
                                             email: data.email,
                                             amount: data.total,
                                             firstname: firstName,
@@ -630,7 +630,7 @@ function KkdPffPaystackFee() {
                                 } else {
                                     var handler = PaystackPop.setup(
                                         {
-                                            key: settings.key,
+                                            key: kkd_pff_settings.key,
                                             email: data.email,
                                             plan: data.plan,
                                             firstname: firstName,
