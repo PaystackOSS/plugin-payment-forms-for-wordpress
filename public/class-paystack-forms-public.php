@@ -16,7 +16,7 @@ class Kkd_Pff_Paystack_Public
     }
     public function enqueue_styles()
     {
-        wp_enqueue_style($this->plugin_name.'1', plugin_dir_url(__FILE__) . 'css/pff-paystack-style.css?ver=' . KKD_PFF_PAYSTACK_VERSION, array(), $this->version, 'all');
+        wp_enqueue_style($this->plugin_name.'1', plugin_dir_url(__FILE__) . 'css/pff-paystack-style.css', array(), $this->version, 'all');
         wp_enqueue_style($this->plugin_name.'2', plugin_dir_url(__FILE__) . 'css/font-awesome.min.css', array(), $this->version, 'all');
     }
 
@@ -47,7 +47,7 @@ class Kkd_Pff_Paystack_Public
         wp_enqueue_script('jQuery_UI', plugin_dir_url(__FILE__) . 'js/jquery.ui.min.js', array( 'jquery' ), $this->version, true, true);
         wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
         wp_enqueue_script('Paystack');
-        wp_enqueue_script('paystack_frontend', plugin_dir_url(__FILE__) . 'js/paystack-forms-public.js?ver=' . KKD_PFF_PAYSTACK_VERSION, array( 'jquery' ), $this->version, true, true);
+        wp_enqueue_script('paystack_frontend', plugin_dir_url(__FILE__) . 'js/paystack-forms-public.js', array( 'jquery' ), $this->version, true, true);
         wp_localize_script('paystack_frontend', 'kkd_pff_settings', array('key'=> Kkd_Pff_Paystack_Public::fetchPublicKey(), 'fee'=>Kkd_Pff_Paystack_Public::fetchFeeSettings()), $this->version, true, true);
     }
 }
