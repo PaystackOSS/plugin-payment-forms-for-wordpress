@@ -3,8 +3,8 @@ Contributors: paystack, kendysond, steveamaza
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 5.1
-Stable tag: 3.3.3
+Tested up to: 5.2
+Stable tag: 3.3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.3.4 =
+* Fix issue where total is not displayed automatically for quantified payments
 = 3.3.0 =
 * Major fixes to convenience fee option!
 * Now known as 'Additional Charge' to clarify it does not _always_ pass transaction fees

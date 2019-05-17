@@ -103,7 +103,7 @@ function KkdPffPaystackFee() {
         });
       });
       if ($("#pf-vamount").length) {
-        var amountField = $("#pf-vamount");
+        var amountField = $("#pf-vamount");     
         calculateTotal();
       } else {
         var amountField = $("#pf-amount");
@@ -190,6 +190,8 @@ function KkdPffPaystackFee() {
         } else {
             $("#pf-total").val(newvalue);
         }
+
+        console.log(quant);
       }
       function calculateFees(transaction_amount) {
         setTimeout(function() {
@@ -258,6 +260,10 @@ function KkdPffPaystackFee() {
           }
         }
       });
+      if($("#pf-quantity").length){
+        calculateTotal();
+      };
+      
       $("#pf-quantity, #pf-vamount, #pf-amount").on("change", function() {
         calculateTotal();
         calculateFees();
