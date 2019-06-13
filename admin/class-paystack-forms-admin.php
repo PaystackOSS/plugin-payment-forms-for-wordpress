@@ -523,7 +523,12 @@ class Kkd_Pff_Paystack_Admin
                 $quantity = '10';
             }
             if ($inventory == "" ) {
-                $inventory = '1';
+                if($sold !== ""){
+                    $inventory = $sold;
+                }else{
+                    $inventory = '1';
+                }
+               
             }
             if($sold == ""){
                 $sold = '0';
@@ -547,16 +552,26 @@ class Kkd_Pff_Paystack_Admin
             }
             if($usequantity == "yes"){
 
-                echo '<p>Inventory Payment:</p><small>Set maximum available items in stock</small>';
+                echo '<p>Max payable quantity:</p>';
+                echo '<input type="number" min="1"  name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
+                <small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
+                echo '<p>Unit of quantity:</p>';
+                echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
+                <small>What is the unit of this quantity? Default is <code>Quantity</code>.</small>';
+
+
+                echo '<p>Inventory Payment:</p>';
                 echo '
                 <select class="form-control" name="_useinventory" style="width:100%;">
 				<option value="no" '.kkd_pff_paystack_txncheck('no', $useinventory).'>No</option>
 				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $useinventory).'>Yes</option>
-                </select>';
+                </select>
+                <small>Set maximum available items in stock</small>
+                ';
                 
               
             }
-            if($useinventory == "yes"){
+            if($useinventory == "yes" && $usequantity  == "yes"){
                 echo '<p>Total Inventory</p>';
                 echo '<input type="number" min="'.$sold.'" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
                 echo '<p>In stock</p>';
@@ -565,12 +580,7 @@ class Kkd_Pff_Paystack_Admin
                 
             }
            
-            echo '<p>Max payable quantity:</p>';
-            echo '<input type="number" min="1"  name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
-			<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
-            echo '<p>Unit of quantity:</p>';
-            echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
-			<small>What is the unit of this quantity? Default is <code>Quantity</code>.</small>';
+          
         }
         function kkd_pff_paystack_editor_add_agreement_data()
         {
