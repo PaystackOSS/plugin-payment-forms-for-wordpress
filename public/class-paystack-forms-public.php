@@ -820,7 +820,24 @@ function kkd_pff_paystack_form_shortcode($atts)
                     }
                 }
             }
-            if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
+            $useinventory = get_post_meta($id, '_useinventory', true);
+            $inventory = get_post_meta($id, '_inventory',true);
+            $sold = get_post_meta($id, '_sold',true);
+            if ($inventory == "" ) {
+                $inventory = '1';
+            }
+            if($sold == ""){
+                $sold = '0';
+            }
+            if($useinventory == ""){
+                $useinventory = "no";
+            }
+            $stock = $inventory - $sold;
+
+            if($useinventory == "yes" && $stock <= 0){
+                echo "<h1>Out of Stock</h1>";
+            }
+            else if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
                 echo '<div id="paystack-form">';
                 if ($hidetitle != 1) {
                     echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
@@ -902,7 +919,10 @@ function kkd_pff_paystack_form_shortcode($atts)
 			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
 			 				 	 	<input type="hidden"  id="pf-amount" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
-                            $max = $quantity+1;
+                            $max = $quantity + 1;
+                            if($max > ($stock +1)){
+                                $max = $stock + 1 ;
+                            }
                             foreach ($paymentoptions as $key => $paymentoption) {
                                 list($a, $b) = explode(':', $paymentoption);
                                 echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.' - '.$currency.' '.number_format($b).'</option>';
@@ -926,7 +946,10 @@ function kkd_pff_paystack_form_shortcode($atts)
                         <div class="select">
                             <input type="hidden" value="'.$amount.'" id="pf-qamount"/>
                             <select class="form-control" id="pf-quantity" name="pf-quantity" >';
-                    $max = $quantity+1;
+                    $max = $quantity + 1;
+                    if($max > ($stock +1)){
+                        $max = $stock + 1 ;
+                    }
                     for ($i=1; $i < $max; $i++) {
                         echo  ' <option value="'.$i.'">'.$i.'</option>';
                     }
@@ -1371,7 +1394,12 @@ function kkd_pff_paystack_submit_action()
     $txnbearer = get_post_meta($_POST["pf-id"], '_txnbearer', true);
     $transaction_charge = get_post_meta($_POST["pf-id"], '_merchantamount', true);
     $transaction_charge = $transaction_charge*100;
-        
+    //--------------------------------------------------------------------------
+    $sold = get_post_meta($_POST["pf-id"], '_sold', true);
+    if($sold == ''){
+        $sold = '0';
+    }
+    //--------------------------------------------------------------------------
     $txncharge = get_post_meta($_POST["pf-id"], '_txncharge', true);
     $minimum = get_post_meta($_POST["pf-id"], '_minimum', true);
     $variableamount = get_post_meta($_POST["pf-id"], '_variableamount', true);
@@ -1414,9 +1442,17 @@ function kkd_pff_paystack_submit_action()
         $unitamount = (int)str_replace(' ', '', $amount);
         $amount = $quantity*$unitamount;
     }
-        
+    //--------------------------------------
+
+    $sold = $sold+$quantity;
     
-    
+    if (get_post_meta($_POST["pf-id"], '_sold', false)) { // If the custom field already has a value
+        update_post_meta($_POST["pf-id"], '_sold', $sold);
+    } else { // If the custom field doesn't have a value
+        add_post_meta($_POST["pf-id"], '_sold', $sold);
+    }
+   
+    //--------------------------------------
     if ($txncharge == 'customer') {
         $amount = kkd_pff_paystack_add_paystack_charge($amount);
     }
@@ -1532,7 +1568,7 @@ function kkd_pff_paystack_submit_action()
 
     $fixedmetadata = json_decode(json_encode($fixedmetadata, JSON_NUMERIC_CHECK), true);
     $fixedmetadata = array_merge($untouchedmetadata, $fixedmetadata);
-
+ 
     $insert =  array(
         'post_id' => strip_tags($_POST["pf-id"], ""),
         'email' => strip_tags($_POST["pf-pemail"], ""),
@@ -1590,6 +1626,10 @@ function kkd_pff_paystack_submit_action()
         'txnbearer' => $txnbearer,
         'transaction_charge' => $transaction_charge
     );
+
+    //-------------------------------------------------------------------------------------------
+
+
     echo json_encode($response);
     die();
 }

@@ -385,6 +385,7 @@ function KkdPffPaystackFee() {
                               var quantity = data.quantity;
                               // console.log(firstName+ " - "+lastName);
                               if (data.plan == "none" || data.plan == "" || data.plan == "no") {
+                                console.log(data)
                                   var handler = PaystackPop.setup(
                                       {
                                           key: kkd_pff_settings.key,

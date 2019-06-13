@@ -22,7 +22,7 @@ class Kkd_Pff_Paystack_Activator
 			txn_code varchar(255) DEFAULT '' NOT NULL,
 			txn_code_2 varchar(255) DEFAULT '' NOT NULL,
 			amount varchar(255) DEFAULT '' NOT NULL,
-		  	ip varchar(255) NOT NULL,
+		  	ip varchar(255) NOT NULL, 
 			deleted_at varchar(255) DEFAULT '' NULL,
 			created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  	modified timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL,
