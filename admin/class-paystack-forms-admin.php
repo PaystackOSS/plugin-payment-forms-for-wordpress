@@ -479,7 +479,7 @@ class Kkd_Pff_Paystack_Admin
             $recur = get_post_meta($post->ID, '_recur', true);
             $recurplan = get_post_meta($post->ID, '_recurplan', true);
 
-            if ($recur == "") {
+            if ($recur == "") { 
                 $recur = 'no';
             }
             if ($recurplan == "") {
@@ -506,16 +506,34 @@ class Kkd_Pff_Paystack_Admin
 
             // Get the location data if its already been entered
             $usequantity = get_post_meta($post->ID, '_usequantity', true);
+            $useinventory = get_post_meta($post->ID, '_useinventory', true);
+            $inventory = get_post_meta($post->ID, '_inventory',true);
+            $sold = get_post_meta($post->ID, '_sold',true);
             $quantity = get_post_meta($post->ID, '_quantity', true);
             $quantityunit = get_post_meta($post->ID, '_quantityunit', true);
             $recur = get_post_meta($post->ID, '_recur', true);
-
+            
             if ($usequantity == "") {
                 $usequantity = 'no';
+            }
+            if($useinventory == ""){
+                $useinventory = "no";
             }
             if ($quantity == "") {
                 $quantity = '10';
             }
+            if ($inventory == "" ) {
+                if($sold !== ""){
+                    $inventory = $sold;
+                }else{
+                    $inventory = '1';
+                }
+               
+            }
+            if($sold == ""){
+                $sold = '0';
+            }
+            $stock = $inventory - $sold;
             if ($quantityunit == "") {
                 $quantityunit = 'Quantity';
             }
@@ -532,12 +550,37 @@ class Kkd_Pff_Paystack_Admin
 				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $usequantity).'>Yes</option>
 			    </select>';
             }
-            echo '<p>Max payable quantity:</p>';
-            echo '<input type="number" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
-			<small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
-            echo '<p>Unit of quantity:</p>';
-            echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
-			<small>What is the unit of this quantity? Default is <code>Quantity</code>.</small>';
+            if($usequantity == "yes"){
+
+                echo '<p>Max payable quantity:</p>';
+                echo '<input type="number" min="1"  name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
+                <small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
+                echo '<p>Unit of quantity:</p>';
+                echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
+                <small>What is the unit of this quantity? Default is <code>Quantity</code>.</small>';
+
+
+                echo '<p>Inventory Payment:</p>';
+                echo '
+                <select class="form-control" name="_useinventory" style="width:100%;">
+				<option value="no" '.kkd_pff_paystack_txncheck('no', $useinventory).'>No</option>
+				<option value="yes" '.kkd_pff_paystack_txncheck('yes', $useinventory).'>Yes</option>
+                </select>
+                <small>Set maximum available items in stock</small>
+                ';
+                
+              
+            }
+            if($useinventory == "yes" && $usequantity  == "yes"){
+                echo '<p>Total Inventory</p>';
+                echo '<input type="number" min="'.$sold.'" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
+                echo '<p>In stock</p>';
+                echo '<input type="number" readonly name="_in_stock" value="' . $stock  . '" class="widefat  pf-number" />
+                <small></small>';
+                
+            }
+           
+          
         }
         function kkd_pff_paystack_editor_add_agreement_data()
         {
@@ -641,7 +684,8 @@ class Kkd_Pff_Paystack_Admin
             if (!current_user_can('edit_post', $post->ID)) {
                 return $post->ID;
             }
-
+            $form_meta['_inventory'] = $_POST['_inventory'];
+            $form_meta['_useinventory'] = $_POST['_useinventory'];
             $form_meta['_amount'] = $_POST['_amount'];
             $form_meta['_hidetitle'] = $_POST['_hidetitle'];
             $form_meta['_minimum'] = $_POST['_minimum'];

@@ -9,6 +9,40 @@
     width:300px !important;
     height:87px !important;
 }
+@font-face {
+    font-family: 'Graphik';
+    font-style: normal;
+    font-weight: normal;
+    src: url('/fonts/graphik/Graphik-Regular.eot');
+    src: url('/fonts/graphik/Graphik-Regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('/fonts/graphik/Graphik-Regular.woff') format('woff'), /* Modern Browsers */ url('/fonts/graphik/Graphik-Regular.ttf') format('truetype'), /* Safari, Android, iOS */ url('/fonts/graphik/Graphik-Regular.svg#Graphik-Regular') format('svg');
+    text-rendering: optimizeLegibility;
+  
+    /* IE9 Compat Modes */
+    /* Legacy iOS */
+  }
+  @font-face {
+    font-family: 'Graphik';
+    font-style: normal;
+    font-weight: 300;
+    src: url('/fonts/graphik/Graphik-Light.eot');
+    src: url('/fonts/graphik/Graphik-Light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('/fonts/graphik/Graphik-Light.woff') format('woff'), Modern Browsers url('/fonts/graphik/Graphik-Light.ttf') format('truetype'), /* Safari, Android, iOS */ url('/fonts/graphik/Graphik-Light.svg#Graphik-Light') format('svg');
+    text-rendering: optimizeLegibility;
+  
+    /* IE9 Compat Modes */
+    /* Legacy iOS */
+  }
+  @font-face {
+    font-family: 'Graphik';
+    font-style: normal;
+    font-weight: bold;
+    src: url('/fonts/graphik/Graphik-Medium.eot');
+    src: url('/fonts/graphik/Graphik-Medium.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */ url('/fonts/graphik/Graphik-Medium.woff') format('woff'), /* Modern Browsers */ url('/fonts/graphik/Graphik-Medium.ttf') format('truetype'), /* Safari, Android, iOS */ url('/fonts/graphik/Graphik-Medium.svg#Graphik-Medium') format('svg');
+    text-rendering: optimizeLegibility;
+  
+    /* IE9 Compat Modes */
+    /* Legacy iOS */
+  }
+  
 
 /* Default
 =============================== */
@@ -27,6 +61,11 @@
     padding:40px 15px;
     max-width: 1280px;
     margin: 0 auto;
+	 font-family: 'Graphik', 'Helvetica Neue', 'Arial', sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 #pf-form.j-forms {
@@ -82,6 +121,18 @@
     appearance:none;
     -webkit-border-radius:0px;
     border-radius:0px;
+}
+
+.j-forms input{
+	    display: block;
+    height: 35px;
+    font-size: 14px;
+    width: 100%;
+    line-height: 35px;
+    padding: 0 10px;
+    border: solid 1px #cccccc;
+    border-radius: 2px;
+    outline: none;
 }
 
 /* Header

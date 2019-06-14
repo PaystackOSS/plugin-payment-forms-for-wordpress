@@ -191,7 +191,6 @@ function KkdPffPaystackFee() {
             $("#pf-total").val(newvalue);
         }
 
-        console.log(quant);
       }
       function calculateFees(transaction_amount) {
         setTimeout(function() {
