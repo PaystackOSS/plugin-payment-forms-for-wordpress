@@ -947,7 +947,8 @@ function kkd_pff_paystack_form_shortcode($atts)
                             <input type="hidden" value="'.$amount.'" id="pf-qamount"/>
                             <select class="form-control" id="pf-quantity" name="pf-quantity" >';
                     $max = $quantity + 1;
-                    if($max > ($stock +1)){
+
+                    if($max > ($stock +1) && $useinventory == 'yes'){
                         $max = $stock + 1 ;
                     }
                     for ($i=1; $i < $max; $i++) {
