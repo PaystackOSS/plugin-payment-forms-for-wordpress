@@ -1,5 +1,5 @@
 function KkdPffPaystackFee() {
-
+ 
   this.DEFAULT_PERCENTAGE = 0.015;
   this.DEFAULT_ADDITIONAL_CHARGE = 10000;
   this.DEFAULT_THRESHOLD = 250000;
@@ -377,6 +377,11 @@ function KkdPffPaystackFee() {
                       dataType: "JSON",
                       success: function (data) {
                           $.unblockUI();
+                          data.custom_fields.push({
+                            "display_name":"Plugin",
+                            "variable_name":"plugin",
+                            "value":"pff-paystack"
+                          })
                           if (data.result == "success") {
                               var names = data.name.split(" ");
                               var firstName = names[0] || "";
@@ -555,6 +560,11 @@ function KkdPffPaystackFee() {
                         processData: false,
                         dataType: "JSON",
                         success: function (data) {
+                          data.custom_fields.push({
+                            "display_name":"Plugin",
+                            "variable_name":"plugin",
+                            "value":"pff-paystack"
+                          })
                             $.unblockUI();
                             if (data.result == "success") {
                                 var names = data.name.split(" ");
