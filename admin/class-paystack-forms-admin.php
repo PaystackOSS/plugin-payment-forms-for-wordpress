@@ -508,7 +508,6 @@ class Kkd_Pff_Paystack_Admin
             $usequantity = get_post_meta($post->ID, '_usequantity', true);
             $useinventory = get_post_meta($post->ID, '_useinventory', true);
             $inventory = get_post_meta($post->ID, '_inventory',true);
-            $sold = get_post_meta($post->ID, '_sold',true);
             $quantity = get_post_meta($post->ID, '_quantity', true);
             $quantityunit = get_post_meta($post->ID, '_quantityunit', true);
             $recur = get_post_meta($post->ID, '_recur', true);
@@ -523,17 +522,11 @@ class Kkd_Pff_Paystack_Admin
                 $quantity = '10';
             }
             if ($inventory == "" ) {
-                if($sold !== ""){
-                    $inventory = $sold;
-                }else{
+               
                     $inventory = '1';
-                }
+                
                
             }
-            if($sold == ""){
-                $sold = '0';
-            }
-            $stock = $inventory - $sold;
             if ($quantityunit == "") {
                 $quantityunit = 'Quantity';
             }
@@ -553,7 +546,7 @@ class Kkd_Pff_Paystack_Admin
             if($usequantity == "yes"){
 
                 echo '<p>Max payable quantity:</p>';
-                echo '<input type="number" min="1"  name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
+                echo '<input type="number" min="1" name="_quantity" value="' . $quantity  . '" class="widefat  pf-number" />
                 <small>Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.</small>';
                 echo '<p>Unit of quantity:</p>';
                 echo '<input type="text" name="_quantityunit" value="' . $quantityunit . '" class="widefat" />
@@ -572,10 +565,10 @@ class Kkd_Pff_Paystack_Admin
               
             }
             if($useinventory == "yes" && $usequantity  == "yes"){
-                echo '<p>Total Inventory</p>';
-                echo '<input type="number" min="'.$sold.'" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
+//                 echo '<p>Total Inventory</p>';
+//                 echo '<input type="number"  name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
                 echo '<p>In stock</p>';
-                echo '<input type="number" readonly name="_in_stock" value="' . $stock  . '" class="widefat  pf-number" />
+                echo '<input type="number" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />
                 <small></small>';
                 
             }
