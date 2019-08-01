@@ -1808,7 +1808,7 @@ function kkd_pff_paystack_confirm_payment()
     if ($result == 'success') {
         ///
         //Create Plan
-        $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
+        $pstk_logger = new kkd_pff_paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
         $pstk_logger->log_transaction_success($code);
         $enabled_custom_plan = get_post_meta($payment_array->post_id, '_startdate_enabled', true);
         if ($enabled_custom_plan == 1) {

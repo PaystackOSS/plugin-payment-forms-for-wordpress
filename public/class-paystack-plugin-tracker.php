@@ -1,5 +1,5 @@
 <?php
-class paystack_plugin_tracker {
+class kkd_pff_paystack_plugin_tracker {
     var $public_key;
     var $plugin_name;
     function __construct($plugin, $pk){
@@ -13,7 +13,7 @@ class paystack_plugin_tracker {
 
     function log_transaction_success($trx_ref){
         //send reference to logger along with plugin name and public key
-        $url = "http://46.101.87.70:4553/log/charge_success";
+        $url = "https://plugin-tracker.paystackintegrations.com/log/charge_success";
 
         $fields = [
             'plugin_name'  => $this->plugin_name,
@@ -36,5 +36,3 @@ class paystack_plugin_tracker {
         //  echo $result;
     }
 }
-
-?>
