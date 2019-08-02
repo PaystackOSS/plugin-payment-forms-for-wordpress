@@ -3,6 +3,8 @@
 require_once ABSPATH . "wp-admin" . '/includes/image.php';
 require_once ABSPATH . "wp-admin" . '/includes/file.php';
 require_once ABSPATH . "wp-admin" . '/includes/media.php';
+include_once plugin_dir_path(__FILE__) . 'class-paystack-plugin-tracker.php';
+
 
 class Kkd_Pff_Paystack_Public
 {
@@ -1620,7 +1622,9 @@ function kkd_pff_paystack_submit_action()
     );
 
     //-------------------------------------------------------------------------------------------
-
+    
+    // $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
+    // $pstk_logger->log_transaction_attempt($code);
 
     echo json_encode($response);
     die();
@@ -1804,6 +1808,8 @@ function kkd_pff_paystack_confirm_payment()
     if ($result == 'success') {
         ///
         //Create Plan
+        $pstk_logger = new kkd_pff_paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
+        $pstk_logger->log_transaction_success($code);
         $enabled_custom_plan = get_post_meta($payment_array->post_id, '_startdate_enabled', true);
         if ($enabled_custom_plan == 1) {
             $mode =  esc_attr(get_option('mode'));
@@ -2025,6 +2031,9 @@ function kkd_pff_paystack_rconfirm_payment()
     }
 
     if ($result == 'success') {
+        //Log to amplitude
+        $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
+        $pstk_logger->log_transaction_success($code);
         $sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
         if ($sendreceipt == 'yes') {
             $decoded = json_decode($payment_array->metadata);
