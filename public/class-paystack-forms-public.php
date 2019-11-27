@@ -824,15 +824,19 @@ function kkd_pff_paystack_form_shortcode($atts)
             }
             $useinventory = get_post_meta($id, '_useinventory', true);
             $inventory = get_post_meta($id, '_inventory',true);
+            $sold = get_post_meta($id, '_sold',true);
             if ($inventory == "" ) {
                 $inventory = '1';
             }
-           
+            if($sold == ""){
+                $sold = '0';
+            }
             if($useinventory == ""){
                 $useinventory = "no";
             }
+            $stock = $inventory - $sold;
 
-            if($useinventory == "yes" && $inventory <= 0){
+            if($useinventory == "yes" && $stock <= 0){
                 echo "<h1>Out of Stock</h1>";
             }
             else if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
@@ -840,7 +844,6 @@ function kkd_pff_paystack_form_shortcode($atts)
                 if ($hidetitle != 1) {
                     echo "<h1 id='pf-form".$id."'>".$obj->post_title."</h1>";
                 }
-              
                 echo '<form version="'.KKD_PFF_PAYSTACK_VERSION.'" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
 				 <div class="j-row">';
                 echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
@@ -919,9 +922,9 @@ function kkd_pff_paystack_form_shortcode($atts)
 			 				 	 	<input type="hidden"  id="pf-amount" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
                             $max = $quantity + 1;
-                             if($max > ($inventory +1) && $useinventory == 'yes'){
-								$max = $inventory + 1 ;
-							}
+                            if($max > ($stock +1)){
+                                $max = $stock + 1 ;
+                            }
                             foreach ($paymentoptions as $key => $paymentoption) {
                                 list($a, $b) = explode(':', $paymentoption);
                                 echo '<option value="'.$b.'" data-name="'.$a.'">'.$a.' - '.$currency.' '.number_format($b).'</option>';
@@ -1009,12 +1012,8 @@ function kkd_pff_paystack_form_shortcode($atts)
 						</label>
 					</div><br>';
                 }
-                // if($useinventory == "yes" && $usequantity == "yes"){
-                //     echo '<small>'.$inventory.' left in stock. </small>';
-                // }
                 echo '<div class="span12 unit">
-                        <small><span style="color: red;">*</span> are compulsory</small><br />
-                        
+						<small><span style="color: red;">*</span> are compulsory</small><br />
 						<img src="'. plugins_url('../images/logos@2x.png', __FILE__) .'" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
 
 							<button type="reset" class="secondary-btn">Reset</button>';
@@ -1399,7 +1398,10 @@ function kkd_pff_paystack_submit_action()
     $transaction_charge = get_post_meta($_POST["pf-id"], '_merchantamount', true);
     $transaction_charge = $transaction_charge*100;
     //--------------------------------------------------------------------------
-   
+    $sold = get_post_meta($_POST["pf-id"], '_sold', true);
+    if($sold == ''){
+        $sold = '0';
+    }
     //--------------------------------------------------------------------------
     $txncharge = get_post_meta($_POST["pf-id"], '_txncharge', true);
     $minimum = get_post_meta($_POST["pf-id"], '_minimum', true);
@@ -1410,6 +1412,7 @@ function kkd_pff_paystack_submit_action()
     $originalamount = $amount;
     $quantity = 1;
     $usequantity = get_post_meta($_POST["pf-id"], '_usequantity', true);
+
     if (($recur == 'no') && ($formamount != 0)) {
         $amount = (int)str_replace(' ', '', $formamount);
     }
@@ -1444,7 +1447,13 @@ function kkd_pff_paystack_submit_action()
     }
     //--------------------------------------
 
+    $sold = $sold+$quantity;
     
+    if (get_post_meta($_POST["pf-id"], '_sold', false)) { // If the custom field already has a value
+        update_post_meta($_POST["pf-id"], '_sold', $sold);
+    } else { // If the custom field doesn't have a value
+        add_post_meta($_POST["pf-id"], '_sold', $sold);
+    }
    
     //--------------------------------------
     if ($txncharge == 'customer') {
@@ -1754,15 +1763,6 @@ function kkd_pff_paystack_confirm_payment()
                     // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
                         $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
-                        $useinventory = get_post_meta($payment_array->post_id, '_useinventory', true);
-                        $inventory = get_post_meta($payment_array->post_id, '_inventory', true);
-                        if($useinventory == 'yes' && $usequantity == 'yes'){
-                            $quantity = $_POST["quantity"];
-							$message = $quantity;
-							$result = "success";
-                            $inventory = $inventory - $quantity;
-                            update_post_meta($payment_array->post_id, '_inventory', $inventory);
-                        }
                         if ($usequantity == 'no') {
                             $oamount = (int)str_replace(' ', '', $amount);
                         } else {
