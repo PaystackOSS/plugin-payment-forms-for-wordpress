@@ -702,6 +702,7 @@ class Kkd_Pff_Paystack_Admin
             $form_meta['_heading'] = $_POST['_heading'];
             $form_meta['_message'] = $_POST['_message'];
             $form_meta['_sendreceipt'] = $_POST['_sendreceipt'];
+            $form_meta['_sendinvoice'] = $_POST['_sendinvoice'];
             ///
             $form_meta['_recur'] = $_POST['_recur'];
             $form_meta['_recurplan'] = $_POST['_recurplan'];
