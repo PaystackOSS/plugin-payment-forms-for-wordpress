@@ -496,6 +496,9 @@ class Kkd_Pff_Paystack_Admin
             echo '<input type="text" name="_recurplan" value="' . $recurplan  . '" class="widefat" />
 				<small>Plan amount must match amount on extra form description.</small>';
         }
+		function kkd_pff_paystack_reset_stock(){
+			
+		}
         function kkd_pff_paystack_editor_add_quantity_data()
         {
             global $post;
@@ -576,12 +579,17 @@ class Kkd_Pff_Paystack_Admin
                 echo '<input type="number" min="'.$sold.'" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
                 echo '<p>In stock</p>';
                 echo '<input type="number" readonly name="_in_stock" value="' . $stock  . '" class="widefat  pf-number" />
-                <small></small>';
+                <small></small>
+				<br/>
+				<div style="height:64px;">
+				<input type="button" onclick="'. update_post_meta($post->ID, "_sold", 0) .';window.location.reload()" value="RESET STOCK" style="float: right;background-color: #007cba;border: none;color: white;margin-top: 15px;padding: 5px 12px;text-align: center;text-decoration: none;display: block;font-size: 12px;border-radius:3px;"/>
+				</div>';
                 
             }
            
           
         }
+		
         function kkd_pff_paystack_editor_add_agreement_data()
         {
             global $post;

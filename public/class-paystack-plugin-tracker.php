@@ -35,4 +35,4 @@ class kkd_pff_paystack_plugin_tracker {
         $result = curl_exec($ch);
         //  echo $result;
     }
-}
+} 
