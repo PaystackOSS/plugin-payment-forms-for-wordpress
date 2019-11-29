@@ -577,13 +577,11 @@ class Kkd_Pff_Paystack_Admin
             if($useinventory == "yes" && $usequantity  == "yes"){
                 echo '<p>Total Inventory</p>';
                 echo '<input type="number" min="'.$sold.'" name="_inventory" value="' . $inventory  . '" class="widefat  pf-number" />';
-                echo '<p>In stock</p>';
-                echo '<input type="number" readonly name="_in_stock" value="' . $stock  . '" class="widefat  pf-number" />
+                echo '<p>Already sold</p>';
+                echo '<input type="number" name="_sold" value="' . $sold  . '" class="widefat  pf-number" />
                 <small></small>
-				<br/>
-				<div style="height:64px;">
-				<input type="button" onclick="'. update_post_meta($post->ID, "_sold", 0) .';window.location.reload()" value="RESET STOCK" style="float: right;background-color: #007cba;border: none;color: white;margin-top: 15px;padding: 5px 12px;text-align: center;text-decoration: none;display: block;font-size: 12px;border-radius:3px;"/>
-				</div>';
+				<br/>'
+				;
                 
             }
            
@@ -718,6 +716,7 @@ class Kkd_Pff_Paystack_Admin
             $form_meta['_recurplan'] = $_POST['_recurplan'];
             $form_meta['_usequantity'] = $_POST['_usequantity'];
             $form_meta['_quantity'] = $_POST['_quantity'];
+			 $form_meta['_sold'] = $_POST['_sold'];
             $form_meta['_quantityunit'] = $_POST['_quantityunit'];
 
             $form_meta['_useagreement'] = $_POST['_useagreement'];

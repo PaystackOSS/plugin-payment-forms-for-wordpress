@@ -3462,6 +3462,11 @@ function kkd_pff_paystack_confirm_payment()
                 if ($usequantity = "yes") {
                     $quantity = $_POST["quantity"];
                     $sold = get_post_meta($payment_array->post_id, '_sold', true);
+                    error_log(print_r("sold", TRUE)); 
+                    error_log(print_r($sold, TRUE)); 
+                    error_log(print_r(" -  -  - -- - --  - -  --  - ", TRUE));
+                    error_log(print_r("Qty", TRUE));  
+                    error_log(print_r($quantity, TRUE)); 
                     if ($sold == '') {
                         $sold = '0';
                     }
@@ -3470,6 +3475,7 @@ function kkd_pff_paystack_confirm_payment()
 
 
                 if (get_post_meta($payment_array->post_id, '_sold', false)) { // If the custom field already has a value
+                  
                     update_post_meta($payment_array->post_id, '_sold', $sold);
                 } else { // If the custom field doesn't have a value
                     add_post_meta($payment_array->post_id, '_sold', $sold);
