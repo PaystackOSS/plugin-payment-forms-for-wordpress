@@ -341,6 +341,7 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
     //  echo date('F j,Y');
     $user_email = stripslashes($email);
     $subject = get_post_meta($id, '_subject', true);
+    $merchant = get_post_meta($id, '_merchant', true);
     $heading = get_post_meta($id, '_heading', true);
     $sitemessage = get_post_meta($id, '_message', true);
 
@@ -387,6 +388,7 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
+    <h5 style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff"><?php echo $merchant; ?></h5>
     <h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo $heading; ?></h5>
     <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">Hello <?php echo strstr($name." ", " ", true); ?>,</p>
     <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo $sitemessage; ?></p>
@@ -1850,7 +1852,7 @@ function kkd_pff_paystack_confirm_payment()
         $sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
         if ($sendreceipt == 'yes') {
             $decoded = json_decode($payment_array->metadata);
-            $fullname = $decoded[0]->value;
+            $fullname = $decoded[1]->value;
             kkd_pff_paystack_send_receipt($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
             kkd_pff_paystack_send_receipt_owner($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
         }
@@ -2037,7 +2039,7 @@ function kkd_pff_paystack_rconfirm_payment()
         $sendreceipt = get_post_meta($payment_array->post_id, '_sendreceipt', true);
         if ($sendreceipt == 'yes') {
             $decoded = json_decode($payment_array->metadata);
-            $fullname = $decoded[0]->value;
+            $fullname = $decoded[1]->value;
             kkd_pff_paystack_send_receipt($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
             kkd_pff_paystack_send_receipt_owner($payment_array->post_id, $currency, $amount_paid, $fullname, $payment_array->email, $paystack_ref, $payment_array->metadata);
         }

@@ -429,6 +429,7 @@ class Kkd_Pff_Paystack_Admin
 
             // Get the location data if its already been entered
             $subject = get_post_meta($post->ID, '_subject', true);
+            $merchant = get_post_meta($post->ID, '_merchant', true);
             $heading = get_post_meta($post->ID, '_heading', true);
             $message = get_post_meta($post->ID, '_message', true);
             $sendreceipt = get_post_meta($post->ID, '_sendreceipt', true);
@@ -462,6 +463,8 @@ class Kkd_Pff_Paystack_Admin
 						</select>';
             echo '<p>Email Subject:</p>';
             echo '<input type="text" name="_subject" value="' . $subject  . '" class="widefat" />';
+            echo '<p>Merchant Name on Receipt:</p>';
+            echo '<input type="text" name="_merchant" value="' . $merchant  . '" class="widefat" />';
             echo '<p>Email Heading:</p>';
             echo '<input type="text" name="_heading" value="' . $heading  . '" class="widefat" />';
             echo '<p>Email Body/Message:</p>';
@@ -695,9 +698,11 @@ class Kkd_Pff_Paystack_Admin
             $form_meta['_redirect'] = $_POST['_redirect'];
             ///
             $form_meta['_subject'] = $_POST['_subject'];
+            $form_meta['_merchant'] = $_POST['_merchant'];
             $form_meta['_heading'] = $_POST['_heading'];
             $form_meta['_message'] = $_POST['_message'];
             $form_meta['_sendreceipt'] = $_POST['_sendreceipt'];
+            $form_meta['_sendinvoice'] = $_POST['_sendinvoice'];
             ///
             $form_meta['_recur'] = $_POST['_recur'];
             $form_meta['_recurplan'] = $_POST['_recurplan'];
