@@ -3,7 +3,7 @@ Contributors: paystack, kendysond, steveamaza
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
-Tested up to: 5.2
+Tested up to: 5.3
 Stable tag: 3.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -92,6 +92,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.3.7.1 =
+* Fixed bug that showed currency on receipt instead of name
 = 3.3.7 =
 * Added option for merchants to reset inventory
 = 3.3.6 =
