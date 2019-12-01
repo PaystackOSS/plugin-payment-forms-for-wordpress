@@ -839,8 +839,10 @@ function Kkd_pff_export_excel()
     $post_id = $_POST['form_id'];
     $obj = get_post($post_id);
     $csv_output = "";
-    
-    
+    $currency = get_post_meta($post_id, '_currency', true);
+    if ($currency == "") {
+        $currency = 'NGN';
+    }
     $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
     $data = array();
     $alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '".$post_id."' AND paid = '1')  ORDER BY `id` ASC");
