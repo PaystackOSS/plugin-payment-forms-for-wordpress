@@ -903,7 +903,7 @@ function Kkd_pff_export_excel()
         header("Content-type: application/vnd.ms-excel");
         header("Content-disposition: csv" . date("Y-m-d") . ".csv");
         header("Content-disposition: filename=".$filename.".csv");
-        print $csv_output;
+        // print $csv_output;
         exit;
     }
     
