@@ -2,14 +2,14 @@
 
 # Payment Forms for Paystack
 
-Welcome to the Paysment Forms for Paystack repository on GitHub. Here you can browse the source, look at open issues and keep track of development. 
+Welcome to the Payment Forms for Paystack repository on GitHub. Here you can browse the source, look at open issues and keep track of development. 
 
 If you are a developer, you can join our Developer Community on [Slack](https://slack.paystack.com).
 
 ## Installation
 
 1. Install the [Payment Forms for Paystack](https://wordpress.org/plugins/payment-forms-for-paystack/) via the Plugins section of your WordPress Dashboard.
-2. For configuration options, please visit our [Help Desk](https://paystack.helpscoutdocs.com/article/83-how-to-setup-paystack-payment-forms-for-wordpress).
+2. For configuration options, please visit our [Help Desk](https://support.paystack.com/hc/en-us/articles/360009881260-How-to-set-up-Paystack-Payment-Forms-for-WordPress).
 
 ## Documentation
 * [Paystack Documentation](https://developers.paystack.co/v1.0/docs/)
