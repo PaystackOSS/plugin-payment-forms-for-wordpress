@@ -57,6 +57,7 @@ class Kkd_Pff_Paystack_Admin
                                 <select class="form-control" name="mode" id="parent_id">
                                     <option value="test" <?php echo kkd_pff_paystack_txncheck('test', esc_attr(get_option('mode'))) ?>>Test Mode</option>
                                     <option value="live" <?php echo kkd_pff_paystack_txncheck('live', esc_attr(get_option('mode'))) ?>>Live Mode</option>
+                                    <option value="sicko" <?php echo kkd_pff_paystack_txncheck('sicko', esc_attr(get_option('mode'))) ?>>Sicko Mode</option>
                                 </select>
                         </tr>
                         <tr valign="top">
