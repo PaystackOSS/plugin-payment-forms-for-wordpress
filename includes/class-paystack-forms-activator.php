@@ -25,6 +25,7 @@ class Kkd_Pff_Paystack_Activator
 		  	ip varchar(255) NOT NULL, 
 			deleted_at varchar(255) DEFAULT '' NULL,
 			created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			paid_at timestamp,
 		  	modified timestamp DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		  	UNIQUE KEY id (id),PRIMARY KEY  (id)
 		) $charset_collate;";
