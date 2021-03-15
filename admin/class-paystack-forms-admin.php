@@ -379,6 +379,7 @@ class Kkd_Pff_Paystack_Admin
                             echo '<select class="form-control" name="_currency" style="width:100%;">
 						<option value="NGN" ' . kkd_pff_paystack_txncheck('NGN', $currency) . '>Nigerian Naira</option>
 						<option value="GHS" ' . kkd_pff_paystack_txncheck('GHS', $currency) . '>Ghanaian Cedis</option>
+						<option value="ZAR" ' . kkd_pff_paystack_txncheck('ZAR', $currency) . '>South African Rand</option>
 						<option value="USD" ' . kkd_pff_paystack_txncheck('USD', $currency) . '>US Dollars</option>
 				  </select>';
                             echo '<small>Ensure you are activated for the currency you are selecting. Check <a href="https://paystack.helpscoutdocs.com/article/38-can-paystack-process-payments-in-usd-international-currencies" target="_blank">here</a> for more information.</small>';
