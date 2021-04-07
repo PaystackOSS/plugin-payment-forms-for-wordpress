@@ -74,5 +74,13 @@ class Kkd_Pff_Paystack_Activator
 		if (empty($row1)) {
 			$wpdb->query("ALTER TABLE `" . $table_name . "` ADD `txn_code_2` VARCHAR(255) DEFAULT '' NULL AFTER `txn_code`;");
 		}
+
+		$row1 = $wpdb->get_results(
+			"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+			WHERE table_name = '" . $table_name . "' AND column_name = 'paid_at'"
+		);
+		if (empty($row1)) {
+			$wpdb->query("ALTER TABLE `" . $table_name . "` ADD `paid_at` timestamp  AFTER `created_at`;");
+		}
 	}
 }
