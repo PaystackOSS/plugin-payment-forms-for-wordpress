@@ -46,7 +46,7 @@ class Kkd_Pff_Paystack_Public
     public function enqueue_scripts()
     {
         wp_enqueue_script('blockUI', plugin_dir_url(__FILE__) . 'js/jquery.blockUI.min.js', array('jquery'), $this->version, true, true);
-        wp_enqueue_script('jQuery_UI', plugin_dir_url(__FILE__) . 'js/jquery.ui.min.js', array('jquery'), $this->version, true, true);
+        wp_enqueue_script('jquery-ui-core');
         wp_register_script('Paystack', 'https://js.paystack.co/v1/inline.js', false, '1');
         wp_enqueue_script('Paystack');
         wp_enqueue_script('paystack_frontend', plugin_dir_url(__FILE__) . 'js/paystack-forms-public.js', array('jquery'), $this->version, true, true);
