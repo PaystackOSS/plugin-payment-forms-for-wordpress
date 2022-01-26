@@ -2034,7 +2034,7 @@ function kkd_pff_paystack_form_shortcode($atts)
                  </div>';
                 echo '<div class="span12 unit">
 				 <label class="label">Amount (' . $currency;
-                if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
+                if (floatval($minimum) == 0 && floatval($amount) != 0 && $usequantity == 'yes') {
                     echo ' ' . number_format($amount);
                 }
 
@@ -2058,9 +2058,9 @@ function kkd_pff_paystack_form_shortcode($atts)
                     } elseif ($recur == 'optional') {
                         echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="' . $amount . '" required/>';
                     } else {
-                        if ($amount == 0) {
+                        if (floatval($amount) == 0) {
                             echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
-                        } elseif ($amount != 0 && $minimum == 1) {
+                        } elseif (floatval($amount) != 0 && $minimum == 1) {
                             echo '<input type="text" name="pf-amount" value="' . $amount . '" id="pf-amount" required/>';
                         } else {
                             echo '<input type="text" name="pf-amount" value="' . $amount . '" id="pf-amount" readonly required/>';
@@ -2075,7 +2075,7 @@ function kkd_pff_paystack_form_shortcode($atts)
 			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
 			 				 	 	<input type="hidden"  id="pf-amount" />
  									<select class="form-control" id="pf-vamount" name="pf-amount">';
-                            $max = $quantity + 1;
+                            $max = intval($quantity) + 1;
                             if ($max > ($stock + 1)) {
                                 $max = $stock + 1;
                             }
@@ -2550,7 +2550,7 @@ function kkd_pff_paystack_submit_action()
     $subaccount = get_post_meta($_POST["pf-id"], '_subaccount', true);
     $txnbearer = get_post_meta($_POST["pf-id"], '_txnbearer', true);
     $transaction_charge = get_post_meta($_POST["pf-id"], '_merchantamount', true);
-    $transaction_charge = $transaction_charge * 100;
+    $transaction_charge = intval(floatval($transaction_charge) * 100);
 
     $txncharge = get_post_meta($_POST["pf-id"], '_txncharge', true);
     $minimum = get_post_meta($_POST["pf-id"], '_minimum', true);
@@ -2562,12 +2562,12 @@ function kkd_pff_paystack_submit_action()
     $quantity = 1;
     $usequantity = get_post_meta($_POST["pf-id"], '_usequantity', true);
 
-    if (($recur == 'no') && ($formamount != 0)) {
-        $amount = (int) str_replace(' ', '', $formamount);
+    if (($recur == 'no') && (floatval($formamount) != 0)) {
+        $amount = (int) str_replace(' ', '', floatval($formamount));
     }
-    if ($minimum == 1 && $formamount != 0) {
-        if ($originalamount < $formamount) {
-            $amount = $formamount;
+    if ($minimum == 1 && floatval($formamount) != 0) {
+        if ($originalamount < floatval($formamount)) {
+            $amount = floatval($formamount);
         } else {
             $amount = $originalamount;
         }
@@ -2860,13 +2860,16 @@ function kkd_pff_paystack_confirm_payment()
         $usevariableamount = get_post_meta($payment_array->post_id, '_usevariableamount', true);
         $variableamount = get_post_meta($payment_array->post_id, '_variableamount', true);
 
-        if ($minimum == 1 && $amount != 0) {
-            if ($payment_array->amount < $formamount) {
-                $amount = $formamount;
-            } else {
-                $amount = $payment_array->amount;
-            }
-        }
+        // if ($minimum == 1 && floatval($amount) != 0) {
+        //     if ($payment_array->amount < floatval($formamount)) {
+        //         $amount = floatval($formamount);
+        //     } else {
+        //         $amount = $payment_array->amount;
+        //     }
+        // }
+
+        $amount = $payment_array->amount;
+
         $oamount = $amount;
         $mode =  esc_attr(get_option('mode'));
         if ($mode == 'test') {
