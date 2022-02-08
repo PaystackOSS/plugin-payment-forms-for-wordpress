@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
 Requires at least: 3.1
 Tested up to: 5.9
-Stable tag: 3.4.0
+Stable tag: 3.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.4.1 =
+* Fix issue with quantity selection returning invalid amount paid
 = 3.4.0 =
 * Support for WordPress 5.9
 * Support for PHP 8
