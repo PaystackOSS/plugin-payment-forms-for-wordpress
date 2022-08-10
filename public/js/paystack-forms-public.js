@@ -98,8 +98,8 @@ function KkdPffPaystackFee() {
     $(function () {
       $(".date-picker").datepicker({
         dateFormat: "mm/dd/yy",
-        prevText: '<i class="fa fa-caret-left"></i>',
-        nextText: '<i class="fa fa-caret-right"></i>'
+        prevText: '<',
+        nextText: '>'
       });
     });
     if ($("#pf-vamount").length) {
