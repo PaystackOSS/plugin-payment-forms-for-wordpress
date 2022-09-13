@@ -2955,7 +2955,8 @@ function kkd_pff_paystack_confirm_payment()
                             $oamount = (int) str_replace(' ', '', $amount);
                         } else {
                             $quantity = $_POST["quantity"];
-                            $unitamount = (int) str_replace(' ', '', $amount);
+                            $unitamount = (int) str_replace(' ', '', get_post_meta($payment_array->post_id, '_amount', true));
+                            // $unitamount = (int) str_replace(' ', '', $amount);
                             $oamount = $quantity * $unitamount;
                         }
                         if ($txncharge == 'customer') {

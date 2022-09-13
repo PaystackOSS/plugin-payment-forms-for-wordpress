@@ -92,6 +92,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wo
 
 
 == Changelog ==
+= 3.4.1 =
+* Fix issue with quantity selection returning invalid amount paid
 = 3.4.0 =
 * Support for WordPress 5.9
 * Support for PHP 8
