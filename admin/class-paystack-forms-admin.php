@@ -382,6 +382,8 @@ class Kkd_Pff_Paystack_Admin
 						<option value="GHS" ' . kkd_pff_paystack_txncheck('GHS', $currency) . '>Ghanaian Cedis</option>
 						<option value="ZAR" ' . kkd_pff_paystack_txncheck('ZAR', $currency) . '>South African Rand</option>
 						<option value="KES" ' . kkd_pff_paystack_txncheck('KES', $currency) . '>Kenyan Shillings</option>
+                        <option value="XOF" ' . kkd_pff_paystack_txncheck('XOF', $currency) . '>West African CFA franc</option>
+                        <option value="EGP" ' . kkd_pff_paystack_txncheck('EGP', $currency) . '>Egyptian Pound</option>
 						<option value="USD" ' . kkd_pff_paystack_txncheck('USD', $currency) . '>US Dollars</option>
 				  </select>';
             echo '<small>Ensure you are activated for the currency you are selecting. Check <a href="https://paystack.helpscoutdocs.com/article/38-can-paystack-process-payments-in-usd-international-currencies" target="_blank">here</a> for more information.</small>';
