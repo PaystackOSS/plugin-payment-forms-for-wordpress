@@ -301,9 +301,15 @@ class Kkd_Pff_Paystack_Admin
         add_action('add_meta_boxes', 'kkd_pff_paystack_editor_add_extra_metaboxes');
         function kkd_pff_paystack_editor_add_extra_metaboxes()
         {
-            if ($_GET['action'] == 'edit') {
-                add_meta_box('kkd_pff_paystack_editor_help_shortcode', 'Paste shortcode on preferred page', 'kkd_pff_paystack_editor_shortcode_details', 'paystack_form', 'custom-metabox-holder');
+             //Threw error initially, Checking if $_GET['action'] exsits before adding meta_box.
+             if (isset($_GET['action'])) {
+                if ($_GET['action'] == 'edit') {                    
+                    add_meta_box('kkd_pff_paystack_editor_help_shortcode', 'Paste shortcode on preferred page', 'kkd_pff_paystack_editor_shortcode_details', 'paystack_form', 'custom-metabox-holder');
+                }
             }
+            // if ($_GET['action'] == 'edit') {
+            //     add_meta_box('kkd_pff_paystack_editor_help_shortcode', 'Paste shortcode on preferred page', 'kkd_pff_paystack_editor_shortcode_details', 'paystack_form', 'custom-metabox-holder');
+            // }
             add_meta_box('kkd_pff_paystack_editor_help_data', 'Help Section', 'kkd_pff_paystack_editor_help_metabox_details', 'paystack_form', 'custom-metabox-holder');
             add_meta_box('kkd_pff_paystack_editor_add_form_data', 'Extra Form Description', 'kkd_pff_paystack_editor_add_form_data', 'paystack_form', 'normal', 'default');
             add_meta_box('kkd_pff_paystack_editor_add_recur_data', 'Recurring Payment', 'kkd_pff_paystack_editor_add_recur_data', 'paystack_form', 'side', 'default');
