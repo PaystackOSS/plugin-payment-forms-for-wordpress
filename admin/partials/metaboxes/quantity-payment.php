@@ -41,9 +41,9 @@ if ( empty( $quantityunit ) ) {
 	</p>
 		<?php if ( 'no' !== $recur ) : ?>
 			<select disabled class="form-control widefat" name="_usequantity" id="quantity_payment_use_quantity">
-					<option value="no" <?php selected( 'no', $usequantity ); ?>>
-						<?php esc_html_e( 'No', 'payment-forms-for-paystack' ); ?>
-					</option>
+				<option value="no" <?php selected( 'no', $usequantity ); ?>>
+					<?php esc_html_e( 'No', 'payment-forms-for-paystack' ); ?>
+				</option>
 			</select>
 		<?php else : ?>
 			<select class="form-control widefat" name="_usequantity" id="quantity_payment_use_quantity">
