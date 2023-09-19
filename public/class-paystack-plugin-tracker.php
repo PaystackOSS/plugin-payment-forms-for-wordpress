@@ -1,38 +1,29 @@
 <?php
-class kkd_pff_paystack_plugin_tracker {
-    var $public_key;
-    var $plugin_name;
-    function __construct($plugin, $pk){
-        //configure plugin name
-        //configure public key
-        $this->plugin_name = $plugin;
-        $this->public_key = $pk;
-    }
 
+namespace Paystack_Plugins\Payment_Forms;
 
+class Paystack_Plugin_Tracker {
 
-    function log_transaction_success($trx_ref){
-        //send reference to logger along with plugin name and public key
-        $url = "https://plugin-tracker.paystackintegrations.com/log/charge_success";
+	public static function log_transaction( $txn_ref ) {
 
-        $fields = [
-            'plugin_name'  => $this->plugin_name,
-            'transaction_reference' => $trx_ref,
-            'public_key' => $this->public_key
-        ];
+		$public_key = paystack_forms_get_public_key();
 
-        $fields_string = http_build_query($fields);
+		if ( empty( $public_key ) ) {
+			return;
+		}
 
-        $ch = curl_init();
+		$url = 'https://plugin-tracker.paystackintegrations.com/log/charge_success';
 
-        curl_setopt($ch,CURLOPT_URL, $url);
-        curl_setopt($ch,CURLOPT_POST, true);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+		$body = array(
+			'public_key'            => $public_key,
+			'plugin_name'           => 'pff-paystack',
+			'transaction_reference' => $txn_ref,
+		);
 
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true); 
+		$args = array(
+			'body' => $body,
+		);
 
-        //execute post
-        $result = curl_exec($ch);
-        //  echo $result;
-    }
-} 
+		wp_remote_post( $url, $args );
+	}
+}
