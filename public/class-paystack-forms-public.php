@@ -137,15 +137,15 @@ class Kkd_Pff_Paystack_PaystackCharge
         if ($amountinkobo > $this->flatline) {
             return $amountinkobo + $this->cap;
         } elseif ($amountinkobo > $this->crossover) {
-            return round((($amountinkobo + $this->additional_charge) / $this->charge_divider),2);
+             return ceil(($amountinkobo + $this->additional_charge) / $this->charge_divider);
         } else {
-            return round(($amountinkobo / $this->charge_divider),2);
+             return ceil($amountinkobo / $this->charge_divider);
         }
     }
 
     public function add_for_ngn($amountinngn)
     {
-        return $this->add_for_kobo(round(($amountinngn * 100),2)) / 100;
+         return $this->add_for_kobo(ceil($amountinngn * 100)) / 100;
     }
 }
 
