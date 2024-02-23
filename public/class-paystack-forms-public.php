@@ -2023,118 +2023,118 @@ function kkd_pff_paystack_form_shortcode($atts) {
                   </div>';
 
                 // Amount selection with consideration for variable amounts, minimum payments, and recurring plans
-echo '<div class="span12 unit">
-<label class="label">Amount (' . esc_html($currency);
-if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
-echo ' ' . esc_html(number_format($amount));
-}
-echo ') <span>*</span></label>
-<div class="input">';
+                echo '<div class="span12 unit">
+                <label class="label">Amount (' . esc_html($currency);
+                if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
+                echo ' ' . esc_html(number_format($amount));
+                }
+                echo ') <span>*</span></label>
+                <div class="input">';
 
-if ($usevariableamount == 0) {
-if ($minimum == 1) {
-echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
-}
-if ($recur == 'plan') {
-if ($showbtn) {
-    echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
-} else {
-    echo '<div class="span12 unit">
-            <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($planerrorcode) . '</label>
-          </div>';
-}
-} elseif ($recur == 'optional') {
-echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
-} else {
-echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
-}
-} else {
-if ($usevariableamount == "") {
-echo "Form Error, set variable amount string";
-} else {
-if (count($paymentoptions) > 0) {
-    echo '<div class="select">
-            <input type="hidden"  id="pf-vname" name="pf-vname" />
-			<input type="hidden"  id="pf-amount" />
-            <select class="form-control" id="pf-vamount" name="pf-amount">';
-    foreach ($paymentoptions as $option) {
-        list($optionName, $optionValue) = explode(':', $option);
-        echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
-    }
-    echo '</select> <i></i> </div>';
-}
-}
-}
+                if ($usevariableamount == 0) {
+                if ($minimum == 1) {
+                echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
+                }
+                if ($recur == 'plan') {
+                if ($showbtn) {
+                    echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
+                } else {
+                    echo '<div class="span12 unit">
+                            <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($planerrorcode) . '</label>
+                        </div>';
+                }
+                } elseif ($recur == 'optional') {
+                echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
+                } else {
+                echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
+                }
+                } else {
+                if ($usevariableamount == "") {
+                echo "Form Error, set variable amount string";
+                } else {
+                if (count($paymentoptions) > 0) {
+                    echo '<div class="select">
+                            <input type="hidden"  id="pf-vname" name="pf-vname" />
+                            <input type="hidden"  id="pf-amount" />
+                            <select class="form-control" id="pf-vamount" name="pf-amount">';
+                    foreach ($paymentoptions as $option) {
+                        list($optionName, $optionValue) = explode(':', $option);
+                        echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
+                    }
+                    echo '</select> <i></i> </div>';
+                }
+                }
+                }
 
-// Transaction charge notice
-if ($txncharge != 'merchant' && $recur != 'plan') {
-echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
-}
+                // Transaction charge notice
+                if ($txncharge != 'merchant' && $recur != 'plan') {
+                echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+                }
 
-echo '</div></div>';
+                echo '</div></div>';
 
-// Quantity selection
-if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
-echo '<div class="span12 unit">
-    <label class="label">Quantity</label>
-    <div class="select">
-        <input type="hidden" value="' . esc_attr($amount) . '" id="pf-qamount"/>
-        <select class="form-control" id="pf-quantity" name="pf-quantity">';
-for ($i = 1; $i <= $quantity; $i++) {
-echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
-}
-echo '</select> <i></i> </div></div>';
-}
+                // Quantity selection
+                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                echo '<div class="span12 unit">
+                    <label class="label">Quantity</label>
+                    <div class="select">
+                        <input type="hidden" value="' . esc_attr($amount) . '" id="pf-qamount"/>
+                        <select class="form-control" id="pf-quantity" name="pf-quantity">';
+                for ($i = 1; $i <= $quantity; $i++) {
+                echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
+                }
+                echo '</select> <i></i> </div></div>';
+                }
 
-// Recurring payment options
-if ($recur == 'optional') {
-echo '<div class="span12 unit">
-    <label class="label">Recurring Payment</label>
-    <div class="select">
-        <select class="form-control" name="pf-interval">';
-$intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
-foreach ($intervals as $intervalValue => $intervalName) {
-echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
-}
-echo '</select> <i></i> </div></div>';
-}
-
-// Plan details for recurring payments
-if ($recur == 'plan' && $showbtn) {
-echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
-echo '<div class="span12 unit">
-    <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($plan->data->name) . ' ' . esc_html($plan->data->interval) . ' recurring payment - ' . esc_html($plan->data->currency) . ' ' . esc_html(number_format($planamount)) . '</label>
-  </div>';
-}
-echo(do_shortcode($obj->post_content));
-
-// Agreement terms
-if ($useagreement == 'yes') {
-echo '<div class="span12 unit">
-    <label class="checkbox">
-        <input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
-        <i></i>
-        Accept terms <a target="_blank" href="' . esc_url($agreementlink) . '">Link</a>
-    </label>
-  </div><br>';
-}
-
-
-// Form submission controls
-echo '<div class="span12 unit">
-<small><span style="color: red;">*</span> are compulsory</small><br />
-<img src="' . esc_url(plugins_url('../images/logos@2x.png', __FILE__)) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
-<button type="reset" class="secondary-btn">Reset</button>';
-if ($showbtn) {
-echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
-}
-echo '</div></div></form>';
-            } else {
-                echo "<h5>You must be logged in to make a payment.</h5>";
-            }
-        } else {
-            echo "<h5>Invalid Paystack form ID or the form does not exist.</h5>";
+        // Recurring payment options
+        if ($recur == 'optional') {
+        echo '<div class="span12 unit">
+            <label class="label">Recurring Payment</label>
+            <div class="select">
+                <select class="form-control" name="pf-interval">';
+        $intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
+        foreach ($intervals as $intervalValue => $intervalName) {
+        echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
         }
+        echo '</select> <i></i> </div></div>';
+        }
+
+        // Plan details for recurring payments
+        if ($recur == 'plan' && $showbtn) {
+        echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
+        echo '<div class="span12 unit">
+            <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($plan->data->name) . ' ' . esc_html($plan->data->interval) . ' recurring payment - ' . esc_html($plan->data->currency) . ' ' . esc_html(number_format($planamount)) . '</label>
+        </div>';
+    }
+    echo(do_shortcode($obj->post_content));
+
+    // Agreement terms
+    if ($useagreement == 'yes') {
+    echo '<div class="span12 unit">
+        <label class="checkbox">
+            <input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
+            <i></i>
+            Accept terms <a target="_blank" href="' . esc_url($agreementlink) . '">Link</a>
+        </label>
+    </div><br>';
+    }
+
+
+    // Form submission controls
+    echo '<div class="span12 unit">
+    <small><span style="color: red;">*</span> are compulsory</small><br />
+    <img src="' . esc_url(plugins_url('../images/logos@2x.png', __FILE__)) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
+    <button type="reset" class="secondary-btn">Reset</button>';
+    if ($showbtn) {
+    echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
+    }
+    echo '</div></div></form>';
+        } else {
+            echo "<h5>You must be logged in to make a payment.</h5>";
+        }
+    } else {
+        echo "<h5>Invalid Paystack form ID or the form does not exist.</h5>";
+    }
     } else {
         echo "<h5>No Paystack form ID provided.</h5>";
     }
