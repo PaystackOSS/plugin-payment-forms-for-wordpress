@@ -1973,7 +1973,7 @@ function kkd_pff_paystack_form_shortcode($atts) {
             }
             $showbtn = true;
             $planerrorcode = 'Input Correct Recurring Plan Code';
-            $recur = $meta['_recur']
+            $recur = $meta['_recur'];
             $recurplan = $meta['_recurplan'];
             if ($meta['_recur']== 'plan') {
                 if ($meta['_recurplan'] == '' || $meta['_recurplan'] == '') {
