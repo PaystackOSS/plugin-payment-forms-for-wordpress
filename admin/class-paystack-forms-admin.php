@@ -62,7 +62,7 @@ class Kkd_Pff_Paystack_Admin
                         <tr valign="top">
                             <th scope="row">Test Secret Key</th>
                             <td>
-                                <input type="text" name="tsk" value="<?php echo esc_attr(get_option('tsk')); ?>" />
+                                <input type="password" name="tsk" value="<?php echo esc_attr(get_option('tsk')); ?>" />
                             </td>
                         </tr>
 
@@ -73,7 +73,7 @@ class Kkd_Pff_Paystack_Admin
 
                         <tr valign="top">
                             <th scope="row">Live Secret Key</th>
-                            <td><input type="text" name="lsk" value="<?php echo esc_attr(get_option('lsk')); ?>" /></td>
+                            <td><input type="password" name="lsk" value="<?php echo esc_attr(get_option('lsk')); ?>" /></td>
                         </tr>
                         <tr valign="top">
                             <th scope="row">Live Public Key</th>
