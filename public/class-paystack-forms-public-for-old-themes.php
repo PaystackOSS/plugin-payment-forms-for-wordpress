@@ -1588,23 +1588,11 @@ function kkd_pff_paystack_confirm_payment()
                         $result = "success";
                     // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
-                        $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
-                        if ($usequantity == 'no') {
-                            $oamount = (int)str_replace(' ', '', $amount);
-                        } else {
-                            $quantity = $_POST["quantity"];
-                            $unitamount = (int)str_replace(' ', '', $amount);
-                            $oamount = $quantity*$unitamount;
-                        }
                         if ($txncharge == 'customer') {
                             if ($minimum == 0 && $amount != 0) {
                                 $oamount = kkd_pff_paystack_add_paystack_charge($oamount);
                             }
                         }
-
-                        // if ($txncharge == 'customer') {
-                        //     $amount = kkd_pff_paystack_add_paystack_charge($amount);
-                        // }
                         if ($oamount !=  $amount_paid) {
                             // echo $oamount. ' - '.$amount_paid;
                             $message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";

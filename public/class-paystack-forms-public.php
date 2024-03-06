@@ -137,15 +137,15 @@ class Kkd_Pff_Paystack_PaystackCharge
         if ($amountinkobo > $this->flatline) {
             return $amountinkobo + $this->cap;
         } elseif ($amountinkobo > $this->crossover) {
-            return ceil(($amountinkobo + $this->additional_charge) / $this->charge_divider);
+             return ceil(($amountinkobo + $this->additional_charge) / $this->charge_divider);
         } else {
-            return ceil($amountinkobo / $this->charge_divider);
+             return ceil($amountinkobo / $this->charge_divider);
         }
     }
 
     public function add_for_ngn($amountinngn)
     {
-        return $this->add_for_kobo(ceil($amountinngn * 100)) / 100;
+         return $this->add_for_kobo(ceil($amountinngn * 100)) / 100;
     }
 }
 
@@ -2850,24 +2850,6 @@ function kkd_pff_paystack_confirm_payment()
                         $result = "success";
                         // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
-                        $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
-                        if ($usequantity == 'no') {
-                            $oamount = (int) str_replace(' ', '', $amount);
-                        } else {
-                            $quantity = $_POST["quantity"];
-                            $unitamount = (int) str_replace(' ', '', $amount);
-                            $oamount = $quantity * $unitamount;
-                        }
-                        if ($txncharge == 'customer') {
-                            if ($minimum == 0 && $amount != 0) {
-                                $oamount = kkd_pff_paystack_add_paystack_charge($oamount);
-                            }
-                        }
-
-
-                        // if ($txncharge == 'customer') {
-                        //     $amount = kkd_pff_paystack_add_paystack_charge($amount);
-                        // }
                         if ($oamount !=  $amount_paid) {
                             // echo $oamount. ' - '.$amount_paid;
                             $message = "Invalid amount Paid. Amount required is " . $currency . "<b>" . number_format($oamount) . "</b>";
