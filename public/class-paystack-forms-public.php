@@ -1964,7 +1964,10 @@ function kkd_pff_paystack_form_shortcode($atts) {
             // Ensure minimum defaults are set
             $meta['_minimum'] = $meta['_minimum'] === "" ? 0 : $meta['_minimum'];
             $meta['_usevariableamount'] = $meta['_usevariableamount'] === "" ? 0 : $meta['_usevariableamount'];
-
+            $meta['_usequantity'] = $meta['_usequantity'] === "" ? 'no' : $meta['_usequantity'];
+            $minimum = floatval($meta['_minimum']);
+            $currency = $meta['_currency'] === "" ? 'NGN' : $meta['_currency'];
+            $txncharge = floatval($meta['_txncharge']);
             // Process variable amount options if applicable
             $paymentoptions = [];
             if ($meta['_usevariableamount'] == 1) {
