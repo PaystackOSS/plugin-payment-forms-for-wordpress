@@ -1923,554 +1923,457 @@ function kkd_pff_paystack_fetch_plan($code)
     }
     return $paystack_response;
 }
-function kkd_pff_paystack_form_shortcode($atts)
-{
+function kkd_pff_paystack_form_shortcode($atts) {
     ob_start();
 
+    // Ensure the current user is populated
     global $current_user;
+    wp_get_current_user();
     $user_id = $current_user->ID;
-    $email = $current_user->user_email;
-    $fname = $current_user->user_firstname;
-    $lname = $current_user->user_lastname;
-    if ($fname == '' && $lname == '') {
-        $fullname = '';
-    } else {
-        $fullname = $fname . ' ' . $lname;
-    }
-    extract(
-        shortcode_atts(
-            array(
-                'id' => 0,
-            ),
-            $atts
-        )
-    );
+    $email = sanitize_email($current_user->user_email);
+    $fname = sanitize_text_field($current_user->user_firstname);
+    $lname = sanitize_text_field($current_user->user_lastname);
+    $fullname = $fname || $lname ? trim($fname . ' ' . $lname) : '';
+
+    // Use array access for shortcode attributes
+    $atts = shortcode_atts(array('id' => 0), $atts, 'paystack_form');
+    $id = intval($atts['id']); // Ensure $id is an integer
+
     $pk = Kkd_Pff_Paystack_Public::fetchPublicKey();
     if (!$pk) {
-        $settingslink = get_admin_url() . 'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php';
-        echo "<h5>You must set your Paystack API keys first <a href='" . $settingslink . "'>settings</a></h5>";
-    } elseif ($id != 0) {
+        $settingslink = esc_url(get_admin_url(null, 'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php'));
+        echo "<h5>You must set your Paystack API keys first <a href='{$settingslink}'>settings</a></h5>";
+        return ob_get_clean(); // Return early to avoid further processing
+    }
+
+    if ($id > 0) {
         $obj = get_post($id);
-        if ($obj->post_type == 'paystack_form') {
-            $amount = get_post_meta($id, '_amount', true);
-            $thankyou = get_post_meta($id, '_successmsg', true);
-            $paybtn = get_post_meta($id, '_paybtn', true);
-            $loggedin = get_post_meta($id, '_loggedin', true);
-            $txncharge = get_post_meta($id, '_txncharge', true);
-            $currency = get_post_meta($id, '_currency', true);
-            $recur = get_post_meta($id, '_recur', true);
-            $recurplan = get_post_meta($id, '_recurplan', true);
-            $usequantity = get_post_meta($id, '_usequantity', true);
-            $quantity = get_post_meta($id, '_quantity', true);
-            $quantityunit = get_post_meta($id, '_quantityunit', true);
-            $useagreement = get_post_meta($id, '_useagreement', true);
-            $agreementlink = get_post_meta($id, '_agreementlink', true);
-            $minimum = get_post_meta($id, '_minimum', true);
-            $variableamount = get_post_meta($id, '_variableamount', true);
-            $usevariableamount = get_post_meta($id, '_usevariableamount', true);
-            $hidetitle = get_post_meta($id, '_hidetitle', true);
-            if ($minimum == "") {
-                $minimum = 0;
+        if ($obj && $obj->post_type === 'paystack_form') {
+            // Fetch and sanitize meta values
+            $meta_keys = [
+                '_amount', '_successmsg', '_paybtn', '_loggedin', '_txncharge', 
+                '_currency', '_recur', '_recurplan', '_usequantity', '_quantity', 
+                '_useagreement', '_agreementlink', '_minimum', '_variableamount', 
+                '_usevariableamount', '_hidetitle'
+            ];
+            $meta = [];
+            foreach ($meta_keys as $key) {
+                $meta[$key] = sanitize_text_field(get_post_meta($id, $key, true));
             }
-            if ($usevariableamount == "") {
-                $usevariableamount = 0;
-            }
-            if ($usevariableamount == 1) {
-                $paymentoptions = explode(',', $variableamount);
-                // echo "<pre>";
-                // print_r($paymentoptions);
-                // echo "</pre>";
-                // die();
+
+            // Ensure minimum defaults are set
+            $meta['_minimum'] = $meta['_minimum'] === "" ? 0 : $meta['_minimum'];
+            $meta['_usevariableamount'] = $meta['_usevariableamount'] === "" ? 0 : $meta['_usevariableamount'];
+            $meta['_usequantity'] = $meta['_usequantity'] === "" ? 'no' : $meta['_usequantity'];
+            $minimum = floatval($meta['_minimum']);
+            $currency = $meta['_currency'] === "" ? 'NGN' : $meta['_currency'];
+            $txncharge = floatval($meta['_txncharge']);
+            // Process variable amount options if applicable
+            $paymentoptions = [];
+            if ($meta['_usevariableamount'] == 1) {
+                $paymentoptions = explode(',', $meta['_variableamount']);
+                $paymentoptions = array_map('sanitize_text_field', $paymentoptions);
             }
             $showbtn = true;
             $planerrorcode = 'Input Correct Recurring Plan Code';
-            if ($recur == 'plan') {
-                if ($recurplan == '' || $recurplan == null) {
+            $recur = $meta['_recur'];
+            $recurplan = $meta['_recurplan'];
+            if ($meta['_recur']== 'plan') {
+                if ($meta['_recurplan'] == '' || $meta['_recurplan'] == '') {
                     $showbtn = false;
                 } else {
-                    $plan =    kkd_pff_paystack_fetch_plan($recurplan);
+                    $plan =    kkd_pff_paystack_fetch_plan($meta['_recurplan']);
                     if (isset($plan->data->amount)) {
-                        $planamount = $plan->data->amount / 100;
+                        $planamount = $plan->data->amount/100;
                     } else {
                         $showbtn = false;
                     }
                 }
             }
-            $useinventory = get_post_meta($id, '_useinventory', true);
-            $inventory = get_post_meta($id, '_inventory', true);
-            $sold = get_post_meta($id, '_sold', true);
-            if ($inventory == "") {
-                $inventory = '1';
-            }
-            if ($sold == "") {
-                $sold = '0';
-            }
-            if ($useinventory == "") {
-                $useinventory = "no";
-            }
-            $stock = $inventory - $sold;
+            // Check if the form should be displayed based on user login status
+            $show_form = ($user_id != 0 && $meta['_loggedin'] == 'yes') || $meta['_loggedin'] == 'no';
 
-            if ($useinventory == "yes" && $stock <= 0) {
-                echo "<h1>Out of Stock</h1>";
-            } else if ((($user_id != 0) && ($loggedin == 'yes')) || $loggedin == 'no') {
-                echo '<div id="paystack-form">';
-                if ($hidetitle != 1) {
-                    echo "<h1 id='pf-form" . $id . "'>" . $obj->post_title . "</h1>";
-                }
-                echo '<form version="' . KKD_PFF_PAYSTACK_VERSION . '" enctype="multipart/form-data" action="' . admin_url('admin-ajax.php') . '" url="' . admin_url() . '" method="post" class="paystack-form j-forms" novalidate>
-				 <div class="j-row">';
-                echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">';
-                echo '<input type="hidden" name="pf-id" value="' . $id . '" />';
-                echo '<input type="hidden" name="pf-user_id" value="' . $user_id . '" />';
-                echo '<input type="hidden" name="pf-recur" value="' . $recur . '" />';
-                echo '<input type="hidden" name="pf-currency" id="pf-currency" value="' . $currency . '" />';
-                $feeSettings = Kkd_Pff_Paystack_Public::fetchFeeSettings();
-                echo '<script>window.KKD_PAYSTACK_CHARGE_SETTINGS={
-                    percentage:' . $feeSettings['prc'] . ',
-                    additional_charge:' . $feeSettings['adc'] . ',
-                    threshold:' . $feeSettings['ths'] . ',
-                    cap:' . $feeSettings['cap'] . '
-                }</script>';
-                echo '<div class="span12 unit">
-				 <label class="label">Full Name <span>*</span></label>
-				 <div class="input">
-					 <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . $fullname . '"
-					 ';
-
-                echo ' required>
-				 </div>
-			     </div>';
-                echo '<div class="span12 unit">
-				 <label class="label">Email <span>*</span></label>
-				 <div class="input">
-					 <input type="email" name="pf-pemail" placeholder="Enter Email Address"  id="pf-email" value="' . $email . '"
-					 ';
-                if ($loggedin == 'yes') {
-                    echo 'readonly ';
-                }
-                echo ' required>
-				 </div>
-                 </div>';
-                echo '<div class="span12 unit">
-				 <label class="label">Amount (' . $currency;
-                if (floatval($minimum) == 0 && floatval($amount) != 0 && $usequantity == 'yes') {
-                    echo ' ' . number_format($amount);
+            if ($show_form) {
+                // Form title
+                if ($meta['_hidetitle'] != 1) {
+                    echo "<h1 id='pf-form" . esc_attr($id) . "'>" . esc_html($obj->post_title) . "</h1>";
                 }
 
+                // Start form output
+                echo '<form version="' . esc_attr(KKD_PFF_PAYSTACK_VERSION) . '" enctype="multipart/form-data" action="' . esc_url(admin_url('admin-ajax.php')) . '" method="post" class="paystack-form j-forms" novalidate>
+                      <div class="j-row">';
 
+                // Hidden inputs
+                echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">
+                      <input type="hidden" name="pf-id" value="' . esc_attr($id) . '" />
+                      <input type="hidden" name="pf-user_id" value="' . esc_attr($user_id) . '" />
+                      <input type="hidden" name="pf-recur" value="' . esc_attr($meta['_recur']) . '" />';
+
+                // Full Name input
+                echo '<div class="span12 unit">
+                      <label class="label">Full Name <span>*</span></label>
+                      <div class="input">
+                          <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . esc_attr($fullname) . '" required>
+                      </div>
+                  </div>';
+
+                // Email input
+                echo '<div class="span12 unit">
+                      <label class="label">Email <span>*</span></label>
+                      <div class="input">
+                          <input type="email" name="pf-pemail" placeholder="Enter Email Address" id="pf-email" value="' . esc_attr($email) . '" ' . ($meta['_loggedin'] == 'yes' ? 'readonly' : '') . ' required>
+                      </div>
+                  </div>';
+
+                // Amount selection with consideration for variable amounts, minimum payments, and recurring plans
+                echo '<div class="span12 unit">
+                <label class="label">Amount (' . esc_html($currency);
+                if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
+                echo ' ' . esc_html(number_format($amount));
+                }
                 echo ') <span>*</span></label>
-				 <div class="input">';
+                <div class="input">';
+
                 if ($usevariableamount == 0) {
-                    if ($minimum == 1) {
-                        echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . $currency . '  ' . number_format($amount) . '</b></small>';
-                        //make it available for javascript so we can test against the input value
-                        echo '<input type="hidden" name="pf-minimum-hidden" value="' . number_format($amount) . '" id="pf-minimum-hidden">';
-                    }
-                    if ($recur == 'plan') {
-                        if ($showbtn) {
-                            echo '<input type="text" name="pf-amount" value="' . $planamount . '" id="pf-amount" readonly required/>';
-                        } else {
-                            echo '<div class="span12 unit">
-                                    <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . $planerrorcode . '</label>
-                                </div>';
-                        }
-                    } elseif ($recur == 'optional') {
-                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="' . $amount . '" required/>';
-                    } else {
-                        if (floatval($amount) == 0) {
-                            echo '<input type="text" name="pf-amount" class="pf-number" value="0" id="pf-amount" required/>';
-                        } elseif (floatval($amount) != 0 && $minimum == 1) {
-                            echo '<input type="text" name="pf-amount" value="' . $amount . '" id="pf-amount" required/>';
-                        } else {
-                            echo '<input type="text" name="pf-amount" value="' . $amount . '" id="pf-amount" readonly required/>';
-                        }
-                    }
-                } else {
-                    if ($usevariableamount == "") {
-                        echo "Form Error, set variable amount string";
-                    } else {
-                        if (count($paymentoptions) > 0) {
-                            echo '<div class="select">
-			 				 	 	<input type="hidden"  id="pf-vname" name="pf-vname" />
-			 				 	 	<input type="hidden"  id="pf-amount" />
- 									<select class="form-control" id="pf-vamount" name="pf-amount">';
-                            $max = intval($quantity) + 1;
-                            if ($max > ($stock + 1)) {
-                                $max = $stock + 1;
-                            }
-                            foreach ($paymentoptions as $key => $paymentoption) {
-                                list($a, $b) = explode(':', $paymentoption);
-                                echo '<option value="' . $b . '" data-name="' . $a . '">' . $a . ' - ' . $currency . ' ' . number_format($b) . '</option>';
-                            }
-                            echo '</select> <i></i> </div>';
-                        }
-                    }
+                if ($minimum == 1) {
+                echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
                 }
-                if ($txncharge != 'merchant' && $recur != 'plan' && $usequantity !== "yes") {
-                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total: <b  class="pf-txntotal"></b></small>';
-                }
-
-                echo '<span id="pf-min-val-warn" style="color: red; font-size: 13px;"></span> 
-				</div>
-			 </div>';
-                if ($recur == 'no' && $usequantity == 'yes') {  //&& ($usevariableamount == 1 || $amount != 0)) { //Commented out because the frontend stops transactions of 0 amount to go through
-                    // if ($minimum == 0 && $recur == 'no' && $usequantity == 'yes' && $amount != 0) {
-                    echo
-                        '<div class="span12 unit">
-                        <label class="label">' . $quantityunit . '</label>
-                        <div class="select">
-                            <input type="hidden" value="' . $amount . '" id="pf-qamount"/>
-                            <select class="form-control" id="pf-quantity" name="pf-quantity" >';
-                    $max = $quantity + 1;
-
-                    if ($max > ($stock + 1) && $useinventory == 'yes') {
-                        $max = $stock + 1;
-                    }
-                    for ($i = 1; $i < $max; $i++) {
-                        echo  ' <option value="' . $i . '">' . $i . '</option>';
-                    }
-                    echo  '</select>
-                            <i></i>
-                        </div>
-                    </div>
-                    <div class="span12 unit">
-                        <label class="label">Total (' . $currency;
-                    echo ') <span>*</span></label>
-                        <div class="input">
-                            <input type="text" id="pf-total" name="pf-total" placeholder="" value="" disabled>';
-                    if ($txncharge != 'merchant' && $recur != 'plan') {
-                        echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total: <b  class="pf-txntotal"></b></small>';
-                    }
-                    echo '</div>
-                    </div>';
-                }
-
-                if ($recur == 'optional') {
-                    echo '<div class="span12 unit">
-			 				 <label class="label">Recurring Payment</label>
-			 				 <div class="select">
-			 					 <select class="form-control" name="pf-interval" >
-			 						 <option value="no">None</option>
-			 						 <option value="daily">Daily</option>
-			 						 <option value="weekly">Weekly</option>
-                                     <option value="monthly">Monthly</option>
-                                     <option value="biannually">Biannually</option>
-			 						 <option value="annually">Annually</option>
-			 					 </select>
-			 					 <i></i>
-			 				 </div>
-			 			 </div>';
-                } elseif ($recur == 'plan') {
-                    if ($showbtn) {
-                        echo '<input type="hidden" name="pf-plancode" value="' . $recurplan . '" />';
-                        echo '<div class="span12 unit">
-									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . $plan->data->name . ' ' . $plan->data->interval . ' recuring payment - ' . $plan->data->currency . ' ' . number_format($planamount) . '</label>
-								</div>';
-                    } else {
-                        echo '<div class="span12 unit">
-								 <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . $planerrorcode . '</label>
-							 </div>';
-                    }
-                }
-
-
-                echo (do_shortcode($obj->post_content));
-
-                if ($useagreement == 'yes') {
-                    echo '<div class="span12 unit">
-						<label class="checkbox ">
-							<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
-							<i id="pf-agreementicon" ></i>
-							Accept terms <a target="_blank" href="' . $agreementlink . '">Link </a>
-						</label>
-					</div><br>';
-                }
-                echo '<div class="span12 unit">
-						<small><span style="color: red;">*</span> are compulsory</small><br />
-						<img src="' . plugins_url('../images/logos@2x.png', __FILE__) . '" alt="cardlogos"  class="paystack-cardlogos size-full wp-image-1096" />
-
-							<button type="reset" class="secondary-btn">Reset</button>';
+                if ($recur == 'plan') {
                 if ($showbtn) {
-                    echo '<button type="submit" class="primary-btn">' . $paybtn . '</button>';
+                    echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
+                } else {
+                    echo '<div class="span12 unit">
+                            <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($planerrorcode) . '</label>
+                        </div>';
                 }
-                echo '</div>';
+                } elseif ($recur == 'optional') {
+                echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
+                } else {
+                echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
+                }
+                } else {
+                if ($usevariableamount == "") {
+                echo "Form Error, set variable amount string";
+                } else {
+                if (count($paymentoptions) > 0) {
+                    echo '<div class="select">
+                            <input type="hidden"  id="pf-vname" name="pf-vname" />
+                            <input type="hidden"  id="pf-amount" />
+                            <select class="form-control" id="pf-vamount" name="pf-amount">';
+                    foreach ($paymentoptions as $option) {
+                        list($optionName, $optionValue) = explode(':', $option);
+                        echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
+                    }
+                    echo '</select> <i></i> </div>';
+                }
+                }
+                }
 
-                echo '</div>
-            </form>';
-                echo '</div>';
-            } else {
-                echo "<h5>You must be logged in to make payment</h5>";
-            }
+                // Transaction charge notice
+                if ($txncharge != 'merchant' && $recur != 'plan') {
+                echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+                }
+
+                echo '</div></div>';
+
+                // Quantity selection
+                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                echo '<div class="span12 unit">
+                    <label class="label">Quantity</label>
+                    <div class="select">
+                        <input type="hidden" value="' . esc_attr($amount) . '" id="pf-qamount"/>
+                        <select class="form-control" id="pf-quantity" name="pf-quantity">';
+                for ($i = 1; $i <= $quantity; $i++) {
+                echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
+                }
+                echo '</select> <i></i> </div></div>';
+                }
+
+        // Recurring payment options
+        if ($recur == 'optional') {
+        echo '<div class="span12 unit">
+            <label class="label">Recurring Payment</label>
+            <div class="select">
+                <select class="form-control" name="pf-interval">';
+        $intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
+        foreach ($intervals as $intervalValue => $intervalName) {
+        echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
         }
+        echo '</select> <i></i> </div></div>';
+        }
+
+        // Plan details for recurring payments
+        if ($recur == 'plan' && $showbtn) {
+        echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
+        echo '<div class="span12 unit">
+            <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($plan->data->name) . ' ' . esc_html($plan->data->interval) . ' recurring payment - ' . esc_html($plan->data->currency) . ' ' . esc_html(number_format($planamount)) . '</label>
+        </div>';
+    }
+    echo(do_shortcode($obj->post_content));
+
+    // Agreement terms
+    if ($useagreement == 'yes') {
+    echo '<div class="span12 unit">
+        <label class="checkbox">
+            <input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
+            <i></i>
+            Accept terms <a target="_blank" href="' . esc_url($agreementlink) . '">Link</a>
+        </label>
+    </div><br>';
     }
 
 
+    // Form submission controls
+    echo '<div class="span12 unit">
+    <small><span style="color: red;">*</span> are compulsory</small><br />
+    <img src="' . esc_url(plugins_url('../images/logos@2x.png', __FILE__)) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
+    <button type="reset" class="secondary-btn">Reset</button>';
+    if ($showbtn) {
+    echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
+    }
+    echo '</div></div></form>';
+        } else {
+            echo "<h5>You must be logged in to make a payment.</h5>";
+        }
+    } else {
+        echo "<h5>Invalid Paystack form ID or the form does not exist.</h5>";
+    }
+    } else {
+        echo "<h5>No Paystack form ID provided.</h5>";
+    }
 
     return ob_get_clean();
 }
+add_shortcode('paystack_form', 'kkd_pff_paystack_form_shortcode');
+
 add_shortcode('pff-paystack', 'kkd_pff_paystack_form_shortcode');
 
-function kkd_pff_paystack_datepicker_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'required' => '0',
-            ),
-            $atts
-        )
+function kkd_pff_paystack_datepicker_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'required' => '0',
+        ),
+        $atts,
+        'datepicker'
     );
+    $name = sanitize_text_field($atts['name']);
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
+    $id = uniqid('datepicker-');
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label for="'.esc_attr($id).'" class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="input">
-			<input type="text" class="date-picker" name="' . $name . '" placeholder="Enter ' . $name . '"';
-    if ($required == 'required') {
-        $code .= ' required="required" ';
-    }
-    $code .= '" /></div></div>';
+        <div class="input">
+            <input type="date" id="'.esc_attr($id).'" class="date-picker" name="'.esc_attr($name).'" placeholder="'.sprintf(esc_attr__('Enter %s', 'text-domain'), $name).'" '.esc_attr($required).' /></div></div>';
+
     return $code;
 }
 add_shortcode('datepicker', 'kkd_pff_paystack_datepicker_shortcode');
 
 
-function kkd_pff_paystack_text_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'required' => '0',
-            ),
-            $atts
-        )
+
+function kkd_pff_paystack_text_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'required' => '0',
+        ),
+        $atts,
+        'text'
     );
+    $name = sanitize_text_field($atts['name']);
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
+    $id = uniqid('text-');
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label for="'.esc_attr($id).'" class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="input">
-			<input type="text" name="' . $name . '" placeholder="Enter ' . $name . '"';
-    if ($required == 'required') {
-        $code .= ' required="required" ';
-    }
-    $code .= '" /></div></div>';
+        <div class="input">
+            <input type="text" id="'.esc_attr($id).'" name="'.esc_attr($name).'" placeholder="'.sprintf(esc_attr__('Enter %s', 'text-domain'), $name).'" '.esc_attr($required).' /></div></div>';
+
     return $code;
 }
 add_shortcode('text', 'kkd_pff_paystack_text_shortcode');
-function kkd_pff_paystack_select_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'options' => '',
-                'required' => '0',
-            ),
-            $atts
-        )
+
+function kkd_pff_paystack_select_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'options' => '',
+            'required' => '0',
+        ),
+        $atts,
+        'select'
     );
+
+    $name = sanitize_text_field($atts['name']);
+    $options = array_map('sanitize_text_field', explode(',', $atts['options']));
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
+    $id = uniqid('select-');
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label for="'.esc_attr($id).'" class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="input">
-			<select class="form-control"  name="' . $name . '"';
-    if ($required == 'required') {
-        $code .= ' required="required" ';
-    }
-    $code .= ">";
+        <div class="input">
+            <select id="'.esc_attr($id).'" class="form-control" name="'.esc_attr($name).'" '.esc_attr($required).'>';
 
-    $soptions = explode(',', $options);
-    if (count($soptions) > 0) {
-        foreach ($soptions as $key => $option) {
-            $code .= '<option  value="' . $option . '" >' . $option . '</option>';
-        }
+    foreach ($options as $option) {
+        $code .= '<option value="'.esc_attr($option).'">'.esc_html($option).'</option>';
     }
-    $code .= '" </select><i></i></div></div>';
+
+    $code .= '</select><i></i></div></div>';
+
     return $code;
 }
 add_shortcode('select', 'kkd_pff_paystack_select_shortcode');
-function kkd_pff_paystack_radio_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'options' => '',
-                'required' => '0',
-            ),
-            $atts
-        )
+
+function kkd_pff_paystack_radio_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'options' => '',
+            'required' => '0',
+        ),
+        $atts,
+        'radio'
     );
+
+    $name = sanitize_text_field($atts['name']);
+    $options = array_map('sanitize_text_field', explode(',', $atts['options']));
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="inline-group">
-		';
-    $soptions = explode(',', $options);
-    if (count($soptions) > 0) {
-        foreach ($soptions as $key => $option) {
-            // $code.= '<option  value="'.$option.'" >'.$option.'</option>';
-            $code .= '<label class="radio">
-				<input type="radio" name="' . $name . '" value="' . $option . '"';
-            if ($key == 0) {
-                $code .= ' checked';
-                if ($required == 'required') {
-                    $code .= ' required="required"';
-                }
-            }
+        <div class="inline-group">';
 
-            $code .= '/>
-				<i></i>
-				' . $option . '
-			</label>';
-        }
+    foreach ($options as $index => $option) {
+        $id = uniqid('radio-');
+        $isChecked = $index == 0 ? 'checked' : '';
+        $code .= '<label for="'.esc_attr($id).'" class="radio">
+            <input type="radio" id="'.esc_attr($id).'" name="'.esc_attr($name).'" value="'.esc_attr($option).'" '.esc_attr($isChecked).' '.esc_attr($required).'>
+            <i></i>
+            '.esc_html($option).'
+        </label>';
     }
+
     $code .= '</div></div>';
+
     return $code;
 }
 add_shortcode('radio', 'kkd_pff_paystack_radio_shortcode');
-function kkd_pff_paystack_checkbox_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'options' => '',
-                'required' => '0',
-            ),
-            $atts
-        )
+
+function kkd_pff_paystack_checkbox_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'options' => '',
+            'required' => '0',
+        ),
+        $atts,
+        'checkbox'
     );
+
+    $name = sanitize_text_field($atts['name']);
+    $options = array_map('sanitize_text_field', explode(',', $atts['options']));
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="inline-group">
-		';
-    // <div class="unit">
-    //                 <div class="inline-group">
-    //                     <label class="label">Inline checkbox</label>
-    //                     <label class="checkbox">
-    //                         <input type="checkbox">
-    //                         <i></i>
-    //                         Apple
-    //                     </label>
-    //                     <label class="checkbox">
-    //                         <input type="checkbox">
-    //                         <i></i>
-    //                         Mango
-    //                     </label>
-    //                     <label class="checkbox">
-    //                         <input type="checkbox">
-    //                         <i></i>
-    //                         Melon
-    //                     </label>
-    //                     <label class="checkbox">
-    //                         <input type="checkbox">
-    //                         <i></i>
-    //                         Lemon
-    //                     </label>
-    //                     <label class="checkbox">
-    //                         <input type="checkbox">
-    //                         <i></i>
-    //                         Watermelon
-    //                     </label>
-    //                 </div>
-    //             </div>
+        <div class="inline-group">';
 
-    $soptions = explode(',', $options);
-    if (count($soptions) > 0) {
-        foreach ($soptions as $key => $option) {
-            // $code.= '<option  value="'.$option.'" >'.$option.'</option>';
-            $code .= '<label class="checkbox">
-				<input type="checkbox" name="' . $name . '[]" value="' . $option . '"';
-            if ($key == 0) {
-                $code .= ' checked';
-                if ($required == 'required') {
-                    $code .= ' required="required"';
-                }
-            }
-
-            $code .= '/>
-				<i></i>
-				' . $option . '
-			</label>';
-        }
+    foreach ($options as $option) {
+        $id = uniqid('checkbox-');
+        $code .= '<label for="'.esc_attr($id).'" class="checkbox">
+            <input type="checkbox" id="'.esc_attr($id).'" name="'.esc_attr($name).'[]" value="'.esc_attr($option).'" '.esc_attr($required).'>
+            <i></i>
+            '.esc_html($option).'
+        </label>';
     }
+
     $code .= '</div></div>';
+
     return $code;
 }
 add_shortcode('checkbox', 'kkd_pff_paystack_checkbox_shortcode');
-function kkd_pff_paystack_textarea_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'required' => '0',
-            ),
-            $atts
-        )
+function kkd_pff_paystack_textarea_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'required' => '0',
+        ),
+        $atts,
+        'textarea'
     );
+
+    $name = sanitize_text_field($atts['name']);
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
+    $id = uniqid('textarea-');
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label for="'.esc_attr($id).'" class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="input">
-			<textarea type="text" name="' . $name . '" rows="3" placeholder="Enter ' . $name . '"';
-    if ($required == 'required') {
-        $code .= ' required="required" ';
-    }
-    $code .= '" ></textarea></div></div>';
+        <div class="input">
+            <textarea id="'.esc_attr($id).'" name="'.esc_attr($name).'" rows="3" placeholder="'.sprintf(esc_attr__('Enter %s', 'text-domain'), $name).'" '.esc_attr($required).'></textarea></div></div>';
+
     return $code;
 }
 add_shortcode('textarea', 'kkd_pff_paystack_textarea_shortcode');
-function kkd_pff_paystack_input_shortcode($atts)
-{
-    extract(
-        shortcode_atts(
-            array(
-                'name' => 'Title',
-                'required' => '0',
-            ),
-            $atts
-        )
+
+function kkd_pff_paystack_input_shortcode($atts) {
+    $atts = shortcode_atts(
+        array(
+            'name' => __('Title', 'text-domain'),
+            'required' => '0',
+        ),
+        $atts,
+        'input'
     );
 
-    $uniqq = kkd_pff_paystack_generate_new_code();
+    $name = sanitize_text_field($atts['name']);
+    $required = $atts['required'] === 'required' ? 'required' : '';
+
+    $fileInputId = uniqid('file-input-');
+    $textInputId = uniqid('text-input-');
+
     $code = '<div class="span12 unit">
-		<label class="label">' . $name;
-    if ($required == 'required') {
+        <label for="'.esc_attr($fileInputId).'" class="label">'.esc_html($name);
+    if ($required) {
         $code .= ' <span>*</span>';
     }
     $code .= '</label>
-		<div class="input  append-small-btn">
-		<div class="file-button">
-			Browse
-			<input type="file" name="' . $name . '" onchange="document.getElementById(\'append-small-btn-' . $uniqq . '\').value = this.value;"';
-    if ($required == 'required') {
-        $code .= ' required="required" ';
-    }
-    $code .= '" /></div>
-		<input type="text" id="append-small-btn-' . $uniqq . '" readonly="" placeholder="no file selected">
-	</div></div>';
+        <div class="input append-small-btn">
+            <div class="file-button">
+                '.__('Browse', 'text-domain').'
+                <input type="file" id="'.esc_attr($fileInputId).'" name="'.esc_attr($name).'" onchange="document.getElementById(\''.esc_attr($textInputId).'\').value = this.value;" '.esc_attr($required).'>
+            </div>
+            <input type="text" id="'.esc_attr($textInputId).'" readonly="" placeholder="'.esc_attr__('No file selected', 'text-domain').'">
+        </div></div>';
+
     return $code;
 }
 add_shortcode('input', 'kkd_pff_paystack_input_shortcode');
