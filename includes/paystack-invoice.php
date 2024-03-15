@@ -103,8 +103,8 @@ if (array_key_exists("0", $record)) {
         </div>
     </main>
 </div>
-<?php
-get_footer();
+    <?php
+    get_footer();
 }else{
     die('Invoice code invalid');
 }
