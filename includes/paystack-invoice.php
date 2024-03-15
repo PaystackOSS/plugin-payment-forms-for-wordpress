@@ -73,7 +73,7 @@ if (array_key_exists("0", $record)) {
        <label class="label inline">Amount:</label>
        <strong><?php echo esc_html($currency.number_format($dbdata->amount)); ?></strong>
       </div>
-        <?php echo kkd_format_metadata($dbdata->metadata); ?>
+        <?php echo  esc_html(kkd_format_metadata($dbdata->metadata)); ?>
                             
       <div class="span12 unit">
        <label class="label inline">Date:</label>
