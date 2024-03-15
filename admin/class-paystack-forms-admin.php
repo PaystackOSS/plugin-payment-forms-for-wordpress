@@ -239,7 +239,7 @@ class Kkd_Pff_Paystack_Admin
                     break;
                 case 'payments':
 
-                    $count_query = 'select count(*) from ' . $table . ' WHERE post_id = "' . $post_id . '" AND paid = "1"';
+                    $count_query = $wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE post_id = %d AND paid = '1'", $post_id);
                     $num = $wpdb->get_var($count_query);
 
                     echo '<u><a href="' . admin_url('admin.php?page=submissions&form=' . $post_id) . '">' . $num . '</a></u>';
@@ -292,7 +292,7 @@ class Kkd_Pff_Paystack_Admin
             <p class="description">
                 <label for="wpcf7-shortcode">Copy this shortcode and paste it into your post, page, or text widget content:</label>
                 <span class="shortcode wp-ui-highlight">
-                    <input type="text" id="wpcf7-shortcode" onfocus="this.select();" readonly="readonly" class="large-text code" value="[pff-paystack id=&quot;<?php echo $post->ID; ?>&quot;]"></span>
+                    <input type="text" id="wpcf7-shortcode" onfocus="this.select();" readonly="readonly" class="large-text code" value="[pff-paystack id=&quot;<?php echo esc_html($post->ID); ?>&quot;]"></span>
             </p>
 
         <?php
@@ -800,14 +800,14 @@ function kkd_pff_paystack_payment_submissions()
         $data = $exampleListTable->prepare_items(); ?>
         <div id="welcome-panel" class="welcome-panel">
             <div class="welcome-panel-content">
-                <h1 style="margin: 0px;"><?php echo $obj->post_title; ?> Payments </h1>
+            <h1 style="margin: 0px;"><?php echo esc_html($obj->post_title); ?> Payments </h1>
                 <p class="about-description">All payments made for this form</p>
                 <?php if ($data > 0) {
                 ?>
 
                     <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
                         <input type="hidden" name="action" value="kkd_pff_export_excel">
-                        <input type="hidden" name="form_id" value="<?php echo $id; ?>">
+                        <input type="hidden" name="form_id" value="<?php echo esc_html($id); ?>">
                         <button type="submit" class="button button-primary button-hero load-customize">Export Data to Excel</button>
                     </form>
                 <?php
@@ -843,7 +843,9 @@ function Kkd_pff_export_excel()
     }
     $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
     $data = array();
-    $alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '" . $post_id . "' AND paid = '1')  ORDER BY `id` ASC");
+    $table = sanitize_text_field($table);
+
+    $alldbdata = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE post_id = %d AND paid = '1' ORDER BY `id` ASC", $post_id));
     $i = 0;
 
     if (count($alldbdata) > 0) {
@@ -970,8 +972,7 @@ class Kkd_Pff_Paystack_Payments_List_Table extends WP_List_Table
 
         $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
         $data = array();
-        $alldbdata = $wpdb->get_results("SELECT * FROM $table WHERE (post_id = '" . $post_id . "' AND paid = '1')");
-
+        $alldbdata = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE post_id = %d AND paid = '1'", $post_id));
         foreach ($alldbdata as $key => $dbdata) {
             $newkey = $key + 1;
             if ($dbdata->txn_code_2 != "") {

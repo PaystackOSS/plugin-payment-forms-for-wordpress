@@ -33,6 +33,5 @@ class kkd_pff_paystack_plugin_tracker {
 
         //execute post
         $result = curl_exec($ch);
-        //  echo $result;
     }
 } 

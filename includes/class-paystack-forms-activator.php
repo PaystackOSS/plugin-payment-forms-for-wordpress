@@ -8,7 +8,7 @@ class Kkd_Pff_Paystack_Activator
 		global $wpdb;
 		$version = get_option('kkd_db_version', '1.0');
 		$table_name = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-
+		$table_name = sanitize_text_field($table_name);
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE IF NOT EXISTS `" . $table_name . "` (
@@ -59,10 +59,12 @@ class Kkd_Pff_Paystack_Activator
 		}
 
 
-		$row = $wpdb->get_results(
-			"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-			WHERE table_name = '" . $table_name . "' AND column_name = 'plan'"
+		$query = $wpdb->prepare(
+			"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = %s AND column_name = 'plan'",
+			$table_name
 		);
+		
+		$row = $wpdb->get_results($query);
 		if (empty($row)) {
 			$wpdb->query("ALTER TABLE `" . $table_name . "` ADD `plan` VARCHAR(255) NOT NULL AFTER `paid`;");
 		}

@@ -804,7 +804,7 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
                                                 <tr>
                                                     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
                                                         <p style="font-family:Helvetica,Arial,sans-serif;font-size:28px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">
-                                                                <a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5">Invoice #<?php echo $code; ?></strong></a></p>
+                                                                <a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5">Invoice #<?php echo esc_html($code);; ?></strong></a></p>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -826,8 +826,8 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
                                                 <tr>
                                                     <td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#888">
                                                         <small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo date('F j,Y'); ?></small>
-                                                        <h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php echo $name; ?></h6>
-                                                        <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php echo $email; ?></p>
+                                                        <h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php echo esc_html($name); ?></h6>
+                                                        <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php echo esc_html($email); ?></p>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -838,7 +838,7 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
                                             <tbody>
                                                 <tr>
                                                     <td class="column_cell font_default" align="left" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-                                                        <h1 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:26px;line-height:36px;font-weight:bold;color:#ffb26b"><?php echo $currency . ' ' . number_format($amount); ?></h1>
+                                                        <h1 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:26px;line-height:36px;font-weight:bold;color:#ffb26b"><?php echo esc_html($currency) . ' ' . number_format($amount); ?></h1>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -986,9 +986,9 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
                                                 <tr>
                                                     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
                                                         <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
-                                                        <h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo $heading; ?></h5>
+                                                        <h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo esc_html($heading); ?></h5>
                                                         <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">Hello <?php echo strstr($name . " ", " ", true); ?>,</p>
-                                                        <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo $sitemessage; ?></p>
+                                                        <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo esc_html($sitemessage); ?></p>
                                                         <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
                                                     </td>
                                                 </tr>
@@ -1028,27 +1028,27 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
                                                             </tbody>
                                                         </table>
                                                         <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-                                                            Amount <strong> : <?php echo $currency . ' ' . number_format($amount); ?></strong><br>
-                                                            Email <strong> : <?php echo $user_email; ?></strong><br>
+                                                            Amount <strong> : <?php echo esc_html($currency) . ' ' . number_format($amount); ?></strong><br>
+                                                            Email <strong> : <?php echo esc_html($user_email); ?></strong><br>
                                                             <?php
                                                                 $new = json_decode($metadata);
                                                                 if (array_key_exists("0", $new)) {
                                                                     foreach ($new as $key => $item) {
                                                                         if ($item->type == 'text') {
-                                                                            echo $item->display_name . "<strong>  :" . $item->value . "</strong><br>";
+                                                                            echo esc_html($item->display_name) . "<strong>  :" . $item->value . "</strong><br>";
                                                                         } else {
-                                                                            echo $item->display_name . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
+                                                                            echo esc_html($item->display_name) . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
                                                                         }
                                                                     }
                                                                 } else {
                                                                     $text = '';
                                                                     if (count($new) > 0) {
                                                                         foreach ($new as $key => $item) {
-                                                                            echo $key . "<strong>  :" . $item . "</strong><br />";
+                                                                            echo esc_html($key) . "<strong>  :" . $item . "</strong><br />";
                                                                         }
                                                                     }
                                                                 } ?>
-                                                            Transaction code: <strong> <?php echo $code; ?></strong><br>
+                                                            Transaction code: <strong> <?php echo esc_html($code);; ?></strong><br>
                                                         </p>
                                                     </td>
                                                 </tr>
@@ -1796,27 +1796,27 @@ function kkd_pff_paystack_send_receipt_owner($id, $currency, $amount, $name, $em
                                                             </tbody>
                                                         </table>
                                                         <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-                                                            Amount <strong> : <?php echo $currency . ' ' . number_format($amount); ?></strong><br>
-                                                            Email <strong> : <?php echo $user_email; ?></strong><br>
+                                                            Amount <strong> : <?php echo esc_html($currency) . ' ' . number_format($amount); ?></strong><br>
+                                                            Email <strong> : <?php echo esc_html($user_email); ?></strong><br>
                                                             <?php
                                                                 $new = json_decode($metadata);
                                                                 if (array_key_exists("0", $new)) {
                                                                     foreach ($new as $key => $item) {
                                                                         if ($item->type == 'text') {
-                                                                            echo $item->display_name . "<strong>  :" . $item->value . "</strong><br>";
+                                                                            echo esc_html($item->display_name) . "<strong>  :" . $item->value . "</strong><br>";
                                                                         } else {
-                                                                            echo $item->display_name . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
+                                                                            echo esc_html($item->display_name) . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
                                                                         }
                                                                     }
                                                                 } else {
                                                                     $text = '';
                                                                     if (count($new) > 0) {
                                                                         foreach ($new as $key => $item) {
-                                                                            echo $key . "<strong>  :" . $item . "</strong><br />";
+                                                                            echo esc_html($key) . "<strong>  :" . $item . "</strong><br />";
                                                                         }
                                                                     }
                                                                 } ?>
-                                                            Transaction code: <strong> <?php echo $code; ?></strong><br>
+                                                            Transaction code: <strong> <?php echo esc_html($code);; ?></strong><br>
                                                         </p>
                                                     </td>
                                                 </tr>
@@ -2393,7 +2393,8 @@ function kkd_pff_paystack_check_code($code)
 {
     global $wpdb;
     $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-    $o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '" . $code . "'");
+    
+    $o_exist = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
 
     if (count($o_exist) > 0) {
         $result = true;
@@ -2635,26 +2636,21 @@ function kkd_pff_paystack_submit_action()
     $fixedmetadata = json_decode(json_encode($fixedmetadata, JSON_NUMERIC_CHECK), true);
     $fixedmetadata = array_merge($untouchedmetadata, $fixedmetadata);
 
-    $insert =  array(
-        'post_id' => strip_tags($_POST["pf-id"], ""),
-        'email' => strip_tags($_POST["pf-pemail"], ""),
-        'user_id' => strip_tags($_POST["pf-user_id"], ""),
-        'amount' => strip_tags($amount, ""),
-        'plan' => strip_tags($plancode, ""),
-        'ip' => kkd_pff_paystack_get_the_user_ip(),
-        'txn_code' => $code,
-        'metadata' => json_encode($fixedmetadata)
+    $insert = array(
+        'post_id' => sanitize_text_field($_POST["pf-id"]),
+        'email' => sanitize_email($_POST["pf-pemail"]),
+        'user_id' => sanitize_text_field($_POST["pf-user_id"]),
+        'amount' => sanitize_text_field($_POST["amount"]), // Assuming $amount comes from $_POST
+        'plan' => sanitize_text_field($_POST["plancode"]), // Assuming $plancode comes from $_POST
+        'ip' => kkd_pff_paystack_get_the_user_ip(), // Make sure this function returns a sanitized IP
+        'txn_code' => sanitize_text_field($_POST['code']), // Assuming $code comes from $_POST
+        'metadata' => wp_json_encode($_POST["fixedmetadata"]) // Assuming $fixedmetadata comes from $_POST
     );
-    $exist = $wpdb->get_results(
-        "SELECT * FROM $table WHERE (post_id = '" . $insert['post_id'] . "'
-			AND email = '" . $insert['email'] . "'
-			AND user_id = '" . $insert['user_id'] . "'
-			AND amount = '" . $insert['amount'] . "'
-			AND plan = '" . $insert['plan'] . "'
-			AND ip = '" . $insert['ip'] . "'
-			AND paid = '0'
-			AND metadata = '" . $insert['metadata'] . "')"
-    );
+    
+    $exist = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$table} WHERE post_id = %s AND email = %s AND user_id = %s AND amount = %s AND plan = %s AND ip = %s AND paid = '0' AND metadata = %s",
+        $insert['post_id'], $insert['email'], $insert['user_id'], $insert['amount'], $insert['plan'], $insert['ip'], $insert['metadata']
+    ));
     if (count($exist) > 0) {
         // $insert['txn_code'] = $code;
         // $insert['plan'] = $exist[0]->plan;
@@ -2769,8 +2765,10 @@ function kkd_pff_paystack_confirm_payment()
     }
     global $wpdb;
     $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-    $code = $_POST['code'];
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '" . $code . "')");
+   
+    $code = sanitize_text_field($_POST['code']);
+
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
     if (array_key_exists("0", $record)) {
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);
@@ -2854,7 +2852,6 @@ function kkd_pff_paystack_confirm_payment()
                         // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
                         if ($oamount !=  $amount_paid) {
-                            // echo $oamount. ' - '.$amount_paid;
                             $message = "Invalid amount Paid. Amount required is " . $currency . "<b>" . number_format($oamount) . "</b>";
                             $result = "failed";
                         } else {
@@ -2958,12 +2955,15 @@ function kkd_pff_paystack_retry_action()
     do_action('kkd_pff_paystack_before_save');
 
     global $wpdb;
-    $code = $_POST['code'];
-    $newcode = kkd_pff_paystack_generate_code();
-    $newcode = $newcode . '_2';
+
+    $code = sanitize_text_field($_POST['code']);
+    $newcode = kkd_pff_paystack_generate_code(); // Ensure this function returns a sanitized string
+    $newcode .= '_2';
     $insert = array();
     $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '" . $code . "')");
+    
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
+    
     if (array_key_exists("0", $record)) {
         $dbdata = $record[0];
         $plan = $dbdata->plan;
@@ -3025,8 +3025,8 @@ function kkd_pff_paystack_rconfirm_payment()
     }
     global $wpdb;
     $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-    $code = $_POST['code'];
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code_2 = '" . $code . "')");
+    $code = sanitize_text_field($_POST['code']); 
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code_2 = %s", $code));
     if (array_key_exists("0", $record)) {
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);

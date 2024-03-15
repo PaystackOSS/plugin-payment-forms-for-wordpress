@@ -40,7 +40,7 @@ function kkd_format_metadata($data)
 
     global $wpdb;
     $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM %s WHERE txn_code = %s", $table, $code));
 
 if (array_key_exists("0", $record)) {
     get_header();
@@ -57,7 +57,7 @@ if (array_key_exists("0", $record)) {
             <article class="post-4 page type-page status-publish hentry" id="post-4">
                 <form action="<?php echo admin_url('admin-ajax.php'); ?>" method="post"   enctype="multipart/form-data"  class="j-forms retry-form" id="pf-form" novalidate="">
                 <input type="hidden" name="action" value="kkd_pff_paystack_retry_action">
-                <input type="hidden" name="code" value="<?php echo $code; ?>" />
+                <input type="hidden" name="code" value="<?php echo esc_html($code);; ?>" />
     <div class="content">
 
      <div class="divider-text gap-top-20 gap-bottom-45">
@@ -67,17 +67,17 @@ if (array_key_exists("0", $record)) {
      <div class="j-row">
       <div class="span12 unit">
        <label class="label inline">Email:</label>
-       <strong><a href="mailto:<?php echo $dbdata->email; ?>"><?php echo $dbdata->email; ?></a></strong>
+       <strong><a href="mailto:<?php echo esc_html($dbdata->email); ?>"><?php echo esc_html($dbdata->email); ?></a></strong>
       </div>
       <div class="span12 unit">
        <label class="label inline">Amount:</label>
-       <strong><?php echo $currency.number_format($dbdata->amount); ?></strong>
+       <strong><?php echo esc_html($currency.number_format($dbdata->amount)); ?></strong>
       </div>
         <?php echo kkd_format_metadata($dbdata->metadata); ?>
                             
       <div class="span12 unit">
        <label class="label inline">Date:</label>
-       <strong><?php echo $dbdata->created_at; ?></strong>
+       <strong><?php echo esc_html($dbdata->created_at); ?></strong>
       </div>
         <?php if($dbdata->paid == 1) {?>
                             <div class="span12 unit">
