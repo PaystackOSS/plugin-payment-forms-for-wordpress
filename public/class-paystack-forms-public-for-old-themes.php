@@ -73,7 +73,6 @@ function kkd_pff_paystack_add_paystack_charge($amount)
     } else {
         $charge = floatval($amount*KKD_PFF_PAYSTACK_PERCENTAGE)+100;
     }
-    // echo $charge;
     if ($charge > 2000) {
         $charge = 2000;
     }
@@ -156,7 +155,7 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:28px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">
-    <a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5">Invoice #<?php  echo $code; ?></strong></a></p>
+    <a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5">Invoice #<?php  echo esc_html($code);; ?></strong></a></p>
     </td>
     </tr>
     </tbody>
@@ -178,8 +177,8 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#888">
     <small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo date('F j,Y'); ?></small>
-    <h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php  echo $name; ?></h6>
-    <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php  echo $email; ?></p>
+    <h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php  echo esc_html($name); ?></h6>
+    <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php  echo esc_html($email); ?></p>
     </td>
     </tr>
     </tbody>
@@ -190,7 +189,7 @@ function kkd_pff_paystack_send_invoice($currency, $amount, $name, $email, $code)
     <tbody>
     <tr>
     <td class="column_cell font_default" align="left" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-    <h1 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:26px;line-height:36px;font-weight:bold;color:#ffb26b"><?php  echo $currency.' '.number_format($amount); ?></h1></td>
+    <h1 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:26px;line-height:36px;font-weight:bold;color:#ffb26b"><?php echo esc_html($currency) . ' ' . number_format($amount); ?></h1></td>
     </tr>
     </tbody>
     </table>
@@ -333,10 +332,10 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
     <tr>
     <td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
-    <h5 style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff"><?php echo $merchant; ?></h5>
-    <h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo $heading; ?></h5>
+    <h5 style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff"><?php echo esc_html($merchant); ?></h5>
+    <h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo esc_html($heading); ?></h5>
     <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">Hello <?php echo strstr($name." ", " ", true); ?>,</p>
-    <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo $sitemessage; ?></p>
+    <p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo esc_html($sitemessage); ?></p>
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
     </td>
     </tr>
@@ -376,27 +375,27 @@ function kkd_pff_paystack_send_receipt($id, $currency, $amount, $name, $email, $
     </tbody>
     </table>
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-        Amount <strong> : <?php echo $currency.' '.number_format($amount); ?></strong><br>
-        Email <strong> :  <?php echo $user_email; ?></strong><br>
+        Amount <strong> : <?php echo esc_html($currency).' '.number_format($amount); ?></strong><br>
+        Email <strong> :  <?php echo esc_html($user_email); ?></strong><br>
     <?php
     $new = json_decode($metadata);
     if (array_key_exists("0", $new)) {
         foreach ($new as $key => $item) {
             if ($item->type == 'text') {
-                echo $item->display_name."<strong>  :".$item->value."</strong><br>";
+                echo esc_html($item->display_name)."<strong>  :".esc_html($item->value)."</strong><br>";
             } else {
-                echo $item->display_name."<strong>  : <a target='_blank' href='".$item->value."'>link</a></strong><br>";
+                echo esc_html($item->display_name)."<strong>  : <a target='_blank' href='".esc_html($item->value)."'>link</a></strong><br>";
             }
         }
     } else {
         $text = '';
         if (count($new) > 0) {
             foreach ($new as $key => $item) {
-                echo $key."<strong>  :".$item."</strong><br />";
+                echo esc_html($key)."<strong>  :".esc_html($item)."</strong><br />";
             }
         }
     } ?>
-        Transaction code: <strong> <?php echo $code; ?></strong><br>
+        Transaction code: <strong> <?php echo esc_html($code);; ?></strong><br>
     </p>
     </td>
     </tr>
@@ -570,27 +569,27 @@ function kkd_pff_paystack_send_receipt_owner($id, $currency, $amount, $name, $em
     </tbody>
     </table>
     <p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-        Amount <strong> : <?php echo $currency.' '.number_format($amount); ?></strong><br>
-        Email <strong> :  <?php echo $user_email; ?></strong><br>
+        Amount <strong> : <?php echo esc_html($currency).' '.number_format($amount); ?></strong><br>
+        Email <strong> :  <?php echo esc_html($user_email); ?></strong><br>
     <?php
     $new = json_decode($metadata);
     if (array_key_exists("0", $new)) {
         foreach ($new as $key => $item) {
             if ($item->type == 'text') {
-                echo $item->display_name."<strong>  :".$item->value."</strong><br>";
+                echo esc_html($item->display_name)."<strong>  :".esc_html($item->value)."</strong><br>";
             } else {
-                echo $item->display_name."<strong>  : <a target='_blank' href='".$item->value."'>link</a></strong><br>";
+                echo esc_html($item->display_name)."<strong>  : <a target='_blank' href='".esc_html($item->value)."'>link</a></strong><br>";
             }
         }
     } else {
         $text = '';
         if (count($new) > 0) {
             foreach ($new as $key => $item) {
-                echo $key."<strong>  :".$item."</strong><br />";
+                echo esc_html($key)."<strong>  :".esc_html($item)."</strong><br />";
             }
         }
     } ?>
-        Transaction code: <strong> <?php echo $code; ?></strong><br>
+        Transaction code: <strong> <?php echo esc_html($code);; ?></strong><br>
     </p>
     </td>
     </tr>
@@ -696,7 +695,8 @@ function kkd_pff_paystack_fetch_plan($code)
     }
     return $paystack_response;
 }
-function kkd_pff_paystack_form_shortcode($atts) {
+function kkd_pff_paystack_form_shortcode($atts)
+{
     ob_start();
 
     // Ensure the current user is populated
@@ -796,112 +796,112 @@ function kkd_pff_paystack_form_shortcode($atts) {
                   </div>';
 
                 // Amount selection with consideration for variable amounts, minimum payments, and recurring plans
-echo '<div class="span12 unit">
+                echo '<div class="span12 unit">
 <label class="label">Amount (' . esc_html($currency);
-if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
-echo ' ' . esc_html(number_format($amount));
-}
-echo ') <span>*</span></label>
+                if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
+                    echo ' ' . esc_html(number_format($amount));
+                }
+                echo ') <span>*</span></label>
 <div class="input">';
 
-if ($usevariableamount == 0) {
-if ($minimum == 1) {
-echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
-}
-if ($recur == 'plan') {
-if ($showbtn) {
-    echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
-} else {
-    echo '<div class="span12 unit">
+                if ($usevariableamount == 0) {
+                    if ($minimum == 1) {
+                        echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
+                    }
+                    if ($recur == 'plan') {
+                        if ($showbtn) {
+                                    echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
+                        } else {
+                                echo '<div class="span12 unit">
             <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($planerrorcode) . '</label>
           </div>';
-}
-} elseif ($recur == 'optional') {
-echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
-} else {
-echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
-}
-} else {
-if ($usevariableamount == "") {
-echo "Form Error, set variable amount string";
-} else {
-if (count($paymentoptions) > 0) {
-    echo '<div class="select">
+                        }
+                    } elseif ($recur == 'optional') {
+                        echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
+                    } else {
+                        echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
+                    }
+                } else {
+                    if ($usevariableamount == "") {
+                        echo "Form Error, set variable amount string";
+                    } else {
+                        if (count($paymentoptions) > 0) {
+                                    echo '<div class="select">
             <input type="hidden"  id="pf-vname" name="pf-vname" />
 			<input type="hidden"  id="pf-amount" />
             <select class="form-control" id="pf-vamount" name="pf-amount">';
-    foreach ($paymentoptions as $option) {
-        list($optionName, $optionValue) = explode(':', $option);
-        echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
-    }
-    echo '</select> <i></i> </div>';
-}
-}
-}
+                            foreach ($paymentoptions as $option) {
+                                list($optionName, $optionValue) = explode(':', $option);
+                                echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
+                            }
+                            echo '</select> <i></i> </div>';
+                        }
+                    }
+                }
 
-// Transaction charge notice
-if ($txncharge != 'merchant' && $recur != 'plan') {
-echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
-}
+                // Transaction charge notice
+                if ($txncharge != 'merchant' && $recur != 'plan') {
+                    echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+                }
 
-echo '</div></div>';
+                echo '</div></div>';
 
-// Quantity selection
-if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
-echo '<div class="span12 unit">
+                // Quantity selection
+                if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
+                    echo '<div class="span12 unit">
     <label class="label">Quantity</label>
     <div class="select">
         <input type="hidden" value="' . esc_attr($amount) . '" id="pf-qamount"/>
         <select class="form-control" id="pf-quantity" name="pf-quantity">';
-for ($i = 1; $i <= $quantity; $i++) {
-echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
-}
-echo '</select> <i></i> </div></div>';
-}
+                    for ($i = 1; $i <= $quantity; $i++) {
+                        echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
+                    }
+                    echo '</select> <i></i> </div></div>';
+                }
 
-// Recurring payment options
-if ($recur == 'optional') {
-echo '<div class="span12 unit">
+                // Recurring payment options
+                if ($recur == 'optional') {
+                    echo '<div class="span12 unit">
     <label class="label">Recurring Payment</label>
     <div class="select">
         <select class="form-control" name="pf-interval">';
-$intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
-foreach ($intervals as $intervalValue => $intervalName) {
-echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
-}
-echo '</select> <i></i> </div></div>';
-}
+                    $intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
+                    foreach ($intervals as $intervalValue => $intervalName) {
+                        echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
+                    }
+                    echo '</select> <i></i> </div></div>';
+                }
 
-// Plan details for recurring payments
-if ($recur == 'plan' && $showbtn) {
-echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
-echo '<div class="span12 unit">
+                // Plan details for recurring payments
+                if ($recur == 'plan' && $showbtn) {
+                    echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
+                    echo '<div class="span12 unit">
     <label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($plan->data->name) . ' ' . esc_html($plan->data->interval) . ' recurring payment - ' . esc_html($plan->data->currency) . ' ' . esc_html(number_format($planamount)) . '</label>
   </div>';
-}
-echo(do_shortcode($obj->post_content));
+                }
+                echo(do_shortcode($obj->post_content));
 
-// Agreement terms
-if ($useagreement == 'yes') {
-echo '<div class="span12 unit">
+                // Agreement terms
+                if ($useagreement == 'yes') {
+                    echo '<div class="span12 unit">
     <label class="checkbox">
         <input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
         <i></i>
         Accept terms <a target="_blank" href="' . esc_url($agreementlink) . '">Link</a>
     </label>
   </div><br>';
-}
+                }
 
 
-// Form submission controls
-echo '<div class="span12 unit">
+                // Form submission controls
+                echo '<div class="span12 unit">
 <small><span style="color: red;">*</span> are compulsory</small><br />
 <img src="' . esc_url(plugins_url('../images/logos@2x.png', __FILE__)) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
 <button type="reset" class="secondary-btn">Reset</button>';
-if ($showbtn) {
-echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
-}
-echo '</div></div></form>';
+                if ($showbtn) {
+                    echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
+                }
+                echo '</div></div></form>';
             } else {
                 echo "<h5>You must be logged in to make a payment.</h5>";
             }
@@ -918,7 +918,8 @@ add_shortcode('paystack_form', 'kkd_pff_paystack_form_shortcode');
 
 add_shortcode('pff-paystack', 'kkd_pff_paystack_form_shortcode');
 
-function kkd_pff_paystack_datepicker_shortcode($atts) {
+function kkd_pff_paystack_datepicker_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -947,7 +948,8 @@ add_shortcode('datepicker', 'kkd_pff_paystack_datepicker_shortcode');
 
 
 
-function kkd_pff_paystack_text_shortcode($atts) {
+function kkd_pff_paystack_text_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -974,7 +976,8 @@ function kkd_pff_paystack_text_shortcode($atts) {
 }
 add_shortcode('text', 'kkd_pff_paystack_text_shortcode');
 
-function kkd_pff_paystack_select_shortcode($atts) {
+function kkd_pff_paystack_select_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -1010,7 +1013,8 @@ function kkd_pff_paystack_select_shortcode($atts) {
 }
 add_shortcode('select', 'kkd_pff_paystack_select_shortcode');
 
-function kkd_pff_paystack_radio_shortcode($atts) {
+function kkd_pff_paystack_radio_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -1049,7 +1053,8 @@ function kkd_pff_paystack_radio_shortcode($atts) {
 }
 add_shortcode('radio', 'kkd_pff_paystack_radio_shortcode');
 
-function kkd_pff_paystack_checkbox_shortcode($atts) {
+function kkd_pff_paystack_checkbox_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -1086,7 +1091,8 @@ function kkd_pff_paystack_checkbox_shortcode($atts) {
     return $code;
 }
 add_shortcode('checkbox', 'kkd_pff_paystack_checkbox_shortcode');
-function kkd_pff_paystack_textarea_shortcode($atts) {
+function kkd_pff_paystack_textarea_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -1114,7 +1120,8 @@ function kkd_pff_paystack_textarea_shortcode($atts) {
 }
 add_shortcode('textarea', 'kkd_pff_paystack_textarea_shortcode');
 
-function kkd_pff_paystack_input_shortcode($atts) {
+function kkd_pff_paystack_input_shortcode($atts)
+{
     $atts = shortcode_atts(
         array(
             'name' => __('Title', 'text-domain'),
@@ -1163,7 +1170,8 @@ function kkd_pff_paystack_check_code($code)
 {
     global $wpdb;
     $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
-    $o_exist = $wpdb->get_results("SELECT * FROM $table WHERE txn_code = '".$code."'");
+    $code = sanitize_text_field($code);
+    $o_exist = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
 
     if (count($o_exist) > 0) {
         $result = true;
@@ -1402,30 +1410,34 @@ function kkd_pff_paystack_submit_action()
         );
     }
 
-    $insert =  array(
-    'post_id' => strip_tags($_POST["pf-id"], ""),
-    'email' => strip_tags($_POST["pf-pemail"], ""),
-    'user_id' => strip_tags($_POST["pf-user_id"], ""),
-    'amount' => strip_tags($amount, ""),
-    'plan' => strip_tags($plancode, ""),
-    'ip' => kkd_pff_paystack_get_the_user_ip(),
-    'txn_code' => $code,
-    'metadata' => json_encode($fixedmetadata)
+    $insert = array(
+        'post_id' => intval($_POST["pf-id"]),
+        'email' => sanitize_email($_POST["pf-pemail"]),
+        'user_id' => intval($_POST["pf-user_id"]),
+        'amount' => sanitize_text_field($amount),
+        'plan' => sanitize_text_field($plancode),
+        'ip' => kkd_pff_paystack_get_the_user_ip(), // Ensure this function returns a sanitized IP address
+        'txn_code' => sanitize_text_field($code),
+        'metadata' => wp_json_encode($fixedmetadata) // Use wp_json_encode for WordPress environments
     );
+    
     $exist = $wpdb->get_results(
-        "SELECT * FROM $table WHERE (post_id = '".$insert['post_id']."'
-			AND email = '".$insert['email']."'
-			AND user_id = '".$insert['user_id']."'
-			AND amount = '".$insert['amount']."'
-			AND plan = '".$insert['plan']."'
-			AND ip = '".$insert['ip']."'
-			AND paid = '0'
-			AND metadata = '". $insert['metadata'] ."')"
+        $wpdb->prepare(
+            "SELECT * FROM $table WHERE post_id = %d AND email = %s AND user_id = %d AND amount = %s AND plan = %s AND ip = %s AND paid = '0' AND metadata = %s",
+            $insert['post_id'], $insert['email'], $insert['user_id'], $insert['amount'], $insert['plan'], $insert['ip'], $insert['metadata']
+        )
     );
     if (count($exist) > 0) {
         // $insert['txn_code'] = $code;
         // $insert['plan'] = $exist[0]->plan;
-        $wpdb->update($table, array( 'txn_code' => $code,'plan' =>$insert['plan']), array('id'=>$exist[0]->id));
+        $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE {$table} SET txn_code = %s, plan = %s WHERE id = %d",
+                $code,
+                $insert['plan'],
+                $exist[0]->id
+            )
+        );
     } else {
         $wpdb->insert(
             $table,
@@ -1532,8 +1544,9 @@ function kkd_pff_paystack_confirm_payment()
     }
     global $wpdb;
     $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
-    $code = $_POST['code'];
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+    $code = sanitize_text_field($_POST['code']);
+    $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
     if (array_key_exists("0", $record)) {
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);
@@ -1586,7 +1599,7 @@ function kkd_pff_paystack_confirm_payment()
                         $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                         $message = $thankyou;
                         $result = "success";
-                    // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+                        // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
                         if ($txncharge == 'customer') {
                             if ($minimum == 0 && $amount != 0) {
@@ -1594,7 +1607,6 @@ function kkd_pff_paystack_confirm_payment()
                             }
                         }
                         if ($oamount !=  $amount_paid) {
-                            // echo $oamount. ' - '.$amount_paid;
                             $message = "Invalid amount Paid. Amount required is ".$currency."<b>".number_format($oamount)."</b>";
                             $result = "failed";
                         } else {
@@ -1696,12 +1708,13 @@ function kkd_pff_paystack_retry_action()
     do_action('kkd_pff_paystack_before_save');
 
     global $wpdb;
-    $code = $_POST['code'];
     $newcode = kkd_pff_paystack_generate_code();
     $newcode = $newcode.'_2';
     $insert = array();
-    $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code = '".$code."')");
+
+    $code = sanitize_text_field($_POST['code']);
+    $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code = %s", $code));
     if (array_key_exists("0", $record)) {
         $dbdata = $record[0];
         $plan = $dbdata->plan;
@@ -1762,8 +1775,9 @@ function kkd_pff_paystack_rconfirm_payment()
     }
     global $wpdb;
     $table = $wpdb->prefix.KKD_PFF_PAYSTACK_TABLE;
-    $code = $_POST['code'];
-    $record = $wpdb->get_results("SELECT * FROM $table WHERE (txn_code_2 = '".$code."')");
+    $code = sanitize_text_field($_POST['code']);
+    $record = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE txn_code_2 = %s", $code));
+
     if (array_key_exists("0", $record)) {
         $payment_array = $record[0];
         $amount = get_post_meta($payment_array->post_id, '_amount', true);
@@ -1805,7 +1819,7 @@ function kkd_pff_paystack_rconfirm_payment()
                         $thankyou = get_post_meta($payment_array->post_id, '_successmsg', true);
                         $message = $thankyou;
                         $result = "success";
-                    // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
+                        // kkd_pff_paystack_send_receipt($currency,$amount,$name,$payment_array->email,$code,$metadata)
                     } else {
                         $usequantity = get_post_meta($payment_array->post_id, '_usequantity', true);
                         if ($usequantity == 'no') {

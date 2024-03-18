@@ -61,7 +61,7 @@
     padding:40px 15px;
     max-width: 1280px;
     margin: 0 auto;
-	 font-family: 'Graphik', 'Helvetica Neue', 'Arial', sans-serif;
+     font-family: 'Graphik', 'Helvetica Neue', 'Arial', sans-serif;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -124,7 +124,7 @@
 }
 
 .j-forms input{
-	    display: block;
+        display: block;
     height: 35px;
     font-size: 14px;
     width: 100%;
@@ -2007,10 +2007,10 @@
 /* Alert messages
 =============================== */
 .alert-success {
-	color: #155724;
+    color: #155724;
     background-color: #d4edda;
     border-color: #c3e6cb;
-	position: relative;
+    position: relative;
     padding: .75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
@@ -2018,10 +2018,10 @@
 }
 
 .alert-danger {
-	color: #721c24;
+    color: #721c24;
     background-color: #f8d7da;
-	border-color: #f5c6cb;
-	position: relative;
+    border-color: #f5c6cb;
+    position: relative;
     padding: .75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
