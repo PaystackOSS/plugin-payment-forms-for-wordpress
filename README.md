@@ -9,10 +9,10 @@ If you are a developer, you can join our Developer Community on [Slack](https://
 ## Installation
 
 1. Install the [Payment Forms for Paystack](https://wordpress.org/plugins/payment-forms-for-paystack/) via the Plugins section of your WordPress Dashboard.
-2. For configuration options, please visit our [Help Desk](https://paystack.helpscoutdocs.com/article/83-how-to-setup-paystack-payment-forms-for-wordpress).
+2. For configuration options, please visit our [Help Desk](https://support.paystack.com/hc/en-us/articles/360009881260-How-to-set-up-Paystack-Payment-Forms-for-WordPress).
 
 ## Documentation
-* [Paystack Documentation](https://developers.paystack.co/v1.0/docs/)
+* [Paystack Documentation](https://paystack.com/docs)
 * [Paystack Helpdesk](https://paystack.com/help)
 
 ## Support

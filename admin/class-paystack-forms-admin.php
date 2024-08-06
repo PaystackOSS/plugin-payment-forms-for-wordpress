@@ -387,7 +387,7 @@ class Kkd_Pff_Paystack_Admin
                         <option value="EGP" ' . kkd_pff_paystack_txncheck('EGP', $currency) . '>Egyptian Pound</option>
 						<option value="USD" ' . kkd_pff_paystack_txncheck('USD', $currency) . '>US Dollars</option>
 				  </select>';
-            echo '<small>Ensure you are activated for the currency you are selecting. Check <a href="https://paystack.helpscoutdocs.com/article/38-can-paystack-process-payments-in-usd-international-currencies" target="_blank">here</a> for more information.</small>';
+            echo '<small>Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.</small>';
             echo '<p>Amount to be paid(Set 0 for customer input):</p>';
             echo '<input type="number" name="_amount" value="' . $amount  . '" class="widefat pf-number" />';
             if ($minimum == 1) {
