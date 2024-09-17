@@ -16,12 +16,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Setup {
 
-    /**
-     * Constructor: Registers the custom post type on WordPress 'init' action.
-     */
-    public function __construct() {
-        add_action( 'init', [ $this, 'register_post_type' ] );
-    }
+	/**
+	 * Constructor: Registers the custom post type on WordPress 'init' action.
+	 */
+	public function __construct() {
+		add_action( 'init', [ $this, 'register_post_type' ] );
+		add_action( 'plugins_loaded', [ $this, 'load_plugin_textdomain' ] );
+		add_action( 'plugin_action_links_' . KKD_PFF_PLUGIN_BASENAME, [ $this, 'add_action_links' ] );
+	}
 
     /**
      * Registers the custom post type 'paystack_form'.
@@ -66,4 +68,21 @@ class Setup {
 		];
         register_post_type( 'paystack_form', $args );
     }
+
+	/**
+	 * Load the plugin text domain for translation.
+	 */
+	public function load_plugin_textdomain() {
+		load_plugin_textdomain( 'pff-paystack', false, KKD_PFF_PAYSTACK_PLUGIN_PATH . '/languages/' );
+	}
+
+	/**
+	 * Add a link to our settings page in the plugin action links.
+	 */
+	public function add_action_links( $links ) {
+		$settings_link = array(
+			'<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=settings') . '">' . __( 'Settings', 'paystack_forms' ) . '</a>',
+		);
+		return array_merge( $settings_link, $links );
+	}
 }

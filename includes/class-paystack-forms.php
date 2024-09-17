@@ -31,6 +31,20 @@ final class Payment_Forms {
 	public $namespace = '\paystack\payment_forms\\';
 
 	/**
+	 * The plugin name.
+	 *
+	 * @var string
+	 */
+	public $plugin_name = 'pff-paystack';
+
+	/**
+	 * The plugin version number.
+	 *
+	 * @var string
+	 */
+	public $version = '4.0.0';
+
+	/**
 	 * Holdes the array of classes key => object.
 	 *
 	 * @var array
@@ -69,10 +83,11 @@ final class Payment_Forms {
 	 * @return void
 	 */
 	private function set_variables() {
-		$this->classes = array(
+		$this->classes     = array(
 			'activation' => '',
 			'setup'      => 'Setup',
 			'settings'   => 'Settings',
+			'forms-list' => 'Forms_List',
 		);
 	}
 
