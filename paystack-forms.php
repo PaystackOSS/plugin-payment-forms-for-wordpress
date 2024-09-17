@@ -13,7 +13,8 @@
 if (!defined('WPINC')) {
     die;
 }
-define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugins_url( __FILE__ ) );
+define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'KKD_PFF_PAYSTACK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
 define( 'KKD_PFF_PAYSTACK_VERSION', '4.0.0' );
 define( 'KKD_PFF_PAYSTACK_TABLE', 'paystack_forms_payments' );
