@@ -1,7 +1,7 @@
 === Payment Forms for Paystack ===
 Contributors: paystack, kendysond, steveamaza, sourcecodeink, krugazul, feedmymedia
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
+Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 3.1
 Tested up to: 6.6
 Stable tag: 4.0.0

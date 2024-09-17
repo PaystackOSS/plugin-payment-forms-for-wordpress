@@ -12,15 +12,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Plugin Activation class.
+ * Plugin Settings class.
  *
  * @package  Accommodation
  */
-class Activation {
+class Settings {
 	/**
-	 * Install Paystack DB Tables
+	 *
+	 * @access private
 	 */
-	public static function install() {
-		
+	public function __construct() {
 	}
+
 }

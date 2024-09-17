@@ -7,12 +7,16 @@
 
 namespace paystack\payment_forms;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Plugin class.
  *
  * @package  /paystack/payment_forms/Payment_Forms()
  */
-class Payment_Forms {
+final class Payment_Forms {
 
 	/**
 	 * Holds class isntance
@@ -44,6 +48,7 @@ class Payment_Forms {
 	private function __construct() {
 		$this->set_variables();
 		$this->include_classes();
+		$this->init_hooks();
 	}
 
 	/**
@@ -67,7 +72,8 @@ class Payment_Forms {
 	 */
 	private function set_variables() {
 		$this->classes = array(
-			'activation' => 'Activation',
+			'activation' => '',
+			'settings'   => 'Settings',
 		);
 	}
 
@@ -79,7 +85,18 @@ class Payment_Forms {
 	private function include_classes() {
 		foreach ( $this->classes as $key => $name ) {
 			include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-' . $key . '.php';
-			$this->classes[ $key ] = new ( $this->namespace . $name );
+			if ( '' !== $name ) {
+				$this->classes[ $key ] = new ( $this->namespace . $name );
+			}
 		}
+	}
+
+	/**
+	 * Hook into actions and filters.
+	 *
+	 * @since 2.3
+	 */
+	private function init_hooks() {
+		register_activation_hook( KKD_PFF_PAYSTACK_MAIN_FILE, array( '\paystack\payment_forms\activation', 'install' ) );
 	}
 }
