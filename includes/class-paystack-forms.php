@@ -71,6 +71,7 @@ final class Payment_Forms {
 	private function set_variables() {
 		$this->classes = array(
 			'activation' => '',
+			'setup'      => 'Setup',
 			'settings'   => 'Settings',
 		);
 	}
