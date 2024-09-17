@@ -51,6 +51,7 @@ class Setup {
             'public'                => true,
             'show_ui'               => true,
             'show_in_menu'          => true,
+			'show_in_rest'          => false,
             'menu_position'         => 5,
             'menu_icon'             => KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logo.png',
             'show_in_nav_menus'     => true,
