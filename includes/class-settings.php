@@ -13,8 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Plugin Settings class.
- *
- * @package  Accommodation
  */
 class Settings {
 	/**

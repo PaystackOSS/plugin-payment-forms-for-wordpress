@@ -6,7 +6,7 @@
 /**
  * The old plugin initilizer.
  *
- * @return object| \paystack\payment_forms\Payment_Forms()
+ * @return \paystack\payment_forms\Payment_Forms
  * @deprecated 3.4.2
  */
 function kkd_pff_paystack_run_paystack_forms() {

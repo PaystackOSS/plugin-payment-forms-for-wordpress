@@ -13,8 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Plugin class.
- *
- * @package  /paystack/payment_forms/Payment_Forms()
  */
 final class Payment_Forms {
 

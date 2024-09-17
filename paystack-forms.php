@@ -31,3 +31,5 @@ function kkd_pff_paystack() {
 	return \paystack\payment_forms\Payment_Forms::get_instance();
 }
 $_GLOBAL['kkd_pff_paystack'] = kkd_pff_paystack();
+
+\paystack\payment_forms\Activation::install();

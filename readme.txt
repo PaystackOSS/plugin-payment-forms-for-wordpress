@@ -2,7 +2,7 @@
 Contributors: paystack, kendysond, steveamaza, sourcecodeink, krugazul, feedmymedia
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
-Requires at least: 3.1
+Requires at least: 6.2
 Tested up to: 6.6
 Stable tag: 4.0.0
 License: GPLv2 or later
