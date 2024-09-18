@@ -35,14 +35,14 @@ final class Payment_Forms {
 	 *
 	 * @var string
 	 */
-	public $plugin_name = 'pff-paystack';
+	public $plugin_name = KKD_PFF_PLUGIN_NAME;
 
 	/**
 	 * The plugin version number.
 	 *
 	 * @var string
 	 */
-	public $version = '4.0.0';
+	public $version = KKD_PFF_PAYSTACK_VERSION;
 
 	/**
 	 * Holdes the array of classes key => object.

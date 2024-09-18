@@ -19,6 +19,7 @@ define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
 define( 'KKD_PFF_PAYSTACK_VERSION', '4.0.0' );
 define( 'KKD_PFF_PAYSTACK_TABLE', 'paystack_forms_payments' );
 define( 'KKD_PFF_PLUGIN_BASENAME', plugin_basename(__FILE__) );
+define( 'KKD_PFF_PLUGIN_NAME', 'pff-paystack' );
 
 include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-paystack-forms.php';
 
@@ -27,7 +28,7 @@ include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-paystack-forms.php'
  *
  * @return object \paystack\payment_forms\Payment_Forms()
  */
-function kkd_pff_paystack() {
+function pff_paystack() {
 	return \paystack\payment_forms\Payment_Forms::get_instance();
 }
-$_GLOBAL['kkd_pff_paystack'] = kkd_pff_paystack();
+$_GLOBAL['kkd_pff_paystack'] = pff_paystack();

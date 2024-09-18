@@ -23,6 +23,8 @@ class Setup {
 		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action( 'plugins_loaded', [ $this, 'load_plugin_textdomain' ] );
 		add_action( 'plugin_action_links_' . KKD_PFF_PLUGIN_BASENAME, [ $this, 'add_action_links' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
     /**
@@ -84,5 +86,27 @@ class Setup {
 			'<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=settings') . '">' . __( 'Settings', 'paystack_forms' ) . '</a>',
 		);
 		return array_merge( $settings_link, $links );
+	}
+
+	/**
+	 * Enqueues our admin css.
+	 *
+	 * @param string $hook
+	 * @return void
+	 */
+	public function enqueue_styles( $hook ) {
+		if ( $hook != 'paystack_form_page_submissions' && $hook != 'paystack_form_page_settings' ) {
+			return;
+		}
+		wp_enqueue_style( pff_paystack()->plugin_name,  KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/paystack-admin.css', array(), pff_paystack()->version, 'all');
+	}
+
+	/**
+	 * Enqueue the Administration scripts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		wp_enqueue_script( pff_paystack()->plugin_name, KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array('jquery'), pff_paystack()->version, false);
 	}
 }
