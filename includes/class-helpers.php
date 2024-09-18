@@ -26,26 +26,37 @@ class Helpers {
 	 * Fetch an array of the plans by the form ID.
 	 *
 	 * @param integer $form_id
-	 * @param string $paid '1' or '0'
+	 * @param array $args
 	 * @return array
 	 */
-	public function get_payments_by_id( $form_id = 0, $paid = '1' ) {
+	public function get_payments_by_id( $form_id = 0, $args = array() ) {
         global $wpdb;
 		$results = array();
 		if ( 0 === $form_id ) {
 			return $results;
 		}
-        $table   = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+
+		$defaults = array(
+			'paid'     => '1', 
+			'order'    => 'desc',
+			'orderby'  => 'created_at',
+		);
+		$args  = wp_parse_args( $args, $defaults );
+        $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$query = "SELECT * 
+				FROM %i 
+				WHERE post_id = %d 
+				AND paid = %s
+				ORDER BY %i " . strtoupper( $args['order'] );
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * 
-				FROM %i 
-				WHERE post_id = %d 
-				AND paid = %s",
+				$query,
 				$table,
 				$form_id,
-				$paid
+				$args['paid'],
+				$args['orderby'],
 			)
 		);
 		return $results;

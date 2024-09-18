@@ -37,7 +37,7 @@ class Submissions {
 			return __( 'No form set', 'paystack_forms' );
 		}
 
-		$form_id  = sanitize_text_field( $_GET['form'] );
+		$form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );
 		$form     = get_post( $form_id );
 
 		if ( 'paystack_form' === get_post_type( $form ) ) {
