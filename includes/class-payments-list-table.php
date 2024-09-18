@@ -18,27 +18,27 @@ class Payments_List_Table extends \WP_List_Table
 		}
 		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );
 
-		$data        = array();
-		$alldbdata   = pff_paystack()->helpers->get_payments_by_id( $this->form_id, $this->get_args() );
-		$data        = $this->format_row_data( $alldbdata );
-		$columns     = $this->get_columns();
-		$hidden      = $this->get_hidden_columns();
-		$sortable    = $this->get_sortable_columns();
-		$perPage     = 20;
-		$currentPage = $this->get_pagenum();
-		$totalItems  = count( $data );
+		$data         = array();
+		$row_data     = pff_paystack()->helpers->get_payments_by_id( $this->form_id, $this->get_args() );
+		$data         = $this->format_row_data( $row_data );
+		$columns      = $this->get_columns();
+		$hidden       = $this->get_hidden_columns();
+		$sortable     = $this->get_sortable_columns();
+		$per_page     = 20;
+		$current_page = $this->get_pagenum();
+		$total_items  = count( $data );
 
 		$this->set_pagination_args(
 			array(
-				'total_items' => $totalItems,
-				'per_page'    => $perPage
+				'total_items' => $total_items,
+				'per_page'    => $per_page
 			)
 		);
-		$data                  = array_slice( $data, ( ( $currentPage - 1 ) * $perPage ), $perPage );
+		$data                  = array_slice( $data, ( ( $current_page - 1 ) * $per_page ), $per_page );
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 		$this->items           = $data;
 
-		$rows = count( $alldbdata );
+		$rows = count( $row_data );
 		return $rows;
     }
 
@@ -154,19 +154,19 @@ class Payments_List_Table extends \WP_List_Table
 		$currency = get_post_meta( $this->form_id, '_currency', true );
 		$new_data = [];
 		foreach ( $alldata as $key => $row ) {
-			$newkey = $key + 1;
+			$new_key = $key + 1;
 			if ( $row->txn_code_2 != "" ) {
 				$txn_code = $row->txn_code_2;
 			} else {
 				$txn_code = $row->txn_code;
 			}
 			$new_data[] = array(
-				'id'  => $newkey,
-				'email' => '<a href="mailto:' . $row->email . '">' . $row->email . '</a>',
-				'amount' => $currency . '<b>' . number_format( $row->amount ) . '</b>',
+				'id'       => $new_key,
+				'email'    => '<a href="mailto:' . $row->email . '">' . $row->email . '</a>',
+				'amount'   => $currency . '<b>' . number_format( $row->amount ) . '</b>',
 				'txn_code' => $txn_code,
 				'metadata' => $this->format_metadata( $row->metadata ),
-				'date'  => $row->created_at
+				'date'     => $row->created_at
 			);
 		}
 		return $new_data;
