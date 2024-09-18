@@ -66,27 +66,43 @@ class Forms_List {
 	}
 
 	public function column_data( $column, $post_id ) {
-		global $post, $wpdb;
-		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 		switch ( $column ) {
 			case 'shortcode':
 				echo wp_kses_post( '<span class="shortcode"><code>[pff-paystack id=&quot;' . $post_id . '&quot;]"</code></span>' );
 				break;
 			case 'payments':
-				$num = $wpdb->get_var(
-					$wpdb->prepare(
-						"SELECT COUNT(*)
-						FROM %i
-						WHERE post_id = %d
-						AND paid = '1'",
-						$table,
-						$post_id
-					)
-				);
+				$num = $this->get_payments_count( $post_id );
 				echo wp_kses_post( '<u><a href="' . admin_url( 'admin.php?page=submissions&form=' . $post_id ) . '">' . $num . '</a></u>' );
 				break;
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * Gets the payments count for the current form.
+	 *
+	 * @param int|string $form_id
+	 * @return int
+	 */
+	private function get_payments_count( $form_id ) {
+		global $wpdb;
+		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$num   = wp_cache_get( 'form_payments_' . $form_id, 'pff_paystack' );
+		if ( false === $num ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$num = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*)
+					FROM %i
+					WHERE post_id = %d
+					AND paid = '1'",
+					$table,
+					$form_id
+				)
+			);
+			wp_cache_set( 'form_payments_' . $form_id, $num, 'pff_paystack', 60*5 );
+		}
+		return $num;
 	}
 }
