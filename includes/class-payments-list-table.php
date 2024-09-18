@@ -12,11 +12,11 @@ class Payments_List_Table extends \WP_List_Table
 	public $form_id = 0;
 
 	public function prepare_items() {
-
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['form'] ) || empty( $_GET['form'] ) ) { 
 			return __( 'No form set', 'paystack_forms' );
 		}
-		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );
+		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$data         = array();
 		$row_data     = pff_paystack()->helpers->get_payments_by_id( $this->form_id, $this->get_args() );
@@ -132,11 +132,13 @@ class Payments_List_Table extends \WP_List_Table
 			'orderby' => 'created_at',
 			'order'   => 'desc',
 		);
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['orderby'] ) ) {
-			$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['order'] ) ) {
-			$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+			$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( 'date' === $args['order'] ) {
 				$args['order'] = 'created_at';
 			}
