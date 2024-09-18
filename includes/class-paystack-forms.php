@@ -52,6 +52,13 @@ final class Payment_Forms {
 	private $classes = array();
 
 	/**
+	 * Helpers functions for the custom payments.
+	 *
+	 * @var \paystack\payment_forms\Helpers
+	 */
+	public $helpers;
+
+	/**
 	 * Initialize the plugin by setting localization, filters, and
 	 * administration functions.
 	 *
@@ -84,10 +91,12 @@ final class Payment_Forms {
 	 */
 	private function set_variables() {
 		$this->classes     = array(
-			'activation' => '',
-			'setup'      => 'Setup',
-			'settings'   => 'Settings',
-			'forms-list' => 'Forms_List',
+			'activation'          => '',
+			'setup'               => 'Setup',
+			'helpers'             => 'Helpers',
+			'settings'            => 'Settings',
+			'forms-list'          => 'Forms_List',
+			'submissions'         => 'Submissions',
 		);
 	}
 
@@ -99,7 +108,9 @@ final class Payment_Forms {
 	private function include_classes() {
 		foreach ( $this->classes as $key => $name ) {
 			include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-' . $key . '.php';
-			if ( '' !== $name ) {
+			if ( 'Helpers' === $name ) {
+				$this->helpers = new ( $this->namespace . $name );
+			} else if ( '' !== $name ) {
 				$this->classes[ $key ] = new ( $this->namespace . $name );
 			}
 		}
