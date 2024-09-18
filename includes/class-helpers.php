@@ -43,16 +43,16 @@ class Helpers {
 		);
 		$args  = wp_parse_args( $args, $defaults );
         $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-		$query = "SELECT * 
-				FROM %i 
-				WHERE post_id = %d 
-				AND paid = %s
-				ORDER BY %i " . strtoupper( $args['order'] );
+		$order = strtoupper( $args['order'] );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				$query,
+				"SELECT * 
+				FROM %i 
+				WHERE post_id = %d 
+				AND paid = %s
+				ORDER BY %i $order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$table,
 				$form_id,
 				$args['paid'],

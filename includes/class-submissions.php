@@ -33,7 +33,7 @@ class Submissions {
 	 * @return void
 	 */
 	public function output_submissions_page() {
-		if ( ! isset( $_GET['form'] ) ) {
+		if ( ! isset( $_GET['form'] ) ) { 
 			return __( 'No form set', 'paystack_forms' );
 		}
 
@@ -57,7 +57,7 @@ class Submissions {
 						<?php esc_html_e( 'All payments made for this form', 'paystack_forms' ); ?>
 					</p>
 					<?php if ( $data > 0 ) { ?>
-						<form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="post">
+						<form action="<?php echo esc_html( admin_url( 'admin-post.php' ) ); ?>" method="post">
 							<input type="hidden" name="action" value="kkd_pff_export_excel">
 							<input type="hidden" name="form_id" value="<?php echo esc_html( $form_id ); ?>">
 							<button type="submit" class="button button-primary button-hero load-customize"><?php esc_html_e( 'Export Data to Excel', 'paystack_forms' ); ?></button>

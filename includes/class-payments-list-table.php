@@ -12,7 +12,11 @@ class Payments_List_Table extends \WP_List_Table
 	public $form_id = 0;
 
 	public function prepare_items() {
-		$this->form_id   = $_GET['form'];
+
+		if ( ! isset( $_GET['form'] ) || empty( $_GET['form'] ) ) { 
+			return __( 'No form set', 'paystack_forms' );
+		}
+		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );
 
 		$data        = array();
 		$alldbdata   = pff_paystack()->helpers->get_payments_by_id( $this->form_id, $this->get_args() );
