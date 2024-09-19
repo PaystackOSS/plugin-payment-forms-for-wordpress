@@ -22,6 +22,10 @@ class Forms_Update {
 	public function __construct() {
 		add_action( 'admin_head', [ $this, 'setup_actions' ] );
 		add_filter( 'admin_head', [ $this, 'disable_wyswyg' ], 10, 1 );
+
+		// Define the meta boxes.
+		add_action( 'edit_form_after_title', [ $this, 'metabox_action' ] );
+		add_action( 'add_meta_boxes', [ $this, 'register_meta_boxes' ] );
 	}
 
 	public function setup_actions() {
@@ -31,7 +35,7 @@ class Forms_Update {
 		remove_action( 'media_buttons', 'media_buttons' );
 		remove_meta_box( 'postimagediv', 'post', 'side' );
 
-		add_action( 'admin_print_footer_scripts', [ $this, 'shortcode_button_script' ] );
+		add_action( 'admin_print_footer_scripts', [ $this, 'shortcode_buttons_script' ] );
 	}
 
 	/**
@@ -61,11 +65,11 @@ class Forms_Update {
 	}
 
 	/**
-	 * Outputs the QuickTags scripts needed to generate the shortcode.
+	 * Outputs the QuickTags scripts needed to generate the field shortcodes.
 	 *
 	 * @return void
 	 */
-	public function shortcode_button_script() {
+	public function shortcode_buttons_script() {
 		if ( wp_script_is( 'quicktags' ) ) {
 			?>
 			<script type="text/javascript">
@@ -165,7 +169,68 @@ class Forms_Update {
 			
 			//
 			</script>
-					<?php
-				}
-			}
+			<?php
+		}
+	}
+
+	/**
+	 * Adds in a custom action to allow us to hook into just under the forms title.
+	 *
+	 * @param \WP_Post $post
+	 * @return void
+	 */
+	public function metabox_action( $post ) {
+		do_meta_boxes( null, 'pff-paystack-metabox-holder', $post );
+	}
+
+	/**
+	 * Registers our custom metaboxes.
+	 *
+	 * @return void
+	 */
+	public function register_meta_boxes() {
+		if ( isset( $_GET['action'] ) ) {
+			add_meta_box( 'pff_paystack_editor_help_shortcode', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
+		}
+		add_meta_box( 'pff_paystack_editor_help_data', __( 'Help Section', 'paystack_forms' ), [ $this, 'help_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
+
+	}
+	
+	/**
+	 * Output the shortcode details
+	 *
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	public function shortcode_details( $post ) {
+		?>
+		<p class="description">
+			<label for="wpcf7-shortcode"><?php esc_html_e( 'Copy this shortcode and paste it into your post, page, or text widget content:', 'paystack_forms' ); ?></label>
+			<span class="shortcode wp-ui-highlight">
+				<input type="text" id="wpcf7-shortcode" onfocus="this.select();" readonly="readonly" class="large-text code" value="[pff-paystack id=&quot;<?php echo esc_html( $post->ID ); ?>&quot;]">
+			</span>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Outputs the help details below the title.
+	 *
+	 * @param WP_Post $post
+	 * @return void
+	 */
+	public function help_details( $post ) {
+			// We shall output 1 Nonce Field for all of our metaboxes.
+			wp_nonce_field( 'pff-paystack-save-form', 'pff_paystack_save' );
+			?>
+			<div class="awesome-meta-admin">
+				<?php echo wp_kses_post( __( 'Email and Full Name field is added automatically, no need to include that.<br /><br />
+				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
+				It should look like this <code> [text name="Full Name" required="required" ]</code><br /><br />' ) ) ; ?>
+
+				<?php echo wp_kses_post( __( '<b style="color:red;">Warning:</b> Using the file input field may cause data overload on your server.
+				Be sure you have enough server space before using it. You also have the ability to set file upload limits.' ) ) ; ?>
+			</div>
+		<?php
+	}
 }
