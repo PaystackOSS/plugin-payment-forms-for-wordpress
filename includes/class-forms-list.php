@@ -1,6 +1,6 @@
 <?php
 /**
- * The setup plugin class, this will return register the post type and other needed items.
+ * The class that controlls the output of the list of forms in the backend.
  *
  * @package paystack\payment_forms
  */
@@ -15,13 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers the additional functions for the WP Dashboard Forms List
  */
 class Forms_List {
-
-	/**
-	 * The plugin name.
-	 *
-	 * @var string
-	 */
-	public $plugin_name = 'pff-paystack';
 
 	/**
 	 * Constructor

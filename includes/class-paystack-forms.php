@@ -90,13 +90,14 @@ final class Payment_Forms {
 	 * @return void
 	 */
 	private function set_variables() {
-		$this->classes     = array(
+		$this->classes = array(
 			'activation'          => '',
 			'setup'               => 'Setup',
 			'helpers'             => 'Helpers',
 			'settings'            => 'Settings',
 			'forms-list'          => 'Forms_List',
 			'submissions'         => 'Submissions',
+			'forms-update'        => 'Forms_Update',
 		);
 	}
 
