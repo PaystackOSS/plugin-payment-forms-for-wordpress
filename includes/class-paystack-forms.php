@@ -98,6 +98,7 @@ final class Payment_Forms {
 			'forms-list'          => 'Forms_List',
 			'submissions'         => 'Submissions',
 			'forms-update'        => 'Forms_Update',
+			'tinymce-plugin'      => 'TinyMCE_Plugin',
 		);
 	}
 
