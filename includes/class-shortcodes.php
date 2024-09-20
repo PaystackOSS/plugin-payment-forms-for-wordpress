@@ -17,15 +17,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcodes {
 
 	/**
+	 * The helper class.
+	 *
+	 * @var Helpers
+	 */
+	public $helpers;
+
+	/**
+	 * Holds the array of meta fields and their stored values.
+	 *
+	 * @var array
+	 */
+	protected $meta = [];
+
+	/**
+	 * Holds the array of the current user data.
+	 *
+	 * @var array
+	 */
+	protected $user = [];
+
+	/**
+	 * Holds the current form Object
+	 *
+	 * @var WP_Post
+	 */
+	protected $form;
+
+	/**
+	 * If we should show the submit button, if this is false there is most likely a config error with the form.
+	 *
+	 * @var WP_Post
+	 */
+	protected $showbtn = true;
+
+	/**
+	 * Holds the array of payment options available.
+	 *
+	 * @var array
+	 */
+	protected $paymentoptions = [];
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		if ( is_admin() ) {
 			return;
 		}
-
-		add_shortcode('paystack_form', [ $this, 'form_shortcode' ] );
-		add_shortcode('pff-paystack', [ $this, 'form_shortcode' ] );
+		add_shortcode( 'paystack_form', [ $this, 'form_shortcode' ] );
+		add_shortcode( 'pff-paystack', [ $this, 'form_shortcode' ] );
 	}
 
 	/**
@@ -34,226 +75,372 @@ class Shortcodes {
 	 * @param array $atts
 	 * @return string
 	 */
-	public function kkd_pff_paystack_form_shortcode( $atts ) {
-		ob_start();
-	
-		// Ensure the current user is populated
-		global $current_user;
-		wp_get_current_user();
-		$user_id = $current_user->ID;
-		$email = sanitize_email($current_user->user_email);
-		$fname = sanitize_text_field($current_user->user_firstname);
-		$lname = sanitize_text_field($current_user->user_lastname);
-		$fullname = $fname || $lname ? trim($fname . ' ' . $lname) : '';
-	
+	public function form_shortcode( $atts ) {
 		// Use array access for shortcode attributes
-		$atts = shortcode_atts(array('id' => 0), $atts, 'paystack_form');
-		$id = intval($atts['id']); // Ensure $id is an integer
+		$defaults = array(
+			'id' => 0
+		);
+		$atts = shortcode_atts(
+			$defaults,
+			$atts,
+			'paystack_form'
+		);
+		$id            = intval( $atts['id'] ); // Ensure $id is an integer
+		$this->helpers = Helpers::get_instance();
 	
-		$pk = Kkd_Pff_Paystack_Public::fetchPublicKey();
+		/*$pk = Pff_Paystack_Public::fetchPublicKey();
 		if (!$pk) {
 			$settingslink = esc_url(get_admin_url(null, 'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php'));
 			echo "<h5>You must set your Paystack API keys first <a href='{$settingslink}'>settings</a></h5>";
 			return ob_get_clean(); // Return early to avoid further processing
-		}
+		}*/
+
+		// Store our items in an array and not an object.
+		$html = [];
 	
-		if ($id > 0) {
-			$obj = get_post($id);
-			if ($obj && $obj->post_type === 'paystack_form') {
-				// Fetch and sanitize meta values
-				$meta_keys = [
-					'_amount', '_successmsg', '_paybtn', '_loggedin', '_txncharge', 
-					'_currency', '_recur', '_recurplan', '_usequantity', '_quantity', 
-					'_useagreement', '_agreementlink', '_minimum', '_variableamount', 
-					'_usevariableamount', '_hidetitle'
-				];
-				$meta = [];
-				foreach ($meta_keys as $key) {
-					$meta[$key] = sanitize_text_field(get_post_meta($id, $key, true));
-				}
-	
-				// Ensure minimum defaults are set
-				$meta['_minimum'] = $meta['_minimum'] === "" ? 0 : $meta['_minimum'];
-				$meta['_usevariableamount'] = $meta['_usevariableamount'] === "" ? 0 : $meta['_usevariableamount'];
-				$meta['_usequantity'] = $meta['_usequantity'] === "" ? 'no' : $meta['_usequantity'];
-				$minimum = floatval($meta['_minimum']);
-				$currency = $meta['_currency'] === "" ? 'NGN' : $meta['_currency'];
-				$txncharge = floatval($meta['_txncharge']);
-				// Process variable amount options if applicable
-				$paymentoptions = [];
-				if ($meta['_usevariableamount'] == 1) {
-					$paymentoptions = explode(',', $meta['_variableamount']);
-					$paymentoptions = array_map('sanitize_text_field', $paymentoptions);
-				}
-				$showbtn = true;
-				$planerrorcode = 'Input Correct Recurring Plan Code';
-				$recur = $meta['_recur'];
-				$recurplan = $meta['_recurplan'];
-				if ($meta['_recur']== 'plan') {
-					if ($meta['_recurplan'] == '' || $meta['_recurplan'] == '') {
-						$showbtn = false;
-					} else {
-						$plan =    kkd_pff_paystack_fetch_plan($meta['_recurplan']);
-						if (isset($plan->data->amount)) {
-							$planamount = $plan->data->amount/100;
-						} else {
-							$showbtn = false;
-						}
-					}
-				}
+		if ( $id > 0 ) {
+			$obj = get_post( $id );
+			if ( null !== $obj && 'paystack_form' === get_post_type( $obj ) ) {
+				
+				$this->form = $obj;
+				$this->set_user_details();
+				$this->set_meta_data( $obj );
+				
 				// Check if the form should be displayed based on user login status
-				$show_form = ($user_id != 0 && $meta['_loggedin'] == 'yes') || $meta['_loggedin'] == 'no';
+				$show_form = $this->should_show_form();
 	
-				if ($show_form) {
+				if ( $show_form ) {
 					// Form title
-					if ($meta['_hidetitle'] != 1) {
-						echo "<h1 id='pf-form" . esc_attr($id) . "'>" . esc_html($obj->post_title) . "</h1>";
+					if ( $this->meta['hidetitle'] != 1 ) {
+						$html[] = "<h1 id='pf-form" . esc_attr( $id ) . "'>" . esc_html( $obj->post_title ) . "</h1>";
 					}
 	
 					// Start form output
-					echo '<form version="' . esc_attr(KKD_PFF_PAYSTACK_VERSION) . '" enctype="multipart/form-data" action="' . esc_url(admin_url('admin-ajax.php')) . '" method="post" class="paystack-form j-forms" novalidate>
+					$html[] = '<form version="' . esc_attr( KKD_PFF_PAYSTACK_VERSION ) . '" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" class="paystack-form j-forms" novalidate>
 						  <div class="j-row">';
 	
-					// Hidden inputs
-					echo '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">
-						  <input type="hidden" name="pf-id" value="' . esc_attr($id) . '" />
-						  <input type="hidden" name="pf-user_id" value="' . esc_attr($user_id) . '" />
-						  <input type="hidden" name="pf-recur" value="' . esc_attr($meta['_recur']) . '" />';
-	
-					// Full Name input
-					echo '<div class="span12 unit">
-						  <label class="label">Full Name <span>*</span></label>
-						  <div class="input">
-							  <input type="text" name="pf-fname" placeholder="First & Last Name" value="' . esc_attr($fullname) . '" required>
-						  </div>
-					  </div>';
-	
-					// Email input
-					echo '<div class="span12 unit">
-						  <label class="label">Email <span>*</span></label>
-						  <div class="input">
-							  <input type="email" name="pf-pemail" placeholder="Enter Email Address" id="pf-email" value="' . esc_attr($email) . '" ' . ($meta['_loggedin'] == 'yes' ? 'readonly' : '') . ' required>
-						  </div>
-					  </div>';
-	
+					// Hidden Fields
+					$html[] = $this->get_hidden_fields();
+					// User fields
+					$html[] = $this->get_fullname_field();
+					$html[] = $this->get_email_field();
+
 					// Amount selection with consideration for variable amounts, minimum payments, and recurring plans
-					echo '<div class="span12 unit">
-					<label class="label">Amount (' . esc_html($currency);
-					if ($minimum == 0 && $amount != 0 && $usequantity == 'yes') {
-						echo ' ' . esc_html(number_format($amount));
-					}
-					echo ') <span>*</span></label>
-					<div class="input">';
+					$html[] = $this->get_amount_field();
+
+					$html[] = $this->get_quantity_field();
 	
-					if ($usevariableamount == 0) {
-						if ($minimum == 1) {
-							echo '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($currency) . '  ' . esc_html(number_format($amount)) . '</b></small>';
-						}
-						if ($recur == 'plan') {
-							if ($showbtn) {
-								echo '<input type="text" name="pf-amount" value="' . esc_attr($planamount) . '" id="pf-amount" readonly required />';
-							} else {
-								echo '<div class="span12 unit">
-								<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($planerrorcode) . '</label>
-							</div>';
-							}
-						} elseif ($recur == 'optional') {
-							echo '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
-						} else {
-							echo '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr($amount == 0 ? "0" : $amount) . '" id="pf-amount" ' . ($amount != 0 && $minimum != 1 ? 'readonly' : '') . ' required />';
-						}
+					// Recurring payment options
+					$html[] = $this->get_recurring_field();
+					$html[] = $this->get_recurring_plan_fields();
+					
+					//$html[] = do_shortcode( $obj->post_content );
+
+					$html[] = $this->get_agreement_field();
+
+					$html[] = $this->get_form_footer();
+	
+					$html[] = '</div></form>';
+				} else {
+					$html[] = '<h5>' . __( 'You must be logged in to make a payment.', 'paystack_forms' ) . '</h5>';
+				}
+			} else {
+				$html[] = '<h5>' . __( 'Invalid Paystack form ID or the form does not exist.', 'paystack_forms' ) . '</h5>';
+			}
+		} else {
+			$html[] = '<h5>' . __( 'No Paystack form ID provided.', 'paystack_forms' ) . '</h5>';
+		}
+
+		$html = implode( '', $html );
+	
+		return $html;
+	}
+
+	/**
+	 * Set the user deteails based on the logged in wp_user
+	 *
+	 * @return void
+	 */
+	public function set_user_details() {
+		// Ensure the current user is populated
+		$this->user['logged_in'] = false;
+		$this->user['id']        = 0;
+		$this->user['fullname']  = '';
+		$this->user['email']     = '';	
+
+		if ( is_user_logged_in() ) {
+			$current_user           = wp_get_current_user();
+			$user['logged_in']      = true;
+			$this->user['id']       = $current_user->ID;
+			$this->user['email']    = $current_user->user_email;
+			$this->user['fname']    = sanitize_text_field( $current_user->user_firstname );
+			$this->user['lname']    = sanitize_text_field( $current_user->user_lastname );
+			$this->user['fullname'] = $this->user['fname'] || $this->user['lname'] ? trim( $this->user['fname'] . ' ' . $this->user['lname'] ) : '';
+		}
+	}
+
+	/**
+	 * Set the user deteails based on the logged in wp_user
+	 *
+	 * @return void
+	 */
+	public function set_meta_data( $obj ) {
+		$this->meta = $this->helpers->parse_meta_values( $obj );
+
+		if ( $this->meta['usevariableamount'] == 1 ) {
+			$this->meta['paymentoptions'] = explode( ',', $this->meta['variableamount'] );
+			$this->meta['paymentoptions'] = array_map( 'sanitize_text_field', $this->meta['paymentoptions'] );
+		}
+
+		$this->meta['planerrorcode'] = __( 'Input Correct Recurring Plan Code', 'paystack_forms' );
+
+		if ( $this->meta['recur']== 'plan') {
+			if ( $this->meta['recurplan'] == '' || $this->meta['recurplan'] == '') {
+				$this->showbtn = false;
+			} else {
+				/**
+				 * TODO: Implement this functionality
+				 */
+				//$plan = pff_paystack_fetch_plan( $this->meta['recurplan'] );
+				if ( isset( $plan->data->amount ) ) {
+					$this->meta['planamount'] = $plan->data->amount/100;
+				} else {
+					$this->showbtn = false;
+				}
+			}
+		}
+	}
+
+	/**
+	 * If we should show the form or not.
+	 *
+	 * @return boolean
+	 */
+	public function should_show_form() {
+		$show_form = false;
+		if ( 'no' === $this->meta['loggedin'] || ( 'yes' === $this->meta['loggedin'] &&  true === $this->user['logged_in'] ) ) {
+			$show_form = true;
+		}
+		return $show_form;
+	}
+
+	/**
+	 * Return the Hidden fields needed.
+	 * @return string
+	 */
+	public function get_hidden_fields() {
+		// Hidden inputs
+		$html = '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">
+				<input type="hidden" name="pf-id" value="' . esc_attr( $this->form->ID ) . '" />
+				<input type="hidden" name="pf-user_id" value="' . esc_attr( $this->user['id'] ) . '" />
+				<input type="hidden" name="pf-recur" value="' . esc_attr( $this->meta['recur'] ) . '" />';
+		return $html;
+	}
+	
+	/**
+	 * Return the Fullname field.
+	 *
+	 * @return string
+	 */
+	public function get_fullname_field() {
+		$html = '<div class="span12 unit">
+			<label class="label">' . __( 'Full Name', 'paystack_forms' ) . ' <span>*</span></label>
+			<div class="input">
+				<input type="text" name="pf-fname" placeholder="' . __( 'First & Last Name', 'paystack_forms' ) . '" value="' . esc_attr( $this->user['fullname'] ) . '" required>
+			</div>
+		</div>';
+		return $html;
+	}
+	
+	/**
+	 * Return the Email field.
+	 *
+	 * @return string
+	 */
+	public function get_email_field() {
+		$html = '<div class="span12 unit">
+			<label class="label">' . __( 'Email', 'paystack_forms' ) . ' <span>*</span></label>
+			<div class="input">
+				<input type="email" name="pf-pemail" placeholder="' . __( 'Enter Email Address', 'paystack_forms' ) . '" id="pf-email" value="' . esc_attr( $this->user['email'] ) . '" ' . ( $this->meta['loggedin'] == 'yes' ? 'readonly' : '' ) . ' required>
+			</div>
+		</div>';
+		return $html;
+	}
+	
+	/**
+	 * Get the amount field
+	 * @return string
+	 */
+	public function get_amount_field() {
+		$html = [];
+		$html[] = '<div class="span12 unit">
+			<label class="label">Amount (' . esc_html( $this->meta['currency'] );
+
+			if ( 0 === $this->meta['minimum'] && 0 !== $this->meta['amount'] && 'yes' === $this->meta['usequantity'] ) {
+				$html[] = ' ' . esc_html( number_format( $this->meta['amount'] ) );
+			}
+
+			$html[] = ') <span>*</span></label>
+			<div class="input">';
+
+			// If the amount is set.
+			if ( 0 === $this->meta['usevariableamount'] ) {
+
+				if ($this->meta['minimum'] == 1) {
+					$html[] = '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($this->meta['currency']) . '  ' . esc_html(number_format($this->meta['amount'])) . '</b></small>';
+				}
+
+				if ($this->meta['recur'] == 'plan') {
+					if ( $this->showbtn ) {
+						$html[] = '<input type="text" name="pf-amount" value="' . esc_attr( $this->meta['planamount'] ) . '" id="pf-amount" readonly required />';
 					} else {
-						if ($usevariableamount == "") {
-							echo "Form Error, set variable amount string";
-						} else {
-							if (count($paymentoptions) > 0) {
-								echo '<div class="select">
+						$html[] = '<div class="span12 unit">
+									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html( $this->meta['planerrorcode'] ) . '</label>
+									</div>';
+					}
+				} elseif ( $this->meta['recur'] == 'optional' ) {
+					$html[] = '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
+				} else {
+					$html[] = '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr( 0 === $this->meta['amount'] ? "0" : $this->meta['amount'] ) . '" id="pf-amount" ' . ( 0 !== $this->meta['amount'] && 1 !== $this->meta['minimum'] ? 'readonly' : '' ) . ' required />';
+				}
+
+			} else {
+
+				if ( '' === $this->meta['usevariableamount'] ) {
+					$html[] = "Form Error, set variable amount string";
+				} else {
+					if ( count( $this->meta['paymentoptions'] ) > 0 ) {
+						$html[] = '<div class="select">
 								<input type="hidden"  id="pf-vname" name="pf-vname" />
 								<input type="hidden"  id="pf-amount" />
 								<select class="form-control" id="pf-vamount" name="pf-amount">';
-								foreach ($paymentoptions as $option) {
-									list($optionName, $optionValue) = explode(':', $option);
-									echo '<option value="' . esc_attr($optionValue) . '">' . esc_html($optionName) . '(' . esc_html(number_format($optionValue)) . ')</option>';
+								foreach ( $this->meta['paymentoptions'] as $option ) {
+									list( $optionName, $optionValue ) = explode( ':', $option );
+									$html[] = '<option value="' . esc_attr( $optionValue ) . '">' . esc_html( $optionName ) . '(' . esc_html( number_format( $optionValue ) ) . ')</option>';
 								}
-								echo '</select> <i></i> </div>';
-							}
-						}
+						$html[] = '</select> <i></i> </div>';
 					}
-	
-					// Transaction charge notice
-					if ($txncharge != 'merchant' && $recur != 'plan') {
-						echo '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
-					}
-	
-					echo '</div></div>';
-	
-					// Quantity selection
-					if ($recur == 'no' && $usequantity == 'yes' && ($usevariableamount == 1 || $amount != 0)) {
-						echo '<div class="span12 unit">
-						<label class="label">Quantity</label>
-						<div class="select">
-							<input type="hidden" value="' . esc_attr($amount) . '" id="pf-qamount"/>
-							<select class="form-control" id="pf-quantity" name="pf-quantity">';
-						for ($i = 1; $i <= $quantity; $i++) {
-							echo '<option value="' . esc_attr($i) . '">' . esc_html($i) . '</option>';
-						}
-						echo '</select> <i></i> </div></div>';
-					}
-	
-					// Recurring payment options
-					if ($recur == 'optional') {
-						echo '<div class="span12 unit">
-				<label class="label">Recurring Payment</label>
-				<div class="select">
-					<select class="form-control" name="pf-interval">';
-						$intervals = ['no' => 'None', 'daily' => 'Daily', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'biannually' => 'Biannually', 'annually' => 'Annually'];
-						foreach ($intervals as $intervalValue => $intervalName) {
-							echo '<option value="' . esc_attr($intervalValue) . '">' . esc_html($intervalName) . '</option>';
-						}
-						echo '</select> <i></i> </div></div>';
-					}
-	
-					// Plan details for recurring payments
-					if ($recur == 'plan' && $showbtn) {
-						echo '<input type="hidden" name="pf-plancode" value="' . esc_attr($recurplan) . '" />';
-						echo '<div class="span12 unit">
-				<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html($plan->data->name) . ' ' . esc_html($plan->data->interval) . ' recurring payment - ' . esc_html($plan->data->currency) . ' ' . esc_html(number_format($planamount)) . '</label>
-			</div>';
-					}
-					echo(do_shortcode($obj->post_content));
-	
-					// Agreement terms
-					if ($useagreement == 'yes') {
-						echo '<div class="span12 unit">
-			<label class="checkbox">
-				<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
-				<i></i>
-				Accept terms <a target="_blank" href="' . esc_url($agreementlink) . '">Link</a>
-			</label>
-		</div><br>';
-					}
-	
-	
-					// Form submission controls
-					echo '<div class="span12 unit">
-		<small><span style="color: red;">*</span> are compulsory</small><br />
-		<img src="' . esc_url(plugins_url('../images/logos@2x.png', __FILE__)) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
-		<button type="reset" class="secondary-btn">Reset</button>';
-					if ($showbtn) {
-						echo '<button type="submit" class="primary-btn">' . esc_html($paybtn) . '</button>';
-					}
-					echo '</div></div></form>';
-				} else {
-					echo "<h5>You must be logged in to make a payment.</h5>";
 				}
-			} else {
-				echo "<h5>Invalid Paystack form ID or the form does not exist.</h5>";
 			}
-		} else {
-			echo "<h5>No Paystack form ID provided.</h5>";
-		}
-	
-		return ob_get_clean();
+
+			// Transaction charge notice
+			if ( $this->meta['txncharge'] != 'merchant' && $this->meta['recur'] != 'plan' ) {
+				$html[] = '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
+			}
+
+		$html[] = '</div></div>';
+
+		return implode( '', $html );
 	}
 
+	/**
+	 * Get the agreement checkbox and link.
+	 * 
+	 * @return string
+	 */
+	public function get_agreement_field() {
+		$html = '';
+		if ( $this->meta['useagreement'] == 'yes' ) {
+		$html = '<div class="span12 unit">
+					<label class="checkbox">
+						<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
+						<i></i>
+						Accept terms <a target="_blank" href="' . esc_url( $this->meta['agreementlink'] ) . '">Link</a>
+					</label>
+				</div><br>';
+		}
+		return $html;
+	}
+
+	/**
+	 * Get the form footer including the logos and the action buttons.
+	 * 
+	 * @return string
+	 */
+	public function get_form_footer() {
+		$html = [];
+
+		// Form submission controls
+		$html[] = '<div class="span12 unit">
+			<small><span style="color: red;">*</span> are compulsory</small>
+			<br />
+			<img src="' . esc_url( KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
+			<button type="reset" class="secondary-btn">Reset</button>';
+			if ($this->showbtn) {
+				$html[] = '<button type="submit" class="primary-btn">' . esc_html( $this->meta['paybtn'] ) . '</button>';
+			}
+		$html[] = '</div>';
+		return implode( '', $html );
+	}
+
+	/**
+	 * Gets the quantity selector if it is set.
+	 * @return string
+	 */
+	public function get_quantity_field() {
+		$html = [];
+		// Quantity selection
+		if ( 'no' === $this->meta['recur'] && 'yes' === $this->meta['usequantity'] && ( 1 === $this->meta['usevariableamount'] || 0 !== $this->meta['amount'] ) ) {
+			$html[] = '<div class="span12 unit">
+				<label class="label">Quantity</label>
+				<div class="select">
+					<input type="hidden" value="' . esc_attr( $this->meta['amount'] ) . '" id="pf-qamount"/>
+					<select class="form-control" id="pf-quantity" name="pf-quantity">';
+				for ( $i = 1; $i <= $this->meta['quantity']; $i++ ) {
+					$html[] = '<option value="' . esc_attr( $i ) . '">' . esc_html( $i ) . '</option>';
+				}
+			$html[] = '</select> <i></i> </div></div>';
+		}
+		return implode( '', $html );
+	}
+
+	/**
+	 * Gets the recurring field.
+	 * @return string
+	 */
+	public function get_recurring_field() {
+		$html = [];
+
+		if ( $this->meta['recur'] == 'optional' ) {
+
+			$intervals = [
+				'no' => 'None',
+				'daily' =>'Daily',
+				'weekly' => 'Weekly',
+				'monthly' => 'Monthly',
+				'biannually' => 'Biannually',
+				'annually' => 'Annually',
+			];
+
+			$html[] = '<div class="span12 unit"><label class="label">Recurring Payment</label>
+				<div class="select">
+					<select class="form-control" name="pf-interval">';
+
+				foreach ( $intervals as $intervalValue => $intervalName ) {
+					$html[] = '<option value="' . esc_attr( $intervalValue ) . '">' . esc_html( $intervalName ) . '</option>';
+				}
+			$html[] = '</select> <i></i>
+					</div>
+				</div>';
+		}
+		return implode( '', $html );
+	}
+
+	/**
+	 * Gets the recurring plan fields.
+	 * 
+	 * @return string
+	 */
+	public function get_recurring_plan_fields() {
+		$html = [];
+		// Plan details for recurring payments
+		if ( $this->meta['recur'] == 'plan' && $this->showbtn ) {
+			$html[] = '<input type="hidden" name="pf-plancode" value="' . esc_attr( $this->meta['recurplan'] ) . '" />';
+			$html[] = '<div class="span12 unit">
+					<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html( $plan->data->name ) . ' ' . esc_html( $plan->data->interval ) . ' recurring payment - ' . esc_html( $plan->data->currency ) . ' ' . esc_html( number_format( $this->meta['planamount'] ) ) . '</label>
+				</div>';
+		}
+
+		return implode( '', $html );
+	}
 }
