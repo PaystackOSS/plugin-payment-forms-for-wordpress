@@ -26,7 +26,7 @@ class Setup {
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_styles' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 
-		add_action( 'enqueue_scripts', [ $this, 'enqueue_styles' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 	}
 
     /**
@@ -100,7 +100,7 @@ class Setup {
 		if ( $hook != 'paystack_form_page_submissions' && $hook != 'paystack_form_page_settings' ) {
 			return;
 		}
-		wp_enqueue_style( pff_paystack()->plugin_name,  KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/paystack-admin.css', array(), pff_paystack()->version, 'all');
+		wp_enqueue_style( KKD_PFF_PLUGIN_NAME,  KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/paystack-admin.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Setup {
 	 * @return void
 	 */
 	public function admin_enqueue_scripts() {
-		wp_enqueue_script( pff_paystack()->plugin_name, KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array('jquery'), pff_paystack()->version, false);
+		wp_enqueue_script( KKD_PFF_PLUGIN_NAME, KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array( 'jquery' ), KKD_PFF_PAYSTACK_VERSION, false );
 	}
 
 	/**
@@ -118,7 +118,7 @@ class Setup {
 	 * @return void
 	 */
 	public function enqueue_styles() {
-        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-style', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/pff-paystack.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all');
-        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-font-awesome', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all');
+        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-style', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/pff-paystack.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
+        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-font-awesome', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
     }
 }
