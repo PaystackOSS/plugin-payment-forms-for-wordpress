@@ -23,8 +23,10 @@ class Setup {
 		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action( 'plugins_loaded', [ $this, 'load_plugin_textdomain' ] );
 		add_action( 'plugin_action_links_' . KKD_PFF_PLUGIN_BASENAME, [ $this, 'add_action_links' ] );
-        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
-        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_styles' ] );
+        add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+
+		add_action( 'enqueue_scripts', [ $this, 'enqueue_styles' ] );
 	}
 
     /**
@@ -94,7 +96,7 @@ class Setup {
 	 * @param string $hook
 	 * @return void
 	 */
-	public function enqueue_styles( $hook ) {
+	public function admin_enqueue_styles( $hook ) {
 		if ( $hook != 'paystack_form_page_submissions' && $hook != 'paystack_form_page_settings' ) {
 			return;
 		}
@@ -106,7 +108,17 @@ class Setup {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function admin_enqueue_scripts() {
 		wp_enqueue_script( pff_paystack()->plugin_name, KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array('jquery'), pff_paystack()->version, false);
 	}
+
+	/**
+	 * Enques our frontend styles
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
+        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-style', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/pff-paystack.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all');
+        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-font-awesome', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all');
+    }
 }

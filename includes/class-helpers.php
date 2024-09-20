@@ -50,10 +50,11 @@ class Helpers {
 			'currency'            => 'NGN',
 			'filelimit'           => 2,
 			'redirect'            => '',
-			'minimum'             => '',
+			'minimum'             => 0,
 			'usevariableamount'   => 0,
 			'variableamount'      => '',
 			'hidetitle'           => 0,
+			'loggedin'            => 'no',
 			'recur'               => 'no',
 			'recurplan'           => '',
 			'subject'             => __( 'Thank you for your payment', 'paystack_forms' ),
@@ -542,7 +543,7 @@ class Helpers {
 			}
 		}
 
-		$meta = wp_parse_args( $new_values, $this->get_meta_defaults() );
+		$meta = wp_parse_args( $new_values, $this->defaults );
 		if ( '' === $meta['inventory'] || '0' === $meta['inventory'] ) {
 			if ( $meta['sold'] !== "" ) {
 				$meta['inventory'] = $meta;
@@ -550,6 +551,10 @@ class Helpers {
 				$meta['inventory'] = '1';
 			}
 		}
+
+		$meta['minimum']   = floatval( $meta['minimum'] );
+		$meta['txncharge'] = floatval( $meta['txncharge'] );
+
 		return $meta;
 	}
 }
