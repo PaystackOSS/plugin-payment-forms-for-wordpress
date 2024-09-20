@@ -38,6 +38,13 @@ class Forms_Update {
 	public $allowed_html = [];
 
 	/**
+	 * The helpers class
+	 *
+	 * @var paystack\payment_forms\Helpers
+	 */
+	public $helpers = [];
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -56,6 +63,16 @@ class Forms_Update {
 		add_action( 'save_post', [ $this, 'save_post_meta' ], 1, 2 );
 	}
 
+	/**
+	 * Sets useable variables like the fields.
+	 *
+	 * @return void
+	 */
+	public function set_vars() {
+		$this->helpers      = new Helpers();
+		$this->defaults     = $this->helpers->get_meta_defaults();
+		$this->allowed_html = $this->helpers->get_allowed_html();
+	}
 	
 	/**
 	 * Add the phone number as the default content when a form is created.
@@ -67,96 +84,13 @@ class Forms_Update {
 	public function default_content( $content, $post ) {
 		switch ( $post->post_type ) {
 			case 'paystack_form':
-				$content = '[text name="Phone Number"]';
+				$content = '[text name="' . __( 'Phone Number', 'paystack_forms' ) . '"]';
 				break;
 			default:
 				$content = '';
 				break;
 		}
 		return $content;
-	}
-
-	/**
-	 * Sets useable variables like the fields.
-	 *
-	 * @return void
-	 */
-	public function set_vars() {
-		$this->defaults = [
-			'amount'              => 0,
-			'paybtn'              => 'Pay',
-			'successmsg'          => 'Thank you for paying!',
-			'txncharge'           => 'merchant',
-			'loggedin'            => '',
-			'currency'            => 'NGN',
-			'filelimit'           => 2,
-			'redirect'            => '',
-			'minimum'             => '',
-			'usevariableamount'   => 0,
-			'variableamount'      => '',
-			'hidetitle'           => 0,
-			'recur'               => 'no',
-			'recurplan'           => '',
-			'subject'             => 'Thank you for your payment',
-			'merchant'            => '',
-			'heading'             => 'We\'ve received your payment',
-			'message'             => 'Your payment was received and we appreciate it.',
-			'sendreceipt'         => 'yes',
-			'sendinvoice'         => 'yes',
-			'usequantity'         => 'no',
-			'useinventory'        => 'no',
-			'inventory'           => '0',
-			'sold'                => '0',
-			'quantity'            => '10',
-			'quantityunit'        => 'Quantity',
-			'useagreement'        => 'no',
-			'agreementlink'       => '',
-			'subaccount'          => '',
-			'txnbearer'           => 'account',
-			'merchantamount'      => '',
-			'startdate_days'      => '',
-			'startdate_plan_code' => '',
-			'startdate_enabled'   => 0,
-		];
-
-		$this->allowed_html = array(
-			'small' => array(
-				'href' => true,
-				'target' => true
-			),
-			'a' => array(
-				'href' => true,
-				'target' => true
-			),
-			'p' => array(),
-			'input' => array(
-				'type' => true,
-				'name' => true,
-				'value' => true,
-				'class' => true,
-				'checked' => true
-			),
-			'br' => array(),
-			'label' => array(
-				'for' => true
-			),
-			'code' => array(),
-			'select' => array(
-				'class' => true,
-				'name' => true,
-				'id' => true,
-				'style' => true
-			),
-			'option' => array(
-				'value' => true,
-				'selected' => true
-			),
-			'textarea' => array(
-				'rows' => true,
-				'name' => true,
-				'class' => true
-			)
-		);
 	}
 
 	/**
@@ -390,23 +324,7 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function parse_meta_values( $post ) {
-		$new_values = [];
-		foreach ( $this->defaults as $key => $default ) {
-			$value = get_post_meta( $post->ID, '_' . $key, true );
-			if ( false !== $value && ! empty( $value ) ) {
-				$new_values[ $key ] = $value;
-			}
-		}
-
-		$meta = wp_parse_args( $new_values, $this->defaults );
-		if ( '' === $meta['inventory'] || '0' === $meta['inventory'] ) {
-			if ( $meta['sold'] !== "" ) {
-				$meta['inventory'] = $meta;
-			} else {
-				$meta['inventory'] = '1';
-			}
-		}
-		$this->meta = $meta;
+		$this->meta = $this->helpers->parse_meta_values( $post );
 	}
 
 	/**

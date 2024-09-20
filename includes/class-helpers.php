@@ -17,10 +17,101 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helpers {
 
 	/**
+	 * The array of meta keys and their default values.
+	 *
+	 * @var array
+	 */
+	protected $defaults = [];
+
+	/**
+	 * An array of the allowed HTML tags
+	 *
+	 * @var array
+	 */
+	protected $allowed_html = [];
+
+	/**
 	 * Construct the class.
 	 */
 	public function __construct() {
+		$this->defaults = [
+			'amount'              => 0,
+			'paybtn'              => __( 'Pay', 'paystack_forms' ),
+			'successmsg'          => __( 'Thank you for paying!', 'paystack_forms' ),
+			'txncharge'           => 'merchant',
+			'loggedin'            => '',
+			'currency'            => 'NGN',
+			'filelimit'           => 2,
+			'redirect'            => '',
+			'minimum'             => '',
+			'usevariableamount'   => 0,
+			'variableamount'      => '',
+			'hidetitle'           => 0,
+			'recur'               => 'no',
+			'recurplan'           => '',
+			'subject'             => __( 'Thank you for your payment', 'paystack_forms' ),
+			'merchant'            => '',
+			'heading'             => __( 'We\'ve received your payment', 'paystack_forms' ),
+			'message'             => __( 'Your payment was received and we appreciate it.', 'paystack_forms' ),
+			'sendreceipt'         => 'yes',
+			'sendinvoice'         => 'yes',
+			'usequantity'         => 'no',
+			'useinventory'        => 'no',
+			'inventory'           => '0',
+			'sold'                => '0',
+			'quantity'            => '10',
+			'quantityunit'        => __( 'Quantity', 'paystack_forms' ),
+			'useagreement'        => 'no',
+			'agreementlink'       => '',
+			'subaccount'          => '',
+			'txnbearer'           => 'account',
+			'merchantamount'      => '',
+			'startdate_days'      => '',
+			'startdate_plan_code' => '',
+			'startdate_enabled'   => 0,
+		];
+
+		$this->allowed_html = array(
+			'small' => array(
+				'href' => true,
+				'target' => true
+			),
+			'a' => array(
+				'href' => true,
+				'target' => true
+			),
+			'p' => array(),
+			'input' => array(
+				'type' => true,
+				'name' => true,
+				'value' => true,
+				'class' => true,
+				'checked' => true
+			),
+			'br' => array(),
+			'label' => array(
+				'for' => true
+			),
+			'code' => array(),
+			'select' => array(
+				'class' => true,
+				'name' => true,
+				'id' => true,
+				'style' => true
+			),
+			'option' => array(
+				'value' => true,
+				'selected' => true
+			),
+			'textarea' => array(
+				'rows' => true,
+				'name' => true,
+				'class' => true
+			)
+			);
 	}
+
+	// GETTERS
 
 	/**
 	 * Fetch an array of the plans by the form ID.
@@ -88,7 +179,6 @@ class Helpers {
 		}
 		return $num;
 	}
-
 
 	/**
 	 * Returns an array | string of the countries
@@ -394,5 +484,51 @@ class Helpers {
 			$states = implode( ',', $states );
 		}
 		return $states;
+	}
+
+	/**
+	 * Returns the meta fields and their default values.
+	 *
+	 * @return array
+	 */
+	public function get_meta_defaults() {
+		return $this->defaults;
+	}
+
+	/**
+	 * Returns the allowed HTML for wp_kses()
+	 *
+	 * @return array
+	 */
+	public function get_allowed_html() {
+		return $this->allowed_html;
+	}
+
+	// FUNCTIONS
+
+	/**
+	 * Gets the current forms meta fields values and set the defaults if needed.
+	 *
+	 * @param WP_Post $post
+	 * @return array
+	 */
+	public function parse_meta_values( $post ) {
+		$new_values = [];
+		foreach ( $this->defaults as $key => $default ) {
+			$value = get_post_meta( $post->ID, '_' . $key, true );
+			if ( false !== $value && ! empty( $value ) ) {
+				$new_values[ $key ] = $value;
+			}
+		}
+
+		$meta = wp_parse_args( $new_values, $this->get_meta_defaults() );
+		if ( '' === $meta['inventory'] || '0' === $meta['inventory'] ) {
+			if ( $meta['sold'] !== "" ) {
+				$meta['inventory'] = $meta;
+			} else {
+				$meta['inventory'] = '1';
+			}
+		}
+		return $meta;
 	}
 }
