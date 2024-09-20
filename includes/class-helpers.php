@@ -552,6 +552,11 @@ class Helpers {
 			}
 		}
 
+		// Strip any text from the variable amount field.
+		if ( isset( $meta['variableamount'] ) && is_string( $meta['variableamount'] ) ) {
+			$meta['variableamount'] = (int) $meta['variableamount'];
+		}
+
 		$meta['minimum']   = floatval( $meta['minimum'] );
 		$meta['txncharge'] = floatval( $meta['txncharge'] );
 

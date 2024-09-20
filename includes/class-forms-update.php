@@ -355,14 +355,14 @@ class Forms_Update {
 
 		$html[] = '<small>' . __('Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.', 'paystack_forms') . '</small>';
 		$html[] = '<p>' . __('Amount to be paid(Set 0 for customer input):', 'paystack_forms') . '</p>';
-		$html[] = '<input type="number" name="_amount" value="' . $this->meta['amount'] . '" class="widefat pf-number" />';
+		$html[] = '<input type="number" min="0" name="_amount" value="' . $this->meta['amount'] . '" class="widefat pf-number" />';
 		if ($this->meta['minimum'] == 1) {
 			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1" checked> ' . __('Make amount minimum payable', 'paystack_forms') . ' </label>';
 		} else {
 			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1"> ' . __('Make amount minimum payable', 'paystack_forms') . ' </label>';
 		}
 		$html[] = '<p>' . __('Variable Dropdown Amount:', 'paystack_forms') . '<code><label>' . __('Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," ', 'paystack_forms') . '</label></code></p>';
-		$html[] = '<input type="text" name="_variableamount" value="' . $this->meta['variableamount'] . '" class="widefat " />';
+		$html[] = '<input type="number" min="0" name="_variableamount" value="' . $this->meta['variableamount'] . '" class="widefat " />';
 		if ($this->meta['usevariableamount'] == 1) {
 			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> ' . __('Use dropdown amount option', 'paystack_forms') . ' </label>';
 		} else {
