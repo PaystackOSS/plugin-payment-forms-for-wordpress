@@ -36,7 +36,7 @@ class Forms_List {
 		if ( get_post_type( $post ) === 'paystack_form' ) {
 			unset( $actions['view'] );
 			unset( $actions['quick edit'] );
-			$actions['export'] = '<a href="' . admin_url( 'admin.php?page=submissions&form=' . $post->ID ) . '" >' . __( 'View Payments', 'payment_forms' ) . '</a>';
+			$actions['export'] = '<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=submissions&form=' . $post->ID ) . '" >' . __( 'View Payments', 'payment_forms' ) . '</a>';
 		}
 		return $actions;
 	}
