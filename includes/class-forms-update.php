@@ -69,7 +69,7 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function set_vars() {
-		$this->helpers      = new Helpers();
+		$this->helpers      = Helpers::get_instance();
 		$this->defaults     = $this->helpers->get_meta_defaults();
 		$this->allowed_html = $this->helpers->get_allowed_html();
 	}
@@ -222,7 +222,7 @@ class Forms_Update {
 			
 			function insertSelectStates() {
 				QTags.insertContent(
-					'[select name="State" options="<?php echo esc_attr( pff_paystack()->helpers->get_states( true ) ); ?>"]'
+					'[select name="State" options="<?php echo esc_attr( $this->helpers->get_states( true ) ); ?>"]'
 				);
 			}
 			QTags.addButton(
@@ -233,7 +233,7 @@ class Forms_Update {
 			
 			function insertSelectCountries() {
 				QTags.insertContent(
-					'[select  name="country" options="<?php echo esc_attr( pff_paystack()->helpers->get_countries( true ) ); ?>"] '
+					'[select  name="country" options="<?php echo esc_attr( $this->helpers->get_countries( true ) ); ?>"] '
 				);
 			}
 			

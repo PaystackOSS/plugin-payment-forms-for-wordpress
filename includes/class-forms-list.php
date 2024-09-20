@@ -59,12 +59,13 @@ class Forms_List {
 	}
 
 	public function column_data( $column, $post_id ) {
+		$helpers = Helpers::get_instance();
 		switch ( $column ) {
 			case 'shortcode':
 				echo wp_kses_post( '<span class="shortcode"><code>[pff-paystack id=&quot;' . $post_id . '&quot;]"</code></span>' );
 				break;
 			case 'payments':
-				$num = pff_paystack()->helpers->get_payments_count( $post_id );
+				$num = $helpers->get_payments_count( $post_id );
 				echo wp_kses_post( '<u><a href="' . admin_url( 'edit.php?post_type=paystack_form&page=submissions&form=' . $post_id ) . '">' . $num . '</a></u>' );
 				break;
 			default:

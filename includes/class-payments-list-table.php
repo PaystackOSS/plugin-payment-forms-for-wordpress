@@ -17,9 +17,9 @@ class Payments_List_Table extends \WP_List_Table
 			return __( 'No form set', 'paystack_forms' );
 		}
 		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
+		$helpers      = Helpers::get_instance();
 		$data         = array();
-		$row_data     = pff_paystack()->helpers->get_payments_by_id( $this->form_id, $this->get_args() );
+		$row_data     = $helpers->get_payments_by_id( $this->form_id, $this->get_args() );
 		$data         = $this->format_row_data( $row_data );
 		$columns      = $this->get_columns();
 		$hidden       = $this->get_hidden_columns();

@@ -17,6 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Helpers {
 
 	/**
+	 * Holds class isntance
+	 *
+	 * @var object \paystack\payment_forms\Helpers
+	 */
+	protected static $instance = null;
+
+	/**
 	 * The array of meta keys and their default values.
 	 *
 	 * @var array
@@ -109,6 +116,20 @@ class Helpers {
 				'class' => true
 			)
 			);
+	}
+
+	/**
+	 * Return an instance of this class.
+	 *
+	 * @return object \paystack\payment_forms\Payment_Forms
+	 */
+	public static function get_instance() {
+		// If the single instance hasn't been set, set it now.
+		if ( null == self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
 	}
 
 	// GETTERS

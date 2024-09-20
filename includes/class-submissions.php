@@ -123,8 +123,8 @@ class Submissions {
 		if ( '' === $currency ) {
 			$currency = 'NGN';
 		}
-
-		$all_data = pff_paystack()->helpers->get_payments_by_id( $form_id );
+		$helpers  = Helpers::get_instance();
+		$all_data = $helpers->get_payments_by_id( $form_id );
 
 		if ( count( $all_data ) > 0 ) {
 			$header = $all_data[0];
