@@ -261,7 +261,7 @@ class Forms_Update {
 	 */
 	public function register_meta_boxes() {
 		// Register the information boxes.
-		if ( isset( $_GET['action'] ) ) {
+		if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
 		}
 		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'paystack_forms' ), [ $this, 'help_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
@@ -594,7 +594,7 @@ class Forms_Update {
 			}
 
 			if ( isset( $_POST[ '_' . $key ] ) ) {
-				$value = sanitize_text_field( $_POST[ '_' . $key ] );
+				$value = sanitize_text_field( wp_unslash( $_POST[ '_' . $key ] ) );
 			} else {
 				$value = $default;
 			}

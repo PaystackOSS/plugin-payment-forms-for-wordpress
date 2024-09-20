@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Plugin Shortcodes class, will only render for the frontend.
  */
-class Shortcodes {
+class Form_Shortcode {
 
 	/**
 	 * The helper class.
@@ -134,7 +134,7 @@ class Shortcodes {
 					$html[] = $this->get_recurring_field();
 					$html[] = $this->get_recurring_plan_fields();
 					
-					//$html[] = do_shortcode( $obj->post_content );
+					$html[] = do_shortcode( $obj->post_content );
 
 					$html[] = $this->get_agreement_field();
 

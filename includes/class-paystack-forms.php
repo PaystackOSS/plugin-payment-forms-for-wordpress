@@ -99,7 +99,8 @@ final class Payment_Forms {
 			'submissions'         => 'Submissions',
 			'forms-update'        => 'Forms_Update',
 			'tinymce-plugin'      => 'TinyMCE_Plugin',
-			'shortcodes'          => 'Shortcodes',
+			'form-shortcode'      => 'Form_Shortcode',
+			'field-shortcodes'    => 'Field_Shortcodes',
 		);
 	}
 
