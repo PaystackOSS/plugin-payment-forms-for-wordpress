@@ -562,4 +562,33 @@ class Helpers {
 
 		return $meta;
 	}
+
+	/**
+	 * Returns the fee settings save or the default values.
+	 *
+	 * @return array
+	 */
+    public function get_fees() {
+        $ret = [];
+        $ret['prc'] = intval( floatval( esc_attr( get_option( 'prc', PFF_PAYSTACK_PERCENTAGE ) ) ) * 100 ) / 10000;
+        $ret['ths'] = intval( floatval( esc_attr( get_option( 'ths', PFF_PAYSTACK_CROSSOVER_TOTAL ) ) ) * 100 );
+        $ret['adc'] = intval( floatval( esc_attr( get_option( 'adc', PFF_PAYSTACK_ADDITIONAL_CHARGE ) ) ) * 100 );
+        $ret['cap'] = intval( floatval( esc_attr( get_option( 'cap', PFF_PAYSTACK_LOCAL_CAP ) ) ) * 100 );
+        return $ret;
+    }
+
+	/**
+	 * Gets the public key from the settings.
+	 *
+	 * @return string
+	 */
+    public function get_public_key() {
+        $mode =  esc_attr( get_option( 'mode' ) );
+        if ( 'test' === $mode ) {
+            $key = esc_attr( get_option( 'tpk', '' ) );
+        } else {
+            $key = esc_attr( get_option( 'lpk', '' ) );
+        }
+        return $key;
+    }
 }
