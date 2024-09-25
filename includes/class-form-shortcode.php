@@ -47,9 +47,23 @@ class Form_Shortcode {
 	/**
 	 * If we should show the submit button, if this is false there is most likely a config error with the form.
 	 *
-	 * @var WP_Post
+	 * @var boolean
 	 */
-	protected $showbtn = true;
+	public $show_btn = true;
+
+	/**
+	 * If the current form has a plan or not.
+	 *
+	 * @var boolean
+	 */
+	public $has_plan = false;
+
+	/**
+	 * A plan object as per the Paystack API Fetch request
+	 * @link https://paystack.com/docs/api/plan
+	 * @var object
+	 */
+	public $plan = false;
 
 	/**
 	 * Holds the array of payment options available.
@@ -196,14 +210,14 @@ class Form_Shortcode {
 
 		if ( 'plan' === $this->meta['recur'] ) {
 			if ( '' === $this->meta['recurplan'] ) {
-				$this->showbtn = false;
+				$this->show_btn = false;
 			} else {
-				$plan = pff_paystack()->classes['request-plan']->fetch_plan( $this->meta['recurplan'] );
-				var_dump( $plan );
-				if ( false !== $plan && isset( $plan->data->amount ) ) {
-					$this->meta['planamount'] = $plan->data->amount/100;
+				$this->plan = pff_paystack()->classes['request-plan']->fetch_plan( $this->meta['recurplan'] );
+				if ( false !== $this->plan && isset( $this->plan->data->amount ) ) {
+					$this->has_plan = true;
+					$this->meta['planamount'] = $this->plan->data->amount / 100;
 				} else {
-					$this->showbtn = false;
+					$this->show_btn = false;
 				}
 			}
 		}
@@ -289,7 +303,7 @@ class Form_Shortcode {
 				}
 
 				if ($this->meta['recur'] == 'plan') {
-					if ( $this->showbtn ) {
+					if ( $this->show_btn ) {
 						$html[] = '<input type="text" name="pf-amount" value="' . esc_attr( $this->meta['planamount'] ) . '" id="pf-amount" readonly required />';
 					} else {
 						$html[] = '<div class="span12 unit">
@@ -364,7 +378,7 @@ class Form_Shortcode {
 			<br />
 			<img src="' . esc_url( KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
 			<button type="reset" class="secondary-btn">Reset</button>';
-			if ($this->showbtn) {
+			if ($this->show_btn) {
 				$html[] = '<button type="submit" class="primary-btn">' . esc_html( $this->meta['paybtn'] ) . '</button>';
 			}
 		$html[] = '</div>';
@@ -432,10 +446,10 @@ class Form_Shortcode {
 	public function get_recurring_plan_fields() {
 		$html = [];
 		// Plan details for recurring payments
-		if ( $this->meta['recur'] == 'plan' && $this->showbtn ) {
+		if ( $this->meta['recur'] == 'plan' && $this->has_plan && $this->show_btn ) {
 			$html[] = '<input type="hidden" name="pf-plancode" value="' . esc_attr( $this->meta['recurplan'] ) . '" />';
 			$html[] = '<div class="span12 unit">
-					<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html( $plan->data->name ) . ' ' . esc_html( $plan->data->interval ) . ' recurring payment - ' . esc_html( $plan->data->currency ) . ' ' . esc_html( number_format( $this->meta['planamount'] ) ) . '</label>
+					<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html( $this->plan->data->name ) . ' ' . esc_html( $this->plan->data->interval ) . ' recurring payment - ' . esc_html( $this->plan->data->currency ) . ' ' . esc_html( number_format( $this->meta['planamount'] ) ) . '</label>
 				</div>';
 		}
 

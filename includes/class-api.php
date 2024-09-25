@@ -38,11 +38,18 @@ class API {
 	protected $url_args = '';
 
 	/**
-	 * The Public Key
+	 * The Public API Key
 	 *
 	 * @var string
 	 */
 	protected $public = '';
+
+	/**
+	 * The Private API Key
+	 *
+	 * @var string
+	 */
+	private $secret = '';
 
 	/**
 	 * Construct the class.
@@ -50,9 +57,11 @@ class API {
 	public function __construct() {
 		$mode = esc_attr( get_option( 'mode' ) );
 		if ( $mode == 'test' ) {
-			$this->public = esc_attr( get_option( 'tsk' ) );
+			$this->public = esc_attr( get_option( 'tpk' ) );
+			$this->secret = esc_attr( get_option( 'tsk' ) );
 		} else {
-			$this->public = esc_attr( get_option( 'lsk' ) );
+			$this->public = esc_attr( get_option( 'lpk' ) );
+			$this->secret = esc_attr( get_option( 'lsk' ) );
 		}
 	}
 
@@ -60,17 +69,17 @@ class API {
 	 * Sets the module variable.
 	 *
 	 * @param string $module
-	 * @return void
+	 * @return string
 	 */
 	protected function set_module( $module = '' ) {
-		$this->module = $module;
+		$this->module = $module . '/';
 	}
 
 	/**
 	 * Sets the additional URl arguments.
 	 *
 	 * @param string $module
-	 * @return void
+	 * @return string
 	 */
 	protected function set_url_args( $args = '' ) {
 		$this->url_args = $args;
@@ -79,18 +88,18 @@ class API {
 	/**
 	 * Gets the headers for the current request.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	protected function get_headers(){
 		return array(
-			'Authorization' => 'Bearer ' . $this->public
+			'Authorization' => 'Bearer ' . $this->secret
 		);
 	}
 
 	/**
 	 * Gets the headers for the current request.
 	 *
-	 * @return void
+	 * @return string
 	 */
 	protected function get_url(){
 		return $this->url . $this->module . $this->url_args;
@@ -99,7 +108,7 @@ class API {
 	/**
 	 * Gets the arguments for the current request.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	protected function get_args(){
 		return array(
@@ -115,6 +124,10 @@ class API {
 	 */
 	public function get_request() {
 		$response = false;
+		print_r('<pre>');
+		print_r($this->get_url());
+		print_r($this->get_args());
+		print_r('</pre>');
 		$request  = wp_remote_get( $this->get_url(), $this->get_args() );
 		if ( ! is_wp_error( $request ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $request ) );
@@ -129,7 +142,6 @@ class API {
 	 */
 	public function api_ready() {
 		$ready = false;
-		var_dump($this->public);
 		if ( '' !== $this->public ) {
 			$ready = true;
 		}

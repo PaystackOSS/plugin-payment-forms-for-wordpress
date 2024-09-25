@@ -34,11 +34,38 @@ class Request_Plan extends API {
 		if ( '' === $code || ! $this->api_ready() ) {
 			return false;
 		}
-		$plan = $this->get_request( $code );
+		$this->set_url_args( $code );
+		$response = $this->get_request();
+		if ( $this->is_plan_valid( $response ) ) {
+			$plan = $response;
+		}
 		return $plan;
 	}
 
+
 	public function plan_exists( $code = '' ) {
 
+	}
+
+	/**
+	 * Reviews the plan parameters to see if the plan is active.
+	 *
+	 * @param object $plan
+	 * @return boolean
+	 */
+	public function is_plan_valid( $plan ) {
+		if ( null === $plan ) {
+			return false;
+		}
+		if ( ! isset( $plan->status ) || false === $plan->status ) {
+			return false;
+		}
+		if ( ! isset( $plan->data->is_archived ) || true === $plan->data->is_archived ) {
+			return false;
+		}
+		if ( ! isset( $plan->data->is_deleted ) || true === $plan->data->is_deleted ) {
+			return false;
+		}
+		return true;
 	}
 }
