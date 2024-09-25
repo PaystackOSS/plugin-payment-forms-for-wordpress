@@ -50,10 +50,10 @@ class Forms_List {
 	public function register_columns( $columns ) {
 		$columns = array(
 			'cb'        => '<input type="checkbox" />',
-			'title'     => __( 'Name', 'paystack_forms' ),
-			'shortcode' => __( 'Shortcode', 'paystack_forms' ),
-			'payments'  => __( 'Payments', 'paystack_forms' ),
-			'date'      => __( 'Date', 'paystack_forms' )
+			'title'     => __( 'Name', 'pff-paystack' ),
+			'shortcode' => __( 'Shortcode', 'pff-paystack' ),
+			'payments'  => __( 'Payments', 'pff-paystack' ),
+			'date'      => __( 'Date', 'pff-paystack' )
 		);
 		return $columns;
 	}

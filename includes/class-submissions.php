@@ -24,7 +24,7 @@ class Submissions {
 	 * @return void
 	 */
 	public function register_submissions_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', __( 'Submissions', 'paystack_forms' ), __( 'Submissions', 'paystack_forms' ), 'administrator', 'submissions', [ $this, 'output_submissions_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', __( 'Submissions', 'pff-paystack' ), __( 'Submissions', 'pff-paystack' ), 'administrator', 'submissions', [ $this, 'output_submissions_page' ] );
 		remove_submenu_page( 'edit.php?post_type=paystack_form', 'submissions' );
 	}
 
@@ -36,7 +36,7 @@ class Submissions {
 	public function output_submissions_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['form'] ) ) { 
-			return __( 'No form set', 'paystack_forms' );
+			return __( 'No form set', 'pff-paystack' );
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );
@@ -54,15 +54,15 @@ class Submissions {
 			?>
 			<div class="info-panel">
 				<div class="info-panel-content">
-				<h1 style="margin: 0px;"><?php echo esc_html( get_the_title( $form ) ); ?> <?php esc_html_e( 'Payments', 'paystack_forms' ); ?></h1>
+				<h1 style="margin: 0px;"><?php echo esc_html( get_the_title( $form ) ); ?> <?php esc_html_e( 'Payments', 'pff-paystack' ); ?></h1>
 					<p class="about-description">
-						<?php esc_html_e( 'All payments made for this form', 'paystack_forms' ); ?>
+						<?php esc_html_e( 'All payments made for this form', 'pff-paystack' ); ?>
 					</p>
 					<?php if ( $data > 0 ) { ?>
 						<form action="<?php echo esc_html( admin_url( 'admin-post.php' ) ); ?>" method="post">
 							<input type="hidden" name="action" value="pff_paystack_export_excel">
 							<input type="hidden" name="form_id" value="<?php echo esc_html( $form_id ); ?>">
-							<button type="submit" class="button button-primary button-hero load-customize"><?php esc_html_e( 'Export Data to Excel', 'paystack_forms' ); ?></button>
+							<button type="submit" class="button button-primary button-hero load-customize"><?php esc_html_e( 'Export Data to Excel', 'pff-paystack' ); ?></button>
 						</form>
 					<?php } ?>
 					<br />

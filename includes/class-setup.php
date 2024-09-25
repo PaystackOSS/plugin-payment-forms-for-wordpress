@@ -85,7 +85,7 @@ class Setup {
 	 */
 	public function add_action_links( $links ) {
 		$settings_link = array(
-			'<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=settings') . '">' . __( 'Settings', 'paystack_forms' ) . '</a>',
+			'<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=settings') . '">' . __( 'Settings', 'pff-paystack' ) . '</a>',
 		);
 		return array_merge( $settings_link, $links );
 	}

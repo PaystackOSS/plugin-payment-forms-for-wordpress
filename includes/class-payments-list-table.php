@@ -14,7 +14,7 @@ class Payments_List_Table extends \WP_List_Table
 	public function prepare_items() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['form'] ) || empty( $_GET['form'] ) ) { 
-			return __( 'No form set', 'paystack_forms' );
+			return __( 'No form set', 'pff-paystack' );
 		}
 		$this->form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$helpers      = Helpers::get_instance();
@@ -50,11 +50,11 @@ class Payments_List_Table extends \WP_List_Table
 	public function get_columns() {
 		$columns = array(
 			'id'  => '#',
-			'email' => __( 'Email', 'paystack_forms' ),
-			'amount' => __( 'Amount', 'paystack_forms' ),
-			'txn_code' => __( 'Txn Code', 'paystack_forms' ),
-			'metadata' => __( 'Data', 'paystack_forms' ),
-			'date'  => __( 'Date', 'paystack_forms' ),
+			'email' => __( 'Email', 'pff-paystack' ),
+			'amount' => __( 'Amount', 'pff-paystack' ),
+			'txn_code' => __( 'Txn Code', 'pff-paystack' ),
+			'metadata' => __( 'Data', 'pff-paystack' ),
+			'date'  => __( 'Date', 'pff-paystack' ),
 		);
 		return $columns;
 	}

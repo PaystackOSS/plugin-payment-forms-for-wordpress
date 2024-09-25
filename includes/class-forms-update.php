@@ -84,7 +84,7 @@ class Forms_Update {
 	public function default_content( $content, $post ) {
 		switch ( $post->post_type ) {
 			case 'paystack_form':
-				$content = '[text name="' . __( 'Phone Number', 'paystack_forms' ) . '"]';
+				$content = '[text name="' . __( 'Phone Number', 'pff-paystack' ) . '"]';
 				break;
 			default:
 				$content = '';
@@ -264,18 +264,18 @@ class Forms_Update {
 		if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
 		}
-		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'paystack_forms' ), [ $this, 'help_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
+		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'pff-paystack' ), [ $this, 'help_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
 
 		// Add in our "normal" meta boxes
-		add_meta_box( 'form_data', __( 'Extra Form Description', 'paystack_forms' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
-		add_meta_box( 'email_data', __( 'Email Receipt Settings', 'paystack_forms' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
+		add_meta_box( 'form_data', __( 'Extra Form Description', 'pff-paystack' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
+		add_meta_box( 'email_data', __( 'Email Receipt Settings', 'pff-paystack' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
 
 		// Add in our "side" meta boxes
-		add_meta_box( 'recuring_data', __( 'Recurring Payment', 'paystack_forms' ), [ $this, 'recur_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'quantity_data', __( 'Quantity Payment', 'paystack_forms' ), [ $this, 'quantity_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'agreement_data', __( 'Agreement checkbox', 'paystack_forms' ), [ $this, 'agreement_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'subaccount_data', __( 'Sub Account', 'paystack_forms' ), [ $this, 'subaccount_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'plan_data', __( '*Special: Subscribe to plan after time', 'paystack_forms' ), [ $this, 'plan_data' ], 'paystack_form', 'side', 'default' );		
+		add_meta_box( 'recuring_data', __( 'Recurring Payment', 'pff-paystack' ), [ $this, 'recur_data' ], 'paystack_form', 'side', 'default' );
+		add_meta_box( 'quantity_data', __( 'Quantity Payment', 'pff-paystack' ), [ $this, 'quantity_data' ], 'paystack_form', 'side', 'default' );
+		add_meta_box( 'agreement_data', __( 'Agreement checkbox', 'pff-paystack' ), [ $this, 'agreement_data' ], 'paystack_form', 'side', 'default' );
+		add_meta_box( 'subaccount_data', __( 'Sub Account', 'pff-paystack' ), [ $this, 'subaccount_data' ], 'paystack_form', 'side', 'default' );
+		add_meta_box( 'plan_data', __( '*Special: Subscribe to plan after time', 'pff-paystack' ), [ $this, 'plan_data' ], 'paystack_form', 'side', 'default' );		
 			
 	}
 	
@@ -288,7 +288,7 @@ class Forms_Update {
 	public function shortcode_details( $post ) {
 		?>
 		<p class="description">
-			<label for="wpcf7-shortcode"><?php esc_html_e( 'Copy this shortcode and paste it into your post, page, or text widget content:', 'paystack_forms' ); ?></label>
+			<label for="wpcf7-shortcode"><?php esc_html_e( 'Copy this shortcode and paste it into your post, page, or text widget content:', 'pff-paystack' ); ?></label>
 			<span class="shortcode wp-ui-highlight">
 				<input type="text" id="wpcf7-shortcode" onfocus="this.select();" readonly="readonly" class="large-text code" value="[pff-paystack id=&quot;<?php echo esc_html( $post->ID ); ?>&quot;]">
 			</span>
@@ -336,56 +336,56 @@ class Forms_Update {
 		$html = [];
 
 		if ($this->meta['hidetitle'] == 1) {
-			$html[] = '<label><input name="_hidetitle" type="checkbox" value="1" checked> ' . __('Hide the form title', 'paystack_forms') . ' </label>';
+			$html[] = '<label><input name="_hidetitle" type="checkbox" value="1" checked> ' . __('Hide the form title', 'pff-paystack') . ' </label>';
 		} else {
-			$html[] = '<label><input name="_hidetitle" type="checkbox" value="1" > ' . __('Hide the form title', 'paystack_forms') . ' </label>';
+			$html[] = '<label><input name="_hidetitle" type="checkbox" value="1" > ' . __('Hide the form title', 'pff-paystack') . ' </label>';
 		}
 		$html[] = '<br>';
 		$html[] = '<p>Currency:</p>';
 		$html[] = '<select class="form-control" name="_currency" style="width:100%;">
-					<option value="NGN" ' . $this->is_option_selected( 'NGN', $this->meta['currency'] ) . '>' . __('Nigerian Naira', 'paystack_forms') . '</option>
-					<option value="GHS" ' . $this->is_option_selected( 'GHS', $this->meta['currency'] ) . '>' . __('Ghanaian Cedis', 'paystack_forms') . '</option>
-					<option value="ZAR" ' . $this->is_option_selected( 'ZAR', $this->meta['currency'] ) . '>' . __('South African Rand', 'paystack_forms') . '</option>
-					<option value="KES" ' . $this->is_option_selected( 'KES', $this->meta['currency'] ) . '>' . __('Kenyan Shillings', 'paystack_forms') . '</option>
-					<option value="XOF" ' . $this->is_option_selected( 'XOF', $this->meta['currency'] ) . '>' . __('West African CFA Franc', 'paystack_forms') . '</option>
-					<option value="RWF" ' . $this->is_option_selected( 'RWF', $this->meta['currency'] ) . '>' . __('Rwandan Franc', 'paystack_forms') . '</option>
-					<option value="EGP" ' . $this->is_option_selected( 'EGP', $this->meta['currency'] ) . '>' . __('Egyptian Pound', 'paystack_forms') . '</option>
-					<option value="USD" ' . $this->is_option_selected( 'USD', $this->meta['currency'] ) . '>' . __('US Dollars', 'paystack_forms') . '</option>
+					<option value="NGN" ' . $this->is_option_selected( 'NGN', $this->meta['currency'] ) . '>' . __('Nigerian Naira', 'pff-paystack') . '</option>
+					<option value="GHS" ' . $this->is_option_selected( 'GHS', $this->meta['currency'] ) . '>' . __('Ghanaian Cedis', 'pff-paystack') . '</option>
+					<option value="ZAR" ' . $this->is_option_selected( 'ZAR', $this->meta['currency'] ) . '>' . __('South African Rand', 'pff-paystack') . '</option>
+					<option value="KES" ' . $this->is_option_selected( 'KES', $this->meta['currency'] ) . '>' . __('Kenyan Shillings', 'pff-paystack') . '</option>
+					<option value="XOF" ' . $this->is_option_selected( 'XOF', $this->meta['currency'] ) . '>' . __('West African CFA Franc', 'pff-paystack') . '</option>
+					<option value="RWF" ' . $this->is_option_selected( 'RWF', $this->meta['currency'] ) . '>' . __('Rwandan Franc', 'pff-paystack') . '</option>
+					<option value="EGP" ' . $this->is_option_selected( 'EGP', $this->meta['currency'] ) . '>' . __('Egyptian Pound', 'pff-paystack') . '</option>
+					<option value="USD" ' . $this->is_option_selected( 'USD', $this->meta['currency'] ) . '>' . __('US Dollars', 'pff-paystack') . '</option>
 			  </select>';
 
-		$html[] = '<small>' . __('Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.', 'paystack_forms') . '</small>';
-		$html[] = '<p>' . __('Amount to be paid(Set 0 for customer input):', 'paystack_forms') . '</p>';
+		$html[] = '<small>' . __('Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.', 'pff-paystack') . '</small>';
+		$html[] = '<p>' . __('Amount to be paid(Set 0 for customer input):', 'pff-paystack') . '</p>';
 		$html[] = '<input type="number" min="0" name="_amount" value="' . $this->meta['amount'] . '" class="widefat pf-number" />';
 		if ($this->meta['minimum'] == 1) {
-			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1" checked> ' . __('Make amount minimum payable', 'paystack_forms') . ' </label>';
+			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1" checked> ' . __('Make amount minimum payable', 'pff-paystack') . ' </label>';
 		} else {
-			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1"> ' . __('Make amount minimum payable', 'paystack_forms') . ' </label>';
+			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1"> ' . __('Make amount minimum payable', 'pff-paystack') . ' </label>';
 		}
-		$html[] = '<p>' . __('Variable Dropdown Amount:', 'paystack_forms') . '<code><label>' . __('Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," ', 'paystack_forms') . '</label></code></p>';
+		$html[] = '<p>' . __('Variable Dropdown Amount:', 'pff-paystack') . '<code><label>' . __('Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," ', 'pff-paystack') . '</label></code></p>';
 		$html[] = '<input type="number" min="0" name="_variableamount" value="' . $this->meta['variableamount'] . '" class="widefat " />';
 		if ($this->meta['usevariableamount'] == 1) {
-			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> ' . __('Use dropdown amount option', 'paystack_forms') . ' </label>';
+			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> ' . __('Use dropdown amount option', 'pff-paystack') . ' </label>';
 		} else {
-			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1"> ' . __('Use dropdown amount option', 'paystack_forms') . ' </label>';
+			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1"> ' . __('Use dropdown amount option', 'pff-paystack') . ' </label>';
 		}
-		$html[] = '<p>' . __('Pay button Description:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Pay button Description:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_paybtn" value="' . $this->meta['paybtn'] . '" class="widefat" />';
-		$html[] = '<p>' . __('Add Extra Charge:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Add Extra Charge:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-							<option value="merchant"' . $this->is_option_selected('merchant', $this->meta['txncharge']) . '> ' . __('No, do not add', 'paystack_forms') . '</option>
-							<option value="customer" ' . $this->is_option_selected('customer', $this->meta['txncharge']) . '> ' . __('Yes, add it', 'paystack_forms') . '</option>
+							<option value="merchant"' . $this->is_option_selected('merchant', $this->meta['txncharge']) . '> ' . __('No, do not add', 'pff-paystack') . '</option>
+							<option value="customer" ' . $this->is_option_selected('customer', $this->meta['txncharge']) . '> ' . __('Yes, add it', 'pff-paystack') . '</option>
 						</select>
-					<br><small>' . __('This allows you include an extra charge to cushion the effect of the transaction fee. <a href="', 'paystack_forms') . get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees" . '">' . __('Configure', 'paystack_forms') . '</a></small>';
-		$html[] = '<p>' . __('User logged In:', 'paystack_forms') . '</p>';
+					<br><small>' . __('This allows you include an extra charge to cushion the effect of the transaction fee. <a href="', 'pff-paystack') . get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees" . '">' . __('Configure', 'pff-paystack') . '</a></small>';
+		$html[] = '<p>' . __('User logged In:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
-							<option value="no" ' . $this->is_option_selected('no', $this->meta['loggedin']) . '> ' . __('User must not be logged in', 'paystack_forms') . '</option>
-							<option value="yes"' . $this->is_option_selected('yes', $this->meta['loggedin']) . '> ' . __('User must be logged In', 'paystack_forms') . '</option>
+							<option value="no" ' . $this->is_option_selected('no', $this->meta['loggedin']) . '> ' . __('User must not be logged in', 'pff-paystack') . '</option>
+							<option value="yes"' . $this->is_option_selected('yes', $this->meta['loggedin']) . '> ' . __('User must be logged In', 'pff-paystack') . '</option>
 						</select>';
-		$html[] = '<p>' . __('Success Message after Payment', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Success Message after Payment', 'pff-paystack') . '</p>';
 		$html[] = '<textarea rows="3"  name="_successmsg"  class="widefat" >' . $this->meta['successmsg'] . '</textarea>';
-		$html[] = '<p>' . __('File Upload Limit(MB):', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('File Upload Limit(MB):', 'pff-paystack') . '</p>';
 		$html[] = '<input type="number" name="_filelimit" value="' . $this->meta['filelimit'] . '" class="widefat  pf-number" />';
-		$html[] = '<p>' . __('Redirect to page link after payment(keep blank to use normal success message):', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Redirect to page link after payment(keep blank to use normal success message):', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_redirect" value="' . $this->meta['redirect'] . '" class="widefat" />';
 		
 		// To output the concatenated $html array content
@@ -415,15 +415,15 @@ class Forms_Update {
 	 */
 	public function recur_data(){
 		$html   = [];
-		$html[] = '<p>' . __('Recurring Payment:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Recurring Payment:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_recur" style="width:100%;">
-					  <option value="no" ' . $this->is_option_selected('no', $this->meta['recur']) . '>' . __('None', 'paystack_forms') . '</option>
-					  <option value="optional" ' . $this->is_option_selected('optional', $this->meta['recur']) . '>' . __('Optional Recurring', 'paystack_forms') . '</option>
-					  <option value="plan" ' . $this->is_option_selected('plan', $this->meta['recur']) . '>' . __('Paystack Plan', 'paystack_forms') . '</option>
+					  <option value="no" ' . $this->is_option_selected('no', $this->meta['recur']) . '>' . __('None', 'pff-paystack') . '</option>
+					  <option value="optional" ' . $this->is_option_selected('optional', $this->meta['recur']) . '>' . __('Optional Recurring', 'pff-paystack') . '</option>
+					  <option value="plan" ' . $this->is_option_selected('plan', $this->meta['recur']) . '>' . __('Paystack Plan', 'pff-paystack') . '</option>
 					</select>';
-		$html[] = '<p>' . __('Paystack Recur Plan code:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Paystack Recur Plan code:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_recurplan" value="' . $this->meta['recurplan'] . '" class="widefat" />
-				   <small>' . __('Plan amount must match amount on extra form description.', 'paystack_forms') . '</small>';
+				   <small>' . __('Plan amount must match amount on extra form description.', 'pff-paystack') . '</small>';
 		
 		// Output the accumulated HTML
 		echo wp_kses( implode( '', $html ), $this->allowed_html ); 
@@ -437,23 +437,23 @@ class Forms_Update {
 	public function email_data() {
 		$html   = [];
 		// Echo out the field
-		$html[] = '<p>' . __('Send an invoice when a payment is attempted:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Send an invoice when a payment is attempted:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_sendinvoice" id="parent_id" style="width:100%;">
-					  <option value="no" ' . $this->is_option_selected('no', $this->meta['sendinvoice']) . '>' . __('Don\'t send', 'paystack_forms') . '</option>
-					  <option value="yes" ' . $this->is_option_selected('yes', $this->meta['sendinvoice']) . '>' . __('Send', 'paystack_forms') . '</option>
+					  <option value="no" ' . $this->is_option_selected('no', $this->meta['sendinvoice']) . '>' . __('Don\'t send', 'pff-paystack') . '</option>
+					  <option value="yes" ' . $this->is_option_selected('yes', $this->meta['sendinvoice']) . '>' . __('Send', 'pff-paystack') . '</option>
 				   </select>';
-		$html[] = '<p>' . __('Send Email Receipt:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Send Email Receipt:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_sendreceipt" id="parent_id" style="width:100%;">
-					  <option value="no" ' . $this->is_option_selected('no', $this->meta['sendreceipt']) . '>' . __('Don\'t send', 'paystack_forms') . '</option>
-					  <option value="yes" ' . $this->is_option_selected('yes', $this->meta['sendreceipt']) . '>' . __('Send', 'paystack_forms') . '</option>
+					  <option value="no" ' . $this->is_option_selected('no', $this->meta['sendreceipt']) . '>' . __('Don\'t send', 'pff-paystack') . '</option>
+					  <option value="yes" ' . $this->is_option_selected('yes', $this->meta['sendreceipt']) . '>' . __('Send', 'pff-paystack') . '</option>
 				   </select>';
-		$html[] = '<p>' . __('Email Subject:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Email Subject:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_subject" value="' . $this->meta['subject'] . '" class="widefat" />';
-		$html[] = '<p>' . __('Merchant Name on Receipt:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Merchant Name on Receipt:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_merchant" value="' . $this->meta['merchant'] . '" class="widefat" />';
-		$html[] = '<p>' . __('Email Heading:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Email Heading:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_heading" value="' . $this->meta['heading'] . '" class="widefat" />';
-		$html[] = '<p>' . __('Email Body/Message:', 'paystack_forms') . '</p>';
+		$html[] = '<p>' . __('Email Body/Message:', 'pff-paystack') . '</p>';
 		$html[] = '<textarea rows="6" name="_message" class="widefat">' . $this->meta['message'] . '</textarea>';
 		
 		echo wp_kses( implode( '', $html ), $this->allowed_html ); 
@@ -468,39 +468,39 @@ class Forms_Update {
 		$html   = [];
 
 		// Echo out the field
-		$html[] = '<small>' . __('Allow your users pay in multiple quantity', 'paystack_forms') . '</small>
-			<p>' . __('Quantified Payment:', 'paystack_forms') . '</p>';
+		$html[] = '<small>' . __('Allow your users pay in multiple quantity', 'pff-paystack') . '</small>
+			<p>' . __('Quantified Payment:', 'pff-paystack') . '</p>';
 
 		if ($this->meta['recur'] != "no") {
 			$html[] = '<select disabled class="form-control" name="_usequantity" style="width:100%;">
-				<option value="no" ' . $this->is_option_selected('no', $this->meta['usequantity']) . '>' . __('No', 'paystack_forms') . '</option>
+				<option value="no" ' . $this->is_option_selected('no', $this->meta['usequantity']) . '>' . __('No', 'pff-paystack') . '</option>
 				</select>';
 		} else {
 			$html[] = '<select class="form-control" name="_usequantity" style="width:100%;">
-				<option value="no" ' . $this->is_option_selected('no', $this->meta['usequantity']) . '>' . __('No', 'paystack_forms') . '</option>
-				<option value="yes" ' . $this->is_option_selected('yes', $this->meta['usequantity']) . '>' . __('Yes', 'paystack_forms') . '</option>
+				<option value="no" ' . $this->is_option_selected('no', $this->meta['usequantity']) . '>' . __('No', 'pff-paystack') . '</option>
+				<option value="yes" ' . $this->is_option_selected('yes', $this->meta['usequantity']) . '>' . __('Yes', 'pff-paystack') . '</option>
 				</select>';
 		}
 
 		if ($this->meta['usequantity'] == "yes") {
 
-			$html[] = '<p>' . __('Max payable quantity:', 'paystack_forms') . '</p>';
-			$html[] = '<input type="number" min="1"  name="_quantity" value="' . $this->meta['quantity'] . '" class="widefat  pf-number" /><small>' . __('Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.', 'paystack_forms') . '</small>';
-			$html[] = '<p>' . __('Unit of quantity:', 'paystack_forms') . '</p>';
-			$html[] = '<input type="text" name="_quantityunit" value="' . $this->meta['quantityunit'] . '" class="widefat" /><small>' . __('What is the unit of this quantity? Default is <code>Quantity</code>.', 'paystack_forms') . '</small>';
+			$html[] = '<p>' . __('Max payable quantity:', 'pff-paystack') . '</p>';
+			$html[] = '<input type="number" min="1"  name="_quantity" value="' . $this->meta['quantity'] . '" class="widefat  pf-number" /><small>' . __('Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.', 'pff-paystack') . '</small>';
+			$html[] = '<p>' . __('Unit of quantity:', 'pff-paystack') . '</p>';
+			$html[] = '<input type="text" name="_quantityunit" value="' . $this->meta['quantityunit'] . '" class="widefat" /><small>' . __('What is the unit of this quantity? Default is <code>Quantity</code>.', 'pff-paystack') . '</small>';
 
-			$html[] = '<p>' . __('Inventory Payment:', 'paystack_forms') . '</p>';
+			$html[] = '<p>' . __('Inventory Payment:', 'pff-paystack') . '</p>';
 			$html[] = '<select class="form-control" name="_useinventory" style="width:100%;">
-				<option value="no" ' . $this->is_option_selected('no', $this->meta['useinventory']) . '>' . __('No', 'paystack_forms') . '</option>
-				<option value="yes" ' . $this->is_option_selected('yes', $this->meta['useinventory']) . '>' . __('Yes', 'paystack_forms') . '</option>
+				<option value="no" ' . $this->is_option_selected('no', $this->meta['useinventory']) . '>' . __('No', 'pff-paystack') . '</option>
+				<option value="yes" ' . $this->is_option_selected('yes', $this->meta['useinventory']) . '>' . __('Yes', 'pff-paystack') . '</option>
 				</select>
-				<small>' . __('Set maximum available items in stock', 'paystack_forms') . '</small>';
+				<small>' . __('Set maximum available items in stock', 'pff-paystack') . '</small>';
 		}
 
 		if ($this->meta['useinventory'] == "yes" && $this->meta['usequantity'] == "yes") {
-			$html[] = '<p>' . __('Total Inventory', 'paystack_forms') . '</p>';
+			$html[] = '<p>' . __('Total Inventory', 'pff-paystack') . '</p>';
 			$html[] = '<input type="number" min="' . $this->meta['sold'] . '" name="_inventory" value="' . $this->meta['inventory'] . '" class="widefat  pf-number" />';
-			$html[] = '<p>' . __('Already sold', 'paystack_forms') . '</p>';
+			$html[] = '<p>' . __('Already sold', 'pff-paystack') . '</p>';
 			$html[] = '<input type="number" name="_sold" value="' . $this->meta['sold'] . '" class="widefat  pf-number" />
 				<small></small>
 				<br/>';
@@ -518,12 +518,12 @@ class Forms_Update {
 		$html   = [];
 		
 		// Add components to the $html array
-		$html[] = '<p>' . __( 'Use agreement checkbox:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Use agreement checkbox:', 'pff-paystack' ) . '</p>';
 		$html[] = '<select class="form-control" name="_useagreement" style="width:100%;">
-					<option value="no" ' . $this->is_option_selected('no', $this->meta['useagreement']) . '>' . __( 'No', 'paystack_forms' ) . '</option>
-					<option value="yes" ' . $this->is_option_selected('yes', $this->meta['useagreement']) . '>' . __( 'Yes', 'paystack_forms' ) . '</option>
+					<option value="no" ' . $this->is_option_selected('no', $this->meta['useagreement']) . '>' . __( 'No', 'pff-paystack' ) . '</option>
+					<option value="yes" ' . $this->is_option_selected('yes', $this->meta['useagreement']) . '>' . __( 'Yes', 'pff-paystack' ) . '</option>
 				</select>';
-		$html[] = '<p>' . __( 'Agreement Page Link:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Agreement Page Link:', 'pff-paystack' ) . '</p>';
 		$html[] = '<input type="text" name="_agreementlink" value="' . $this->meta['agreementlink']  . '" class="widefat" />';
 		echo wp_kses( implode( '', $html ), $this->allowed_html );
 	}
@@ -536,14 +536,14 @@ class Forms_Update {
 	public function subaccount_data() {
 		$html   = [];
 		// Add components to the $html array
-		$html[] = '<p>' . __( 'Sub Account code:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Sub Account code:', 'pff-paystack' ) . '</p>';
 		$html[] = '<input type="text" name="_subaccount" value="' . $this->meta['subaccount']  . '" class="widefat" />';
-		$html[] = '<p>' . __( 'Transaction Charge bearer:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Transaction Charge bearer:', 'pff-paystack' ) . '</p>';
 		$html[] = '<select class="form-control" name="_txnbearer" id="parent_id" style="width:100%;">
-					<option value="account" ' . $this->is_option_selected('account', $this->meta['txnbearer']) . '>' . __( 'Merchant (default)', 'paystack_forms' ) . '</option>
-					<option value="subaccount" ' . $this->is_option_selected('subaccount', $this->meta['txnbearer']) . '>' . __( 'Sub Account', 'paystack_forms' ) . '</option>
+					<option value="account" ' . $this->is_option_selected('account', $this->meta['txnbearer']) . '>' . __( 'Merchant (default)', 'pff-paystack' ) . '</option>
+					<option value="subaccount" ' . $this->is_option_selected('subaccount', $this->meta['txnbearer']) . '>' . __( 'Sub Account', 'pff-paystack' ) . '</option>
 				</select>';
-		$html[] = '<p>' . __( 'Merchant Amount:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Merchant Amount:', 'pff-paystack' ) . '</p>';
 		$html[] = '<input type="text" name="_merchantamount" value="' . $this->meta['merchantamount'] . '" class="widefat" />';
 		echo wp_kses( implode( '', $html ), $this->allowed_html );
 	}
@@ -555,16 +555,16 @@ class Forms_Update {
 	 */
 	public function plan_data() {
 		$html   = [];
-		$html[] = '<p>' . __( 'User subscribes to plan after number of days:', 'paystack_forms' ) . '</p>';
-		$html[] = '<p>' . __( 'Number of days:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'User subscribes to plan after number of days:', 'pff-paystack' ) . '</p>';
+		$html[] = '<p>' . __( 'Number of days:', 'pff-paystack' ) . '</p>';
 		$html[] = '<input type="number" name="_startdate_days" value="' . $this->meta['startdate_days'] . '" class="widefat pf-number" />';
-		$html[] = '<p>' . __( 'Plan:', 'paystack_forms' ) . '</p>';
+		$html[] = '<p>' . __( 'Plan:', 'pff-paystack' ) . '</p>';
 		$html[] = '<input type="text" name="_startdate_plan_code" value="' . $this->meta['startdate_plan_code'] . '" class="widefat" />';
 		
 		if ($this->meta['startdate_enabled'] == 1) {
-			$html[] = '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1" checked> ' . __( 'Enable', 'paystack_forms' ) . ' </label></p>';
+			$html[] = '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1" checked> ' . __( 'Enable', 'pff-paystack' ) . ' </label></p>';
 		} else {
-			$html[] = '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1"> ' . __( 'Enable', 'paystack_forms' ) . ' </label></p>';
+			$html[] = '<p><br><label><input name="_startdate_enabled" type="checkbox" value="1"> ' . __( 'Enable', 'pff-paystack' ) . ' </label></p>';
 		}
 		echo wp_kses( implode( '', $html ), $this->allowed_html );
 	}

@@ -25,7 +25,7 @@ class Field_Shortcodes {
 	public function text_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'paystack_forms' ),
+				'name'     => __( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,

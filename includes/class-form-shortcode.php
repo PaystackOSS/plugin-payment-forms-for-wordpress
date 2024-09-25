@@ -142,13 +142,13 @@ class Form_Shortcode {
 	
 					$html[] = '</div></form>';
 				} else {
-					$html[] = '<h5>' . __( 'You must be logged in to make a payment.', 'paystack_forms' ) . '</h5>';
+					$html[] = '<h5>' . __( 'You must be logged in to make a payment.', 'pff-paystack' ) . '</h5>';
 				}
 			} else {
-				$html[] = '<h5>' . __( 'Invalid Paystack form ID or the form does not exist.', 'paystack_forms' ) . '</h5>';
+				$html[] = '<h5>' . __( 'Invalid Paystack form ID or the form does not exist.', 'pff-paystack' ) . '</h5>';
 			}
 		} else {
-			$html[] = '<h5>' . __( 'No Paystack form ID provided.', 'paystack_forms' ) . '</h5>';
+			$html[] = '<h5>' . __( 'No Paystack form ID provided.', 'pff-paystack' ) . '</h5>';
 		}
 
 		$html = implode( '', $html );
@@ -192,7 +192,7 @@ class Form_Shortcode {
 			$this->meta['paymentoptions'] = array_map( 'sanitize_text_field', $this->meta['paymentoptions'] );
 		}
 
-		$this->meta['planerrorcode'] = __( 'Input Correct Recurring Plan Code', 'paystack_forms' );
+		$this->meta['planerrorcode'] = __( 'Input Correct Recurring Plan Code', 'pff-paystack' );
 
 		if ( $this->meta['recur']== 'plan') {
 			if ( $this->meta['recurplan'] == '' || $this->meta['recurplan'] == '') {
@@ -244,9 +244,9 @@ class Form_Shortcode {
 	 */
 	public function get_fullname_field() {
 		$html = '<div class="span12 unit">
-			<label class="label">' . __( 'Full Name', 'paystack_forms' ) . ' <span>*</span></label>
+			<label class="label">' . __( 'Full Name', 'pff-paystack' ) . ' <span>*</span></label>
 			<div class="input">
-				<input type="text" name="pf-fname" placeholder="' . __( 'First & Last Name', 'paystack_forms' ) . '" value="' . esc_attr( $this->user['fullname'] ) . '" required>
+				<input type="text" name="pf-fname" placeholder="' . __( 'First & Last Name', 'pff-paystack' ) . '" value="' . esc_attr( $this->user['fullname'] ) . '" required>
 			</div>
 		</div>';
 		return $html;
@@ -259,9 +259,9 @@ class Form_Shortcode {
 	 */
 	public function get_email_field() {
 		$html = '<div class="span12 unit">
-			<label class="label">' . __( 'Email', 'paystack_forms' ) . ' <span>*</span></label>
+			<label class="label">' . __( 'Email', 'pff-paystack' ) . ' <span>*</span></label>
 			<div class="input">
-				<input type="email" name="pf-pemail" placeholder="' . __( 'Enter Email Address', 'paystack_forms' ) . '" id="pf-email" value="' . esc_attr( $this->user['email'] ) . '" ' . ( $this->meta['loggedin'] == 'yes' ? 'readonly' : '' ) . ' required>
+				<input type="email" name="pf-pemail" placeholder="' . __( 'Enter Email Address', 'pff-paystack' ) . '" id="pf-email" value="' . esc_attr( $this->user['email'] ) . '" ' . ( $this->meta['loggedin'] == 'yes' ? 'readonly' : '' ) . ' required>
 			</div>
 		</div>';
 		return $html;

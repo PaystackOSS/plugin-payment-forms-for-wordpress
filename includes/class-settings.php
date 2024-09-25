@@ -30,49 +30,49 @@ class Settings {
 		$this->fields = array(
 			'general' => array(
 				'mode' => array(
-					'title'   => __( 'Mode', 'paystack_forms' ),
+					'title'   => __( 'Mode', 'pff-paystack' ),
 					'type'    => 'select',
 					'default' => 'test',
 				),
 				'tsk' => array(
-					'title'   => __( 'Test Secret Key', 'paystack_forms' ),
+					'title'   => __( 'Test Secret Key', 'pff-paystack' ),
 					'type'    => 'password',
 					'default' => '',
 				),
 				'tpk' => array(
-					'title'   => __( 'Test Public Key', 'paystack_forms' ),
+					'title'   => __( 'Test Public Key', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => '',
 				),
 				'lsk' => array(
-					'title'   => __( 'Live Secret Key', 'paystack_forms' ),
+					'title'   => __( 'Live Secret Key', 'pff-paystack' ),
 					'type'    => 'password',
 					'default' => '',
 				),
 				'lpk' => array(
-					'title'   => __( 'Live Public Key', 'paystack_forms' ),
+					'title'   => __( 'Live Public Key', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => '',
 				),
 			),
 			'fees' => array(
 				'prc' => array(	
-					'title'   => __( 'Percentage', 'paystack_forms' ),
+					'title'   => __( 'Percentage', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => 1.5,
 				),
 				'ths' => array(	
-					'title'   => __( 'Threshold <br> <small>(amount above which Paystack adds the fixed amount below)</small>', 'paystack_forms' ),
+					'title'   => __( 'Threshold <br> <small>(amount above which Paystack adds the fixed amount below)</small>', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => 2500,
 				),
 				'adc' => array(	
-					'title'   => __( 'Additional Charge <br> <small> (amount added to percentage fee when transaction amount is above threshold) </small>', 'paystack_forms' ),
+					'title'   => __( 'Additional Charge <br> <small> (amount added to percentage fee when transaction amount is above threshold) </small>', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => 100,
 				),
 				'cap' => array(	
-					'title'   => __( 'Cap <br> <small> (maximum charge paystack can charge on your transactions)', 'paystack_forms' ),
+					'title'   => __( 'Cap <br> <small> (maximum charge paystack can charge on your transactions)', 'pff-paystack' ),
 					'type'    => 'text',
 					'default' => 2000,
 				),
@@ -88,7 +88,7 @@ class Settings {
 	 * @return void
 	 */
 	public function register_settings_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', __( 'Settings', 'paystack_forms' ), __( 'Settings', 'paystack_forms' ), 'edit_posts', 'settings', [ $this, 'output_settings_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', __( 'Settings', 'pff-paystack' ), __( 'Settings', 'pff-paystack' ), 'edit_posts', 'settings', [ $this, 'output_settings_page' ] );
 	}
 
 	/**
@@ -109,10 +109,10 @@ class Settings {
 	public function output_settings_page() {
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Paystack Forms Settings', 'paystack_forms' ); ?></h1>
-			<h2><?php esc_html_e( 'API Keys Settings', 'paystack_forms' ); ?></h2>
+			<h1><?php esc_html_e( 'Paystack Forms Settings', 'pff-paystack' ); ?></h1>
+			<h2><?php esc_html_e( 'API Keys Settings', 'pff-paystack' ); ?></h2>
 
-			<span><?php echo wp_kses_post( __( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'paystack_forms' ) ); ?> </span>
+			<span><?php echo wp_kses_post( __( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'pff-paystack' ) ); ?> </span>
 			
 			<form method="post" action="options.php">
 				<?php 
@@ -131,8 +131,8 @@ class Settings {
 								$saved_val = get_option( 'mode', $field['default'] );
 								?>
 								<select class="form-control" name="<?php echo esc_attr( $key ); ?>" id="parent_id">
-									<option value="test" <?php echo esc_attr( $this->is_option_selected( 'test', $saved_val ) ); ?>><?php esc_html_e( 'Test Mode', 'paystack_forms' ); ?></option>
-									<option value="live" <?php echo esc_attr( $this->is_option_selected( 'live', $saved_val ) ); ?>><?php esc_html_e( 'Live Mode', 'paystack_forms' ); ?></option>
+									<option value="test" <?php echo esc_attr( $this->is_option_selected( 'test', $saved_val ) ); ?>><?php esc_html_e( 'Test Mode', 'pff-paystack' ); ?></option>
+									<option value="live" <?php echo esc_attr( $this->is_option_selected( 'live', $saved_val ) ); ?>><?php esc_html_e( 'Live Mode', 'pff-paystack' ); ?></option>
 								</select>
 							<?php } else { ?>
 								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, $field['default'] ) ); ?>" />
@@ -145,7 +145,7 @@ class Settings {
 				</table>
 				<hr>
 				<table class="form-table paystack_setting_page" id="paystack_setting_fees">
-					<h2><?php esc_html_e( 'Fees Settings', 'paystack_forms' ); ?></h2>
+					<h2><?php esc_html_e( 'Fees Settings', 'pff-paystack' ); ?></h2>
 					<?php
 					foreach ( $settings_fields['fees'] as $key => $field ) {
 						?>
