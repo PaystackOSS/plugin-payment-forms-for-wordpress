@@ -187,22 +187,20 @@ class Form_Shortcode {
 	public function set_meta_data( $obj ) {
 		$this->meta = $this->helpers->parse_meta_values( $obj );
 
-		if ( $this->meta['usevariableamount'] == 1 ) {
+		if ( 1 === $this->meta['usevariableamount'] ) {
 			$this->meta['paymentoptions'] = explode( ',', $this->meta['variableamount'] );
 			$this->meta['paymentoptions'] = array_map( 'sanitize_text_field', $this->meta['paymentoptions'] );
 		}
 
 		$this->meta['planerrorcode'] = __( 'Input Correct Recurring Plan Code', 'pff-paystack' );
 
-		if ( $this->meta['recur']== 'plan') {
-			if ( $this->meta['recurplan'] == '' || $this->meta['recurplan'] == '') {
+		if ( 'plan' === $this->meta['recur'] ) {
+			if ( '' === $this->meta['recurplan'] ) {
 				$this->showbtn = false;
 			} else {
-				/**
-				 * TODO: Implement this functionality
-				 */
-				//$plan = pff_paystack_fetch_plan( $this->meta['recurplan'] );
-				if ( isset( $plan->data->amount ) ) {
+				$plan = pff_paystack()->classes['request-plan']->fetch_plan( $this->meta['recurplan'] );
+				var_dump( $plan );
+				if ( false !== $plan && isset( $plan->data->amount ) ) {
 					$this->meta['planamount'] = $plan->data->amount/100;
 				} else {
 					$this->showbtn = false;

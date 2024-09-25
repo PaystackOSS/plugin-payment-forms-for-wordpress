@@ -49,7 +49,7 @@ final class Payment_Forms {
 	 *
 	 * @var array
 	 */
-	private $classes = array();
+	public $classes = array();
 
 	/**
 	 * Helpers functions for the custom payments.
@@ -101,6 +101,8 @@ final class Payment_Forms {
 			'tinymce-plugin'      => 'TinyMCE_Plugin',
 			'form-shortcode'      => 'Form_Shortcode',
 			'field-shortcodes'    => 'Field_Shortcodes',
+			'api'                 => '',
+			'request-plan'        => 'Request_Plan',
 		);
 	}
 
