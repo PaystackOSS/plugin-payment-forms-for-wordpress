@@ -266,8 +266,8 @@ function KkdPffPaystackFee()
 
                     $.blockUI({ message: "Please wait..." });
 
+					// IS THIS BEING USED?
                     var formdata = new FormData(this);
-					console.log( formdata );
 
                     $.ajax(
                         {
@@ -281,6 +281,7 @@ function KkdPffPaystackFee()
                             dataType: "JSON",
                             success: function (data) {
                                 $.unblockUI();
+
                                 data.custom_fields.push(
                                     {
                                         "display_name": "Plugin",
@@ -288,12 +289,12 @@ function KkdPffPaystackFee()
                                         "value": "pff-paystack"
                                     }
                                 )
-                                if (data.result == "success") {
+                                if ( data.result == "success" ) {
                                     var names = data.name.split(" ");
                                     var firstName = names[0] || "";
                                     var lastName = names[1] || "";
                                     var quantity = data.quantity;
-                                    // console.log(firstName+ " - "+lastName);
+                                    
                                     if (data.plan == "none" || data.plan == "" || data.plan == "no") {
                                         var handler = PaystackPop.setup(
                                             {
@@ -439,6 +440,7 @@ function KkdPffPaystackFee()
                                 } else {
                                     alert(data.message);
                                 }
+
                             },
                             error: function (xhr, status, error) {
                                 console.log("An error occurred");

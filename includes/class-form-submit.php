@@ -431,11 +431,6 @@ class Form_Submit {
 			'transaction_charge' => $transaction_charge,
 		);
 
-		print_r('<pre>');
-		print_r($response);
-		print_r('</pre>');
-		die();
-
 		//-------------------------------------------------------------------------------------------
 
 		// $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
