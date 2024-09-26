@@ -327,14 +327,14 @@ class Form_Shortcode {
 							<select class="form-control" id="pf-vamount" name="pf-amount">';
 							foreach ( $this->meta['paymentoptions'] as $option ) {
 								list( $optionName, $optionValue ) = explode( ':', $option );
-								$html[] = '<option value="' . esc_attr( $optionValue ) . '">' . esc_html( $optionName ) . '(' . esc_html( number_format( $optionValue ) ) . ')</option>';
+								$html[] = '<option value="' . $optionValue . '" data-name="' . $optionName . '">' . $optionName . ' - ' . $this->meta['currency'] . ' ' . number_format( $optionValue ) . '</option>';
 							}
 					$html[] = '</select> <i></i> </div>';
 				}
 			}
 
 			// Transaction charge notice
-			if ( $this->meta['txncharge'] != 'merchant' && $this->meta['recur'] != 'plan' ) {
+			if ( 'merchant' !== $this->meta['txncharge'] && 'plan' !== $this->meta['recur'] ) {
 				$html[] = '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
 			}
 
