@@ -93,6 +93,119 @@ function KkdPffPaystackFee()
     this.__setup();
 }
 
+function checkMinimumVal() {
+	if ($("#pf-minimum-hidden").length) {
+		var min_amount = Number($("#pf-minimum-hidden").val());
+		var amt = Number($("#pf-amount").val());
+		if (min_amount > 0 && amt < min_amount) {
+			$("#pf-min-val-warn").text(
+				"Amount cannot be less than the minimum amount"
+			);
+			return false;
+		} else {
+			$("#pf-min-val-warn").text("");
+			$("#pf-amount").removeClass("rerror");
+		}
+	}
+}
+
+function format_validate(max, e) {
+	var value = amountField.text();
+	if (e.which != 8 && value.length > max) {
+		e.preventDefault();
+	}
+	// Allow: backspace, delete, tab, escape, enter and .
+	if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 
+		// Allow: Ctrl+A
+		|| (e.keyCode == 65 && e.ctrlKey === true) 
+		// Allow: Ctrl+C
+		|| (e.keyCode == 67 && e.ctrlKey === true) 
+		// Allow: Ctrl+X
+		|| (e.keyCode == 88 && e.ctrlKey === true) 
+		// Allow: home, end, left, right
+		|| (e.keyCode >= 35 && e.keyCode <= 39)
+	) {
+		// let it happen, don't do anything
+		calculateFees();
+		return;
+	}
+	// Ensure that it is a number and stop the keypress
+	if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) 
+		&& (e.keyCode < 96 || e.keyCode > 105)
+	) {
+		e.preventDefault();
+	} else {
+		calculateFees();
+	}
+}
+
+function calculateTotal() {
+	var unit;
+	if ($("#pf-vamount").length) {
+		unit = $("#paystack-form").find("#pf-vamount").val();
+	} else {
+		unit = $("#pf-amount").val();
+	}
+	var quant = $("#pf-quantity").val();
+	var newvalue = unit * quant;
+
+	if (quant == "" || quant == null) {
+		quant = 1;
+	} else {
+		$("#pf-total").val(newvalue);
+	}
+
+}
+function calculateFees(transaction_amount) {
+	setTimeout(
+		function () {
+			transaction_amount = transaction_amount || parseInt(amountField.val());
+			var currency = $("#pf-currency").val();
+			var quant = $("#pf-quantity").val();
+			if ($("#pf-vamount").length) {
+				var name = $("#pf-vamount option:selected").attr("data-name");
+				$("#pf-vname").val(name);
+			}
+			if (transaction_amount == "" 
+				|| transaction_amount == 0 
+				|| transaction_amount.length == 0 
+				|| transaction_amount == null 
+				|| isNaN(transaction_amount)
+			) {
+					  var total = 0;
+					  var fees = 0;
+			} else {
+				var obj = new KkdPffPaystackFee();
+
+				obj.withAdditionalCharge(pffSettings.fee.adc);
+				obj.withThreshold(pffSettings.fee.ths);
+				obj.withCap(pffSettings.fee.cap);
+				obj.withPercentage(pffSettings.fee.prc);
+				if (quant) {
+						transaction_amount = transaction_amount * quant;
+				}
+				var total = obj.addFor(transaction_amount * 100) / 100;
+				var fees = total - transaction_amount;
+			}
+			$(".pf-txncharge")
+			.hide()
+			.html(currency + " " + fees.toFixed(2))
+			.show()
+			.digits();
+			$(".pf-txntotal")
+			.hide()
+			.html(currency + " " + total.toFixed(2))
+			.show()
+			.digits();
+		}, 100
+	);
+}
+
+function validateEmail(email) {
+	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(email);
+}
+
 (function ($) {
     "use strict";
     $(document).ready(
@@ -110,7 +223,7 @@ function KkdPffPaystackFee()
 				} );
 			}
 
-            if ($("#pf-vamount").length) {
+            if ( $("#pf-vamount").length ) {
                   var amountField = $("#pf-vamount");
                   calculateTotal();
             } else {
@@ -129,54 +242,6 @@ function KkdPffPaystackFee()
                 }
             );
 
-            function checkMinimumVal()
-            {
-                if ($("#pf-minimum-hidden").length) {
-                    var min_amount = Number($("#pf-minimum-hidden").val());
-                    var amt = Number($("#pf-amount").val());
-                    if (min_amount > 0 && amt < min_amount) {
-                        $("#pf-min-val-warn").text(
-                            "Amount cannot be less than the minimum amount"
-                        );
-                        return false;
-                    } else {
-                        $("#pf-min-val-warn").text("");
-                        $("#pf-amount").removeClass("rerror");
-                    }
-                }
-            }
-
-            function format_validate(max, e)
-            {
-                var value = amountField.text();
-                if (e.which != 8 && value.length > max) {
-                    e.preventDefault();
-                }
-                // Allow: backspace, delete, tab, escape, enter and .
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 
-                    // Allow: Ctrl+A
-                    || (e.keyCode == 65 && e.ctrlKey === true) 
-                    // Allow: Ctrl+C
-                    || (e.keyCode == 67 && e.ctrlKey === true) 
-                    // Allow: Ctrl+X
-                    || (e.keyCode == 88 && e.ctrlKey === true) 
-                    // Allow: home, end, left, right
-                    || (e.keyCode >= 35 && e.keyCode <= 39)
-                ) {
-                    // let it happen, don't do anything
-                    calculateFees();
-                    return;
-                }
-                // Ensure that it is a number and stop the keypress
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) 
-                    && (e.keyCode < 96 || e.keyCode > 105)
-                ) {
-                    e.preventDefault();
-                } else {
-                    calculateFees();
-                }
-            }
-
             $.fn.digits = function () {
                 return this.each(
                     function () {
@@ -188,70 +253,6 @@ function KkdPffPaystackFee()
                     }
                 );
             };
-
-            function calculateTotal()
-            {
-                var unit;
-                if ($("#pf-vamount").length) {
-                    unit = $("#paystack-form").find("#pf-vamount").val();
-                } else {
-                    unit = $("#pf-amount").val();
-                }
-                var quant = $("#pf-quantity").val();
-                var newvalue = unit * quant;
-
-                if (quant == "" || quant == null) {
-                    quant = 1;
-                } else {
-                    $("#pf-total").val(newvalue);
-                }
-
-            }
-            function calculateFees(transaction_amount)
-            {
-                setTimeout(
-                    function () {
-                        transaction_amount = transaction_amount || parseInt(amountField.val());
-                        var currency = $("#pf-currency").val();
-                        var quant = $("#pf-quantity").val();
-                        if ($("#pf-vamount").length) {
-                            var name = $("#pf-vamount option:selected").attr("data-name");
-                            $("#pf-vname").val(name);
-                        }
-                        if (transaction_amount == "" 
-                            || transaction_amount == 0 
-                            || transaction_amount.length == 0 
-                            || transaction_amount == null 
-                            || isNaN(transaction_amount)
-                        ) {
-                                  var total = 0;
-                                  var fees = 0;
-                        } else {
-                            var obj = new KkdPffPaystackFee();
-
-                            obj.withAdditionalCharge(pffSettings.fee.adc);
-                            obj.withThreshold(pffSettings.fee.ths);
-                            obj.withCap(pffSettings.fee.cap);
-                            obj.withPercentage(pffSettings.fee.prc);
-                            if (quant) {
-                                    transaction_amount = transaction_amount * quant;
-                            }
-                            var total = obj.addFor(transaction_amount * 100) / 100;
-                            var fees = total - transaction_amount;
-                        }
-                        $(".pf-txncharge")
-                        .hide()
-                        .html(currency + " " + fees.toFixed(2))
-                        .show()
-                        .digits();
-                        $(".pf-txntotal")
-                        .hide()
-                        .html(currency + " " + total.toFixed(2))
-                        .show()
-                        .digits();
-                    }, 100
-                );
-            }
 
             calculateFees();
 
@@ -287,11 +288,6 @@ function KkdPffPaystackFee()
                 }
             );
 
-            function validateEmail(email)
-            {
-                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(email);
-            }
             $(".paystack-form").on(
                 "submit", function (e) {
                     var requiredFieldIsInvalid = false;
