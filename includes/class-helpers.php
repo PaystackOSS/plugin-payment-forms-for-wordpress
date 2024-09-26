@@ -587,8 +587,7 @@ class Helpers {
 		}
 
 		$meta['minimum']   = floatval( $meta['minimum'] );
-		$meta['txncharge'] = floatval( $meta['txncharge'] );
-
+		//$meta['txncharge'] = floatval( $meta['txncharge'] );
 		return $meta;
 	}
 
@@ -663,5 +662,60 @@ class Helpers {
 			}
 		}
 		return $fields;
+	}
+
+	/**
+	 * Retrieve the user's IP address.
+	 *
+	 * @return string User's IP address.
+	 */
+	public function get_the_user_ip() {
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
+	}
+
+	/**
+	 * Generate a new Paystack code.
+	 *
+	 * @param int $length Length of the code to generate. Default 10.
+	 * @return string Generated code.
+	 */
+	public function generate_new_code( $length = 10 ) {
+		$characters        = '06EFGHI9KL' . time() . 'MNOPJRSUVW01YZ923234' . time() . 'ABCD5678QXT';
+		$characters_length = strlen( $characters );
+		$random_string     = '';
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$random_string .= $characters[ rand( 0, $characters_length - 1 ) ];
+		}
+
+		return time() . '_' . $random_string;
+	}
+
+	/**
+	 * Check if the given code exists in the database.
+	 *
+	 * @param string $code The code to check.
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 * @return bool True if the code exists, false otherwise.
+	 */
+	public function check_code( $code ) {
+		global $wpdb;
+		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+
+		$o_exist = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE txn_code = %s",
+				$code
+			)
+		);
+
+		return ( count( $o_exist ) > 0 );
 	}
 }

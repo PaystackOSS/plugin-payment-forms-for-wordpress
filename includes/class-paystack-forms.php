@@ -104,6 +104,7 @@ final class Payment_Forms {
 			'api'                 => '',
 			'request-plan'        => 'Request_Plan',
 			'form-submit'         => 'Form_Submit',
+			'transaction-fee'     => '',
 		);
 	}
 

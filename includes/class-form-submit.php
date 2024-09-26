@@ -113,6 +113,7 @@ class Form_Submit {
 	 * @return void
 	 */
 	protected function setup_data() {
+		$this->helpers   = new Helpers();
 		$this->meta      = $this->helpers->parse_meta_values( get_post( $this->form_id ) );
 		$this->form_data = filter_input_array( INPUT_POST );
 
@@ -189,7 +190,6 @@ class Form_Submit {
 		/**
 		 * Setup our data to be processed.
 		 */
-		$this->helpers = new Helpers();
 		$this->setup_data();
 	
 		/**
@@ -225,16 +225,9 @@ class Form_Submit {
 			'type'          => 'text',
 			'value'         => $this->meta['currency'] . number_format( $amount ),
 		);
-
-		print_r('<pre>');
-		print_r($code);
-		print_r($amount);
-		print_r($this->fixed_metadata);
-		print_r('</pre>');
-		die();
 	
 		if ( 'customer' === $this->meta['txncharge'] ) {
-			$amount = kkd_pff_paystack_add_paystack_charge( $amount );
+			$amount = $this->process_transaction_fees( $amount );
 		}
 
 		/*$max_file_size = $file_limit * 1024 * 1024;
@@ -347,24 +340,43 @@ class Form_Submit {
 			);
 		}*/
 
-		$fixed_metadata = json_decode( json_encode( $fixed_metadata, JSON_NUMERIC_CHECK ), true );
-		$fixed_metadata = array_merge( $untouched_metadata, $fixed_metadata );
+		$this->fixed_metadata = json_decode( json_encode( $this->fixed_metadata, JSON_NUMERIC_CHECK ), true );
+		$this->fixed_metadata = array_merge( $this->untouched, $this->fixed_metadata );
+
+		if ( null === $this->meta['plancode'] ) {
+			$this->meta['plancode'] = '';
+		}
 
 		$insert = array(
-			'post_id'  => sanitize_text_field( $_POST['pf-id'] ),
-			'email'    => sanitize_email( $_POST['pf-pemail'] ),
-			'user_id'  => sanitize_text_field( $_POST['pf-user_id'] ),
-			'amount'   => sanitize_text_field( $_POST['amount'] ), // Assuming $amount comes from $_POST
-			'plan'     => sanitize_text_field( $_POST['plancode'] ), // Assuming $plancode comes from $_POST
-			'ip'       => kkd_pff_paystack_get_the_user_ip(), // Make sure this function returns a sanitized IP
-			'txn_code' => sanitize_text_field( $_POST['code'] ), // Assuming $code comes from $_POST
-			'metadata' => wp_json_encode( $_POST['fixedmetadata'] ), // Assuming $fixed_metadata comes from $_POST
+			'post_id'  => $this->form_data['pf-id'],
+			'email'    => $this->form_data['pf-pemail'],
+			'user_id'  => $this->form_data['pf-user_id'],
+			'amount'   => $amount,
+			'plan'     => $this->meta['plancode'],
+			'ip'       => $this->helpers->get_the_user_ip(),
+			'txn_code' => $code,
+			'metadata' => wp_json_encode( $this->fixed_metadata ),
 		);
 
 		$exist = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE post_id = %s AND email = %s AND user_id = %s AND amount = %s AND plan = %s AND ip = %s AND paid = '0' AND metadata = %s",
-				$insert['post_id'], $insert['email'], $insert['user_id'], $insert['amount'], $insert['plan'], $insert['ip'], $insert['metadata']
+				"SELECT * 
+					FROM {$table} 
+					WHERE post_id = %s 
+					AND email = %s 
+					AND user_id = %s 
+					AND amount = %s 
+					AND plan = %s 
+					AND ip = %s 
+					AND paid = '0' 
+					AND metadata = %s",
+				$insert['post_id'], 
+				$insert['email'],
+				$insert['user_id'],
+				$insert['amount'],
+				$insert['plan'],
+				$insert['ip'],
+				$insert['metadata']
 			)
 		);
 
@@ -386,11 +398,14 @@ class Form_Submit {
 			);
 
 			if ( 'yes' == get_post_meta( $insert['post_id'], '_sendinvoice', true ) ) {
-				kkd_pff_paystack_send_invoice( $currency, $insert['amount'], $fullname, $insert['email'], $code );
+				kkd_pff_paystack_send_invoice( $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
 			}
 		}
 
-		if ( '' == $subaccount || ! isset( $subaccount ) ) {
+		$transaction_charge = (int) $this->meta['merchantamount'];
+        $transaction_charge = $transaction_charge * 100;
+
+		if ( '' == $this->meta['subaccount'] || ! isset( $this->meta['subaccount'] ) ) {
 			$subaccount         = null;
 			$txn_bearer         = null;
 			$transaction_charge = null;
@@ -405,16 +420,21 @@ class Form_Submit {
 			'result'             => 'success',
 			'code'               => $insert['txn_code'],
 			'plan'               => $insert['plan'],
-			'quantity'           => $quantity,
+			'quantity'           => $this->form_data['pf-quantity'],
 			'email'              => $insert['email'],
-			'name'               => $fullname,
+			'name'               => $this->form_data['pf-fname'],
 			'total'              => round( $amount ),
-			'currency'           => $currency,
-			'custom_fields'      => $fixed_metadata,
+			'currency'           => $this->meta['currency'],
+			'custom_fields'      => $this->fixed_metadata,
 			'subaccount'         => $subaccount,
 			'txnbearer'          => $txn_bearer,
 			'transaction_charge' => $transaction_charge,
 		);
+
+		print_r('<pre>');
+		print_r($response);
+		print_r('</pre>');
+		die();
 
 		//-------------------------------------------------------------------------------------------
 
@@ -426,71 +446,33 @@ class Form_Submit {
 	}
 
 	/**
-	 * Generate a new Paystack code.
-	 *
-	 * @param int $length Length of the code to generate. Default 10.
-	 * @return string Generated code.
-	 */
-	protected function generate_new_code( $length = 10 ) {
-		$characters        = '06EFGHI9KL' . time() . 'MNOPJRSUVW01YZ923234' . time() . 'ABCD5678QXT';
-		$characters_length = strlen( $characters );
-		$random_string     = '';
-
-		for ( $i = 0; $i < $length; $i++ ) {
-			$random_string .= $characters[ rand( 0, $characters_length - 1 ) ];
-		}
-
-		return time() . '_' . $random_string;
-	}
-
-	/**
-	 * Check if the given code exists in the database.
-	 *
-	 * @param string $code The code to check.
-	 * @global wpdb $wpdb WordPress database abstraction object.
-	 * @return bool True if the code exists, false otherwise.
-	 */
-	protected function check_code( $code ) {
-		global $wpdb;
-		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
-
-		$o_exist = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE txn_code = %s",
-				$code
-			)
-		);
-
-		return ( count( $o_exist ) > 0 );
-	}
-
-	/**
 	 * Generate a unique Paystack code that does not yet exist in the database.
 	 *
 	 * @return string Generated unique code.
 	 */
 	public function generate_code() {
 		do {
-			$code = $this->generate_new_code();
-			$check = $this->check_code( $code );
+			$code = $this->helpers->generate_new_code();
+			$check = $this->helpers->check_code( $code );
 		} while ( $check );
 
 		return $code;
 	}
 
 	/**
-	 * Retrieve the user's IP address.
+	 * Takes the amount and processes the "transactional" fees.
 	 *
-	 * @return string User's IP address.
+	 * @param integer $amount
+	 * @return integer
 	 */
-	public function get_the_user_ip() {
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip;
+	public function process_transaction_fees( $amount ) {
+		$fees = $this->helpers->get_fees();
+		$pc   = new Transaction_Fee(
+			$fees['prc'],
+			$fees['adc'],
+			$fees['ths'],
+			$fees['cap']
+		);
+		return $pc->add_for_ngn( $amount );
 	}
 }

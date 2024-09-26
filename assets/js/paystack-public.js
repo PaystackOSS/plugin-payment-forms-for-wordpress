@@ -267,6 +267,7 @@ function KkdPffPaystackFee()
                     $.blockUI({ message: "Please wait..." });
 
                     var formdata = new FormData(this);
+					console.log( formdata );
 
                     $.ajax(
                         {
