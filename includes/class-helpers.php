@@ -52,7 +52,7 @@ class Helpers {
 			'redirect'            => '',
 			'minimum'             => 0,
 			'usevariableamount'   => 0,
-			'variableamount'      => '',
+			'variableamount'      => 'Please configure your options:0,None:0',
 			'hidetitle'           => 0,
 			'loggedin'            => 'no',
 			'recur'               => 'no',
@@ -134,6 +134,35 @@ class Helpers {
 	}
 
 	// GETTERS
+
+	/**
+	 * Returns the fee settings save or the default values.
+	 *
+	 * @return array
+	 */
+	public function get_fees() {
+		$ret = [];
+		$ret['prc'] = intval( floatval( esc_attr( get_option( 'prc', PFF_PAYSTACK_PERCENTAGE ) ) ) * 100 ) / 10000;
+		$ret['ths'] = intval( floatval( esc_attr( get_option( 'ths', PFF_PAYSTACK_CROSSOVER_TOTAL ) ) ) * 100 );
+		$ret['adc'] = intval( floatval( esc_attr( get_option( 'adc', PFF_PAYSTACK_ADDITIONAL_CHARGE ) ) ) * 100 );
+		$ret['cap'] = intval( floatval( esc_attr( get_option( 'cap', PFF_PAYSTACK_LOCAL_CAP ) ) ) * 100 );
+		return $ret;
+	}
+
+	/**
+	 * Gets the public key from the settings.
+	 *
+	 * @return string
+	 */
+	public function get_public_key() {
+		$mode =  esc_attr( get_option( 'mode' ) );
+		if ( 'test' === $mode ) {
+			$key = esc_attr( get_option( 'tpk', '' ) );
+		} else {
+			$key = esc_attr( get_option( 'lpk', '' ) );
+		}
+		return $key;
+	}
 
 	/**
 	 * Fetch an array of the plans by the form ID.
@@ -553,8 +582,8 @@ class Helpers {
 		}
 
 		// Strip any text from the variable amount field.
-		if ( isset( $meta['variableamount'] ) && is_string( $meta['variableamount'] ) ) {
-			$meta['variableamount'] = (int) $meta['variableamount'];
+		if ( isset( $meta['usevariableamount'] ) && is_string( $meta['usevariableamount'] ) ) {
+			$meta['usevariableamount'] = (int) $meta['usevariableamount'];
 		}
 
 		$meta['minimum']   = floatval( $meta['minimum'] );
@@ -564,31 +593,75 @@ class Helpers {
 	}
 
 	/**
-	 * Returns the fee settings save or the default values.
+	 * Take an array of the submitted form values and formats it for a paystack request.
 	 *
-	 * @return array
+	 * @param array $metadata
+	 * @return void
 	 */
-    public function get_fees() {
-        $ret = [];
-        $ret['prc'] = intval( floatval( esc_attr( get_option( 'prc', PFF_PAYSTACK_PERCENTAGE ) ) ) * 100 ) / 10000;
-        $ret['ths'] = intval( floatval( esc_attr( get_option( 'ths', PFF_PAYSTACK_CROSSOVER_TOTAL ) ) ) * 100 );
-        $ret['adc'] = intval( floatval( esc_attr( get_option( 'adc', PFF_PAYSTACK_ADDITIONAL_CHARGE ) ) ) * 100 );
-        $ret['cap'] = intval( floatval( esc_attr( get_option( 'cap', PFF_PAYSTACK_LOCAL_CAP ) ) ) * 100 );
-        return $ret;
-    }
+	public function format_meta_as_custom_fields( $metadata ) {
+		$fields = array();
 
-	/**
-	 * Gets the public key from the settings.
-	 *
-	 * @return string
-	 */
-    public function get_public_key() {
-        $mode =  esc_attr( get_option( 'mode' ) );
-        if ( 'test' === $mode ) {
-            $key = esc_attr( get_option( 'tpk', '' ) );
-        } else {
-            $key = esc_attr( get_option( 'lpk', '' ) );
-        }
-        return $key;
-    }
+		foreach ( $metadata as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$value = implode( ', ', $value );
+			}
+
+			switch ( $key ) {
+				case 'pf-fname':
+					$fields[] = array(
+						'display_name'  => __( 'Full Name', 'pff-paystack' ),
+						'variable_name' => 'Full_Name',
+						'type'          => 'text',
+						'value'         => $value,
+					);
+					break;
+
+				case 'pf-plancode':
+					$fields[] = array(
+						'display_name'  => __( 'Plan', 'pff-paystack' ),
+						'variable_name' => 'Plan',
+						'type'          => 'text',
+						'value'         => $value,
+					);
+					break;
+
+				case 'pf-vname':
+					$fields[] = array(
+						'display_name'  => __( 'Payment Option', 'pff-paystack' ),
+						'variable_name' => 'Payment Option',
+						'type'          => 'text',
+						'value'         => $value,
+					);
+					break;
+
+				case 'pf-interval':
+					$fields[] = array(
+						'display_name'  => __( 'Plan Interval', 'pff-paystack' ),
+						'variable_name' => 'Plan Interval',
+						'type'          => 'text',
+						'value'         => $value,
+					);
+					break;
+
+				case 'pf-quantity':
+					$fields[] = array(
+						'display_name'  => __( 'Quantity', 'pff-paystack' ),
+						'variable_name' => 'Quantity',
+						'type'          => 'text',
+						'value'         => $value,
+					);
+					break;
+
+				default:
+					$fields[] = array(
+						'display_name'  => ucwords( str_replace( '_', ' ', $key ) ),
+						'variable_name' => $key,
+						'type'          => 'text',
+						'value'         => (string) $value,
+					);
+					break;
+			}
+		}
+		return $fields;
+	}
 }

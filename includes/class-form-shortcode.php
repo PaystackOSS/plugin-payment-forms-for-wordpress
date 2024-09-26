@@ -200,9 +200,9 @@ class Form_Shortcode {
 	 */
 	public function set_meta_data( $obj ) {
 		$this->meta = $this->helpers->parse_meta_values( $obj );
-
 		if ( 1 === $this->meta['usevariableamount'] ) {
 			$this->meta['paymentoptions'] = explode( ',', $this->meta['variableamount'] );
+			
 			$this->meta['paymentoptions'] = array_map( 'sanitize_text_field', $this->meta['paymentoptions'] );
 		}
 
@@ -318,20 +318,18 @@ class Form_Shortcode {
 
 			} else {
 
-				if ( '' === $this->meta['usevariableamount'] ) {
-					$html[] = "Form Error, set variable amount string";
-				} else {
-					if ( count( $this->meta['paymentoptions'] ) > 0 ) {
-						$html[] = '<div class="select">
-								<input type="hidden"  id="pf-vname" name="pf-vname" />
-								<input type="hidden"  id="pf-amount" />
-								<select class="form-control" id="pf-vamount" name="pf-amount">';
-								foreach ( $this->meta['paymentoptions'] as $option ) {
-									list( $optionName, $optionValue ) = explode( ':', $option );
-									$html[] = '<option value="' . esc_attr( $optionValue ) . '">' . esc_html( $optionName ) . '(' . esc_html( number_format( $optionValue ) ) . ')</option>';
-								}
-						$html[] = '</select> <i></i> </div>';
-					}
+				if ( '' === $this->meta['variableamount'] || 0 === $this->meta['variableamount'] || ! is_array( $this->meta['paymentoptions'] ) ) {
+					$html[] = __( 'Form Error, set variable amount string', 'pff-paystack' );
+				} else if ( count( $this->meta['paymentoptions'] ) > 0 ) {
+					$html[] = '<div class="select">
+							<input type="hidden"  id="pf-vname" name="pf-vname" />
+							<input type="hidden"  id="pf-amount" />
+							<select class="form-control" id="pf-vamount" name="pf-amount">';
+							foreach ( $this->meta['paymentoptions'] as $option ) {
+								list( $optionName, $optionValue ) = explode( ':', $option );
+								$html[] = '<option value="' . esc_attr( $optionValue ) . '">' . esc_html( $optionName ) . '(' . esc_html( number_format( $optionValue ) ) . ')</option>';
+							}
+					$html[] = '</select> <i></i> </div>';
 				}
 			}
 

@@ -124,10 +124,10 @@ class API {
 	 */
 	public function get_request() {
 		$response = false;
-		print_r('<pre>');
+		/*print_r('<pre>');
 		print_r($this->get_url());
 		print_r($this->get_args());
-		print_r('</pre>');
+		print_r('</pre>');*/
 		$request  = wp_remote_get( $this->get_url(), $this->get_args() );
 		if ( ! is_wp_error( $request ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $request ) );
@@ -142,7 +142,7 @@ class API {
 	 */
 	public function api_ready() {
 		$ready = false;
-		if ( '' !== $this->public ) {
+		if ( '' !== $this->secret ) {
 			$ready = true;
 		}
 		return $ready;
