@@ -242,7 +242,7 @@ class Form_Shortcode {
 	 */
 	public function get_hidden_fields() {
 		// Hidden inputs
-		$html = '<input type="hidden" name="action" value="kkd_pff_paystack_submit_action">
+		$html = '<input type="hidden" name="action" value="pff_paystack_submit_action">
 				<input type="hidden" name="pf-id" value="' . esc_attr( $this->form->ID ) . '" />
 				<input type="hidden" name="pf-user_id" value="' . esc_attr( $this->user['id'] ) . '" />
 				<input type="hidden" name="pf-recur" value="' . esc_attr( $this->meta['recur'] ) . '" />

@@ -574,8 +574,8 @@ class Helpers {
 
 		$meta = wp_parse_args( $new_values, $this->defaults );
 		if ( '' === $meta['inventory'] || '0' === $meta['inventory'] ) {
-			if ( $meta['sold'] !== "" ) {
-				$meta['inventory'] = $meta;
+			if ( '' !== $meta['sold'] ) {
+				$meta['inventory'] = $meta['sold'];
 			} else {
 				$meta['inventory'] = '1';
 			}

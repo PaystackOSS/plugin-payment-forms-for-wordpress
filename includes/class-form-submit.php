@@ -56,8 +56,8 @@ class Form_Submit {
 	 * Constructor
 	 */
 	public function __construct() {
-		//add_action( 'wp_ajax_pff_paystack_submit_action', [ $this, 'submit_action' ] );
-		//add_action( 'wp_ajax_nopriv_pff_paystack_submit_action', [ $this, 'submit_action' ] );
+		add_action( 'wp_ajax_pff_paystack_submit_action', [ $this, 'submit_action' ] );
+		add_action( 'wp_ajax_nopriv_pff_paystack_submit_action', [ $this, 'submit_action' ] );
 	}
 
 	/**
@@ -134,6 +134,11 @@ class Form_Submit {
 		 * @deprecated 3.4.2
 		 */
 		do_action( 'kkd_pff_paystack_before_save' );
+
+		print_r('<pre>');
+		print_r($this);
+		print_r('</pre>');
+		die();
 
 		global $wpdb;
 		//$code            = kkd_pff_paystack_generate_code();
