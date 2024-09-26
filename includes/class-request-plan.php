@@ -42,11 +42,6 @@ class Request_Plan extends API {
 		return $plan;
 	}
 
-
-	public function plan_exists( $code = '' ) {
-
-	}
-
 	/**
 	 * Reviews the plan parameters to see if the plan is active.
 	 *

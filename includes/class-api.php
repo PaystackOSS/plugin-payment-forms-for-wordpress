@@ -129,7 +129,7 @@ class API {
 		print_r($this->get_args());
 		print_r('</pre>');*/
 		$request  = wp_remote_get( $this->get_url(), $this->get_args() );
-		if ( ! is_wp_error( $request ) ) {
+		if ( ! is_wp_error( $request ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $request ) );
 		}
 		return $response;

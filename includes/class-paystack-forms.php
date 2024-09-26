@@ -103,8 +103,10 @@ final class Payment_Forms {
 			'field-shortcodes'    => 'Field_Shortcodes',
 			'api'                 => '',
 			'request-plan'        => 'Request_Plan',
+			'transaction-verify'  => 'Transaction_Verify',
 			'form-submit'         => 'Form_Submit',
 			'transaction-fee'     => '',
+			'confirm-payment'     => 'Confirm_Payment',
 		);
 	}
 
