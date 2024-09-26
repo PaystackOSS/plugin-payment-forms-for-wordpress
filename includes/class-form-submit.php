@@ -53,6 +53,27 @@ class Form_Submit {
 	protected $form_data = 0;
 
 	/**
+	 * Holds the current form meta data being built
+	 *
+	 * @var array
+	 */
+	protected $metadata = array();
+
+	/**
+	 * Holds the current untouched form meta, as a backup
+	 *
+	 * @var array
+	 */
+	protected $untouched = array();
+
+	/**
+	 * Holds the adjusted meta data after looking at the recurring.
+	 *
+	 * @var array
+	 */
+	protected $fixed_metadata = array();
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -108,6 +129,54 @@ class Form_Submit {
 		$this->untouched = $this->helpers->format_meta_as_custom_fields( $this->metadata );
 	}
 
+	/**
+	 * This will adjust the amount being paid according to the variable payment and amounts.
+	 *
+	 * @param integer $amount
+	 * @return integer
+	 */
+	public function process_amount( $amount = 0 ) {
+		$original_amount  = $amount;
+
+		if ( 'no' === $this->meta['recur'] && 0 !== floatval( $this->meta['amount'] ) ) {
+			$amount = (int) str_replace( ' ', '', floatval( $this->meta['amount'] ) );
+		}
+		if ( 1 === $this->meta['minimum'] && 0 !== floatval( $this->meta['amount'] ) ) {
+			if ( $original_amount < floatval( $this->meta['amount'] ) ) {
+				$amount = floatval( $this->meta['amount'] );
+			} else {
+				$amount = $original_amount;
+			}
+		}
+		if ( 1 === $this->meta['use_variable_amt'] ) {
+			$payment_options = explode( ',', $this->meta['variableamount'] );
+			if ( count( $payment_options ) > 0 ) {
+				foreach ( $payment_options as $key => $payment_option ) {
+					list( $a, $b ) = explode( ':', $payment_option );
+					if ( $this->form_data['pf-vname'] == $a ) {
+						$amount = $b;
+					}
+				}
+			}
+		}
+		return $amount;
+	}
+
+	/**
+	 * This will adjust the amount if the quantity fields are being used.
+	 *
+	 * @param integer $amount
+	 * @return integer
+	 */
+	public function process_amount_quantity( $amount = 0 ) {
+		if ( $this->meta['use_quantity'] === 'yes' && ! ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) ) {
+			$quantity   = $this->form_data['pf-quantity'];
+			$unit_amt   = (int) str_replace( ' ', '', $amount );
+			$amount     = $quantity * $unit_amt;
+		}
+		return $amount;
+	}
+
 	public function submit_action() {
 		/**
 		 * TODO - Needs better security checks - NONCE
@@ -135,75 +204,40 @@ class Form_Submit {
 		 */
 		do_action( 'kkd_pff_paystack_before_save' );
 
-		print_r('<pre>');
-		print_r($this);
-		print_r('</pre>');
-		die();
-
 		global $wpdb;
-		//$code            = kkd_pff_paystack_generate_code();
+		$code            = $this->generate_code();
 		$table           = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 		
-		$fixed_metadata     = [];
-	
-		// These are the values from the SAVED Form.
-		$file_limit         = get_post_meta( $_POST['pf-id'], '_filelimit', true );
-		$currency           = get_post_meta( $_POST['pf-id'], '_currency', true );
-		$form_amount        = get_post_meta( $_POST['pf-id'], '_amount', true ); // From form
-		$recur              = get_post_meta( $_POST['pf-id'], '_recur', true );
-		$subaccount         = get_post_meta( $_POST['pf-id'], '_subaccount', true );
-		$txn_bearer         = get_post_meta( $_POST['pf-id'], '_txnbearer', true );
-		$transaction_charge = get_post_meta( $_POST['pf-id'], '_merchantamount', true );
-		$transaction_charge = intval( floatval( $transaction_charge ) * 100 );
-		$txn_charge       = get_post_meta( $_POST['pf-id'], '_txncharge', true );
-		$minimum          = get_post_meta( $_POST['pf-id'], '_minimum', true );
-		$variable_amount  = get_post_meta( $_POST['pf-id'], '_variableamount', true );
-		$use_variable_amt = get_post_meta( $_POST['pf-id'], '_usevariableamount', true );
-		$use_quantity     = get_post_meta( $_POST['pf-id'], '_usequantity', true );
+		$this->fixed_metadata = [];
 
-		$amount           = (int) str_replace( ' ', '', $_POST['pf-amount'] );
-		$variable_name    = $_POST['pf-vname'];
-		$original_amount  = $amount;
-		$quantity         = 1;
-		
+		/*
+		$transaction_charge = '_merchantamount';
+		$transaction_charge = intval( floatval( $transaction_charge ) * 100 );
+		*/
 	
-		/*if ( ( 'no' === $recur ) && ( floatval( $form_amount ) != 0 ) ) {
-			$amount = (int) str_replace( ' ', '', floatval( $form_amount ) );
-		}
-		if ( $minimum == 1 && floatval( $form_amount ) != 0 ) {
-			if ( $original_amount < floatval( $form_amount ) ) {
-				$amount = floatval( $form_amount );
-			} else {
-				$amount = $original_amount;
-			}
-		}
-		if ( $use_variable_amt == 1 ) {
-			$payment_options = explode( ',', $variable_amount );
-			if ( count( $payment_options ) > 0 ) {
-				foreach ( $payment_options as $key => $payment_option ) {
-					list( $a, $b ) = explode( ':', $payment_option );
-					if ( $variable_name == $a ) {
-						$amount = $b;
-					}
-				}
-			}
-		}
-		$fixed_metadata[] = array(
-			'display_name'  => 'Unit Price',
+		$amount = (int) str_replace( ' ', '', $this->form_data['pf-amount'] );
+		$amount = $this->process_amount( $amount );
+
+		// Store the single unit price.
+		$this->fixed_metadata[] = array(
+			'display_name'  => __( 'Unit Price', 'pff-paystack' ),
 			'variable_name' => 'Unit_Price',
 			'type'          => 'text',
-			'value'         => $currency . number_format( $amount ),
+			'value'         => $this->meta['currency'] . number_format( $amount ),
 		);
-		if ( $use_quantity === 'yes' && ! ( ( $recur === 'optional' ) || ( $recur === 'plan' ) ) ) {
-			$quantity   = $_POST['pf-quantity'];
-			$unit_amt   = (int) str_replace( ' ', '', $amount );
-			$amount     = $quantity * $unit_amt;
-		}
+
+		print_r('<pre>');
+		print_r($code);
+		print_r($amount);
+		print_r($this->fixed_metadata);
+		print_r('</pre>');
+		die();
 	
-		if ( $txn_charge == 'customer' ) {
+		if ( 'customer' === $this->meta['txncharge'] ) {
 			$amount = kkd_pff_paystack_add_paystack_charge( $amount );
 		}
-		$max_file_size = $file_limit * 1024 * 1024;
+
+		/*$max_file_size = $file_limit * 1024 * 1024;
 	
 		if ( ! empty( $_FILES ) ) {
 			foreach ( $_FILES as $key_name => $value ) {
@@ -311,7 +345,7 @@ class Form_Submit {
 				'type'          => 'text',
 				'value'         => $plan_code,
 			);
-		}
+		}*/
 
 		$fixed_metadata = json_decode( json_encode( $fixed_metadata, JSON_NUMERIC_CHECK ), true );
 		$fixed_metadata = array_merge( $untouched_metadata, $fixed_metadata );
@@ -389,5 +423,74 @@ class Form_Submit {
 
 		echo json_encode( $response );
 		die();
+	}
+
+	/**
+	 * Generate a new Paystack code.
+	 *
+	 * @param int $length Length of the code to generate. Default 10.
+	 * @return string Generated code.
+	 */
+	protected function generate_new_code( $length = 10 ) {
+		$characters        = '06EFGHI9KL' . time() . 'MNOPJRSUVW01YZ923234' . time() . 'ABCD5678QXT';
+		$characters_length = strlen( $characters );
+		$random_string     = '';
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$random_string .= $characters[ rand( 0, $characters_length - 1 ) ];
+		}
+
+		return time() . '_' . $random_string;
+	}
+
+	/**
+	 * Check if the given code exists in the database.
+	 *
+	 * @param string $code The code to check.
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 * @return bool True if the code exists, false otherwise.
+	 */
+	protected function check_code( $code ) {
+		global $wpdb;
+		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+
+		$o_exist = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$table} WHERE txn_code = %s",
+				$code
+			)
+		);
+
+		return ( count( $o_exist ) > 0 );
+	}
+
+	/**
+	 * Generate a unique Paystack code that does not yet exist in the database.
+	 *
+	 * @return string Generated unique code.
+	 */
+	public function generate_code() {
+		do {
+			$code = $this->generate_new_code();
+			$check = $this->check_code( $code );
+		} while ( $check );
+
+		return $code;
+	}
+
+	/**
+	 * Retrieve the user's IP address.
+	 *
+	 * @return string User's IP address.
+	 */
+	public function get_the_user_ip() {
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
 	}
 }
