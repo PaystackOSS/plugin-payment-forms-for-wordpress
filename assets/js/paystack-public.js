@@ -1,4 +1,4 @@
-function KkdPffPaystackFee()
+function PffPaystackFee()
 {
 
     this.DEFAULT_PERCENTAGE = 0.015;
@@ -98,7 +98,7 @@ function KkdPffPaystackFee()
     $(document).ready(
         function ($) {
 
-            if ( 0 < $(".date-picker").length ) {
+            /*if ( 0 < $(".date-picker").length ) {
 				$(".date-picker").each( function() {
 					$(".date-picker").datepicker(
 						{
@@ -108,7 +108,7 @@ function KkdPffPaystackFee()
 						}
 					);
 				} );
-			}
+			}*/
 
             if ( $("#pf-vamount").length ) {
                   var amountField = $("#pf-vamount");
@@ -192,15 +192,18 @@ function KkdPffPaystackFee()
                     var email = $(this)
                     .find("#pf-email")
                     .val();
+					
                     var amount;
                     if ($("#pf-vamount").length) {
-                        amount = $("#paystack-form").find("#pf-vamount").val();
+                        amount = $("#pf-vamount").val();
                         calculateTotal();
                     } else {
                         amount = $(this)
                         .find("#pf-amount")
                         .val();
                     }
+					
+
                     if (Number(amount) > 0) {
                     } else {
                         $(this)
@@ -651,9 +654,7 @@ function KkdPffPaystackFee()
 					var min_amount = Number($("#pf-minimum-hidden").val());
 					var amt = Number($("#pf-amount").val());
 					if (min_amount > 0 && amt < min_amount) {
-						$("#pf-min-val-warn").text(
-							"Amount cannot be less than the minimum amount"
-						);
+						$("#pf-min-val-warn").text( "Amount cannot be less than the minimum amount");
 						return false;
 					} else {
 						$("#pf-min-val-warn").text("");
@@ -695,7 +696,7 @@ function KkdPffPaystackFee()
 			function calculateTotal() {
 				var unit;
 				if ($("#pf-vamount").length) {
-					unit = $("#paystack-form").find("#pf-vamount").val();
+					unit = $("#pf-vamount").val();
 				} else {
 					unit = $("#pf-amount").val();
 				}
@@ -728,7 +729,7 @@ function KkdPffPaystackFee()
 								  var total = 0;
 								  var fees = 0;
 						} else {
-							var obj = new KkdPffPaystackFee();
+							var obj = new PffPaystackFee();
 			
 							obj.withAdditionalCharge(pffSettings.fee.adc);
 							obj.withThreshold(pffSettings.fee.ths);
