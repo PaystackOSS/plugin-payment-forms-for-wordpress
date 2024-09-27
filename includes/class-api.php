@@ -118,7 +118,7 @@ class API {
 	}
 
 	/**
-	 * Sends the request and checkes to see is is_wp_error().
+	 * Sends a GET request and checks to see is is_wp_error().
 	 *
 	 * @return boolean|object
 	 */
@@ -126,6 +126,25 @@ class API {
 		$response = false;
 		$return   = wp_remote_get( $this->get_url(), $this->get_args() );
 		if ( ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
+			$response = json_decode( wp_remote_retrieve_body( $return ) );
+		}
+		return $response;
+	}
+
+	/**
+	 * Sends a POST request and checks to see is is_wp_error().
+	 *
+	 * @return boolean|object
+	 */
+	public function post_request( $body = [] ) {
+		$response = false;
+		$args     = array(
+			'body'    => $body,
+			'headers' => $this->get_headers(),
+			'timeout' => 60,
+		);
+		$return   = wp_remote_post( $this->get_url(), $args );
+		if ( ! empty( $body ) && ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
 		return $response;

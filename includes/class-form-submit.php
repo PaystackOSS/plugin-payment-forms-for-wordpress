@@ -375,7 +375,9 @@ class Form_Submit {
 	 * This function looks for a recurring plan set by the customer, a recurring plan code set by the owner.
 	 */
 	public function process_recurring_plans( $amount ) {
-		$plan_code = 'none';
+		$plan_code    = 'none';
+		$has_interval = false;
+
 		if ( 'no' !== $this->meta['recur'] ) {
 
 			// is the user setting the interval?
@@ -384,66 +386,29 @@ class Form_Submit {
 
 				// Only create a subscription plan if they choose an interval.
 				if ( 'no' !== $interval ) {
-					/*$mode = esc_attr( get_option( 'mode' ) );
-					if ( $mode === 'test' ) {
-						$key = esc_attr( get_option( 'tsk' ) );
+					$unit_amount    = $amount * 100;
+					$possible_plan = pff_paystack()->classes['request-plan']->list_plans( '?amount=' . $unit_amount . '&interval=' . $interval );
+
+					// If we have found a plan, then use that code, otherwise create a new one.
+					if ( false !== $possible_plan && isset( $possible_plan->plan_code ) ) {
+						$plan_code    = $possible_plan->plan_code;
+						$has_interval = $possible_plan->interval;
 					} else {
-						$key = esc_attr( get_option( 'lsk' ) );
-					}
-					$kobo_amount = $amount * 100;
-		
-					$paystack_url = 'https://api.paystack.co/plan';
-					$check_url    = 'https://api.paystack.co/plan?amount=' . $kobo_amount . '&interval=' . $interval;
-					$headers      = array(
-						'Content-Type'  => 'application/json',
-						'Authorization' => 'Bearer ' . $key,
-					);
-		
-					$check_args = array(
-						'headers' => $headers,
-						'timeout' => 60,
-					);
-		
-					// Check if plan exists.
-					$check_request = wp_remote_get( $check_url, $check_args );
-					if ( ! is_wp_error( $check_request ) ) {
-						$response = json_decode( wp_remote_retrieve_body( $check_request ) );
-						if ( isset( $response->meta->total ) && $response->meta->total >= 1 ) {
-							$plan      = $response->data[0];
-							$plan_code = $plan->plan_code;
-							$this->fixed_metadata[] = array(
-								'display_name'  => 'Plan Interval',
-								'variable_name' => 'Plan Interval',
-								'type'          => 'text',
-								'value'         => $plan->interval,
-							);
-						} else {
-							// Create Plan.
-							$body = array(
-								'name'     => $this->meta['currency'] . number_format( $original_amount ) . ' [' . $this->meta['currency'] . number_format( $amount ) . '] - ' . $interval,
-								'amount'   => $kobo_amount,
-								'interval' => $interval,
-							);
-							$args = array(
-								'body'    => wp_json_encode( $body ),
-								'headers' => $headers,
-								'timeout' => 60,
-							);
-		
-							$request = wp_remote_post( $paystack_url, $args );
-							if ( ! is_wp_error( $request ) ) {
-								$paystack_response = json_decode( wp_remote_retrieve_body( $request ) );
-								$plan_code         = $paystack_response->data->plan_code;
-								$this->fixed_metadata[]  = array(
-									'display_name'  => 'Plan Interval',
-									'variable_name' => 'Plan Interval',
-									'type'          => 'text',
-									'value'         => $paystack_response->data->interval,
-								);
-							}
+						// Create Plan.
+						$body = array(
+							'name'     => get_the_title( $this->form_id ) . ' [' . $this->meta['currency'] . number_format( $amount ) . '] - ' . $interval,
+							'amount'   => $unit_amount,
+							'interval' => $interval,
+						);
+						$created_plan = pff_paystack()->classes['request-plan']->create_plan( $body );
+						if ( false !== $created_plan && isset( $created_plan->plan_code ) ) {
+							$plan_code    = $created_plan->data->plan_code;
+							$has_interval = $created_plan->data->interval;
 						}
-					}*/
+					}
 				}
+
+				die();
 			} else {
 				// Use Plan Code.
 				$plan_code = sanitize_text_field( wp_unslash( $this->form_data['pf-plancode'] ) );
@@ -459,6 +424,16 @@ class Form_Submit {
 				'type'          => 'text',
 				'value'         => $plan_code,
 			);
+
+			if ( false !== $has_interval ) {
+				$this->fixed_metadata[] = array(
+					'display_name'  => __( 'Plan Interval', 'pff-paystack' ),
+					'variable_name' => 'Plan Interval',
+					'type'          => 'text',
+					'value'         => $has_interval,
+				);
+			}
+
 		} else if ( ! isset( $this->meta['plancode'] )  ) {
 			$this->meta['plancode'] = '';
 		}
