@@ -718,4 +718,21 @@ class Helpers {
 
 		return ( count( $o_exist ) > 0 );
 	}
+
+	/**
+	 * Takes the amount and processes the "transactional" fees.
+	 *
+	 * @param integer $amount
+	 * @return integer
+	 */
+	public function process_transaction_fees( $amount ) {
+		$fees = $this->get_fees();
+		$pc   = new Transaction_Fee(
+			$fees['prc'],
+			$fees['adc'],
+			$fees['ths'],
+			$fees['cap']
+		);
+		return $pc->add_for_ngn( $amount );
+	}
 }
