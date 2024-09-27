@@ -407,8 +407,6 @@ class Form_Submit {
 						}
 					}
 				}
-
-				die();
 			} else {
 				// Use Plan Code.
 				$plan_code = sanitize_text_field( wp_unslash( $this->form_data['pf-plancode'] ) );

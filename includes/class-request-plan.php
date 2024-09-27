@@ -76,7 +76,6 @@ class Request_Plan extends API {
 		}
 		$this->set_url_args( $url_args );
 		$response = $this->get_request();
-
 		if ( isset( $response->meta->total ) && $response->meta->total >= 1 && isset( $response->data[0] ) ) {
 			$plan = $response->data[0];
 		}
