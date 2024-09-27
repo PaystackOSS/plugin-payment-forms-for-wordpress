@@ -391,11 +391,6 @@ class Form_Shortcode {
 	public function get_quantity_field() {
 		$html = [];
 		// Quantity selection
-
-		print_r('<pre>');
-		print_r($this->meta);
-		print_r('</pre>');
-
 		if ( 'no' === $this->meta['recur'] && 'yes' === $this->meta['usequantity'] && ( 1 === $this->meta['usevariableamount'] || 0 !== $this->meta['amount'] ) ) {
 			$html[] = '<div class="span12 unit">
 				<label class="label">Quantity</label>

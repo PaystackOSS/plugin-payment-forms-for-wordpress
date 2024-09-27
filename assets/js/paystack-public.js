@@ -387,7 +387,7 @@ function PffPaystackFee()
                                                     $.post(
                                                         $form.attr("action"),
                                                         {
-                                                            action: "kkd_pff_paystack_confirm_payment",
+                                                            action: "pff_paystack_confirm_payment",
                                                             code: response.trxref
                                                           },
                                                         function (newdata) {
