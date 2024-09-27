@@ -59,7 +59,7 @@ class Transaction_Verify extends API {
 				$return = [
 					'message' => __( 'Payment Verification Passed', 'pff-paystack' ),
 					'result'  => 'success',
-					'data'    => json_encode( $response->data ),
+					'data'    => wp_json_encode( $response->data ),
 				];
 			} else {
 				$return = [

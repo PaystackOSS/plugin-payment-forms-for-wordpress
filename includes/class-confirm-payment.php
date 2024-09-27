@@ -102,7 +102,7 @@ class Confirm_Payment {
 				'error_message' => __( 'Did you make a payment?', 'pff-paystack' ),
 			);
 	
-			exit( json_encode( $response ) );
+			exit( wp_json_encode( $response ) );
 		}
 	
 	
@@ -205,7 +205,7 @@ class Confirm_Payment {
 			$response['link']   = $this->meta['redirect'];
 		}
 	
-		echo json_encode( $response );
+		echo wp_json_encode( $response );
 		die();
 	}
 
@@ -286,10 +286,6 @@ class Confirm_Payment {
 					'result' => 'success',
 				];
 			} else {
-
-				if ($txncharge == 'customer') {
-					$amount = kkd_pff_paystack_add_paystack_charge($amount);
-				}
 
 				if ( $this->oamount !== $amount_paid ) {
 					$return = [

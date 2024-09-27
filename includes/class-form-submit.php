@@ -184,7 +184,7 @@ class Form_Submit {
 		 */
 		if ( ! $this->valid_submission() ) {
 			// Exit here, for not processing further because of the error
-			exit( json_encode( $this->response ) );
+			exit( wp_json_encode( $this->response ) );
 		}
 
 		/**
@@ -238,7 +238,7 @@ class Form_Submit {
 					if ( $value['size'] > $max_file_size ) {
 						$response['result']  = 'failed';
 						$response['message'] = 'Max upload size is ' . $file_limit . 'MB';
-						exit( json_encode( $response ) );
+						exit( wp_json_encode( $response ) );
 					} else {
 						$attachment_id  = media_handle_upload( $key_name, $_POST['pf-id'] );
 						$url            = wp_get_attachment_url( $attachment_id );
@@ -305,7 +305,7 @@ class Form_Submit {
 								'interval' => $interval,
 							);
 							$args = array(
-								'body'    => json_encode( $body ),
+								'body'    => wp_json_encode( $body ),
 								'headers' => $headers,
 								'timeout' => 60,
 							);
@@ -340,7 +340,7 @@ class Form_Submit {
 			);
 		}*/
 
-		$this->fixed_metadata = json_decode( json_encode( $this->fixed_metadata, JSON_NUMERIC_CHECK ), true );
+		$this->fixed_metadata = json_decode( wp_json_encode( $this->fixed_metadata, JSON_NUMERIC_CHECK ), true );
 		$this->fixed_metadata = array_merge( $this->untouched, $this->fixed_metadata );
 
 		if ( null === $this->meta['plancode'] ) {
@@ -436,7 +436,7 @@ class Form_Submit {
 		// $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
 		// $pstk_logger->log_transaction_attempt($code);*/
 
-		echo json_encode( $response );
+		echo wp_json_encode( $response );
 		die();
 	}
 
