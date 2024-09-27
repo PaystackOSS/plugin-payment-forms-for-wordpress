@@ -362,12 +362,10 @@ class Forms_Update {
 			$html[] = '<br><label><input name="_minimum" type="checkbox" value="1"> ' . __('Make amount minimum payable', 'pff-paystack') . ' </label>';
 		}
 		$html[] = '<p>' . __('Variable Dropdown Amount:', 'pff-paystack') . '<code><label>' . __('Format(option:amount):  Option 1:10000,Option 2:3000 Separate options with "," ', 'pff-paystack') . '</label></code></p>';
-		$html[] = '<input type="number" min="0" name="_variableamount" value="' . $this->meta['variableamount'] . '" class="widefat " />';
-		if ($this->meta['usevariableamount'] == 1) {
-			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1" checked> ' . __('Use dropdown amount option', 'pff-paystack') . ' </label>';
-		} else {
-			$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1"> ' . __('Use dropdown amount option', 'pff-paystack') . ' </label>';
-		}
+		$html[] = '<input type="text" name="_variableamount" value="' . $this->meta['variableamount'] . '" class="widefat " />';
+		$html[] = '<br><label><input name="_usevariableamount" type="checkbox" value="1" ' . $this->is_option_selected( 1, $this->meta['usevariableamount'], 'checked' ) . '> ' . __('Use dropdown amount option', 'pff-paystack') . ' </label>';
+		
+
 		$html[] = '<p>' . __('Pay button Description:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_paybtn" value="' . $this->meta['paybtn'] . '" class="widefat" />';
 		$html[] = '<p>' . __('Add Extra Charge:', 'pff-paystack') . '</p>';
@@ -399,9 +397,9 @@ class Forms_Update {
 	 * @param string $compare
 	 * @return string
 	 */
-	public function is_option_selected( $value, $compare ) {
+	public function is_option_selected( $value, $compare, $selected = 'selected' ) {
 		if ( $value == $compare ) {
-			$result = "selected";
+			$result = $selected;
 		} else {
 			$result = "";
 		}

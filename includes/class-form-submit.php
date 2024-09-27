@@ -154,7 +154,10 @@ class Form_Submit {
 				$amount = $original_amount;
 			}
 		}
-		if ( 1 === $this->meta['usevariableamt'] ) {
+		print_r('<pre>');
+		print_r($this->meta);
+		print_r('</pre>');
+		if ( 1 === $this->meta['usevariableamount'] ) {
 			$payment_options = explode( ',', $this->meta['variableamount'] );
 			if ( count( $payment_options ) > 0 ) {
 				foreach ( $payment_options as $key => $payment_option ) {
@@ -411,7 +414,7 @@ class Form_Submit {
 			);
 
 			if ( 'yes' == get_post_meta( $insert['post_id'], '_sendinvoice', true ) ) {
-				kkd_pff_paystack_send_invoice( $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
+				//kkd_pff_paystack_send_invoice( $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
 			}
 		}
 
