@@ -80,7 +80,6 @@ class Confirm_Payment {
 	 */
 	protected function setup_data( $payment ) {
 		$this->payment_meta = $payment;
-		var_dump($this->payment_meta->post_id);
 		$this->helpers      = new Helpers();
 		$this->meta         = $this->helpers->parse_meta_values( get_post( $this->payment_meta->post_id ) );
 		$this->amount       = $this->payment_meta->amount;

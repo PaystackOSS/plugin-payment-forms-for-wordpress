@@ -652,8 +652,9 @@ class Helpers {
 					break;
 
 				default:
+					$display_name = ucwords( str_replace( array( '_', '-', 'pf' ), ' ', $key ) );
 					$fields[] = array(
-						'display_name'  => ucwords( str_replace( '_', ' ', $key ) ),
+						'display_name'  => $display_name,
 						'variable_name' => $key,
 						'type'          => 'text',
 						'value'         => (string) $value,

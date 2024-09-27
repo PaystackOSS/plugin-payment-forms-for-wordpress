@@ -128,6 +128,11 @@ class Form_Submit {
 			$this->metadata['pf-interval']
 		);
 		$this->untouched = $this->helpers->format_meta_as_custom_fields( $this->metadata );
+
+		// Make sure we always have 1 quantity being purchased.
+		if ( ! isset( $this->form_data['pf-quantity'] ) ) {
+			$this->form_data['pf-quantity'] = 1;
+		}
 	}
 
 	/**
@@ -149,7 +154,7 @@ class Form_Submit {
 				$amount = $original_amount;
 			}
 		}
-		if ( 1 === $this->meta['use_variable_amt'] ) {
+		if ( 1 === $this->meta['usevariableamt'] ) {
 			$payment_options = explode( ',', $this->meta['variableamount'] );
 			if ( count( $payment_options ) > 0 ) {
 				foreach ( $payment_options as $key => $payment_option ) {
@@ -176,6 +181,42 @@ class Form_Submit {
 			$amount     = $quantity * $unit_amt;
 		}
 		return $amount;
+	}
+
+	/**
+	 * This function uploads the images with media_handle_upload and adds them to the metadata array.
+	 *
+	 * @return void
+	 */
+	public function process_images() {
+		$max_file_size = $this->meta['filelimit'] * 1024 * 1024;
+		if ( ! empty( $_FILES ) ) {
+			foreach ( $_FILES as $key_name => $value ) {
+				if ( $value['size'] > 0 ) {
+					if ( $value['size'] > $max_file_size ) {
+						$response['result']  = 'failed';
+						$response['message'] = sprintf( __( 'Max upload size is %sMB', 'pff-paystack' ), $this->meta['filelimit'] );
+						exit( wp_json_encode( $response ) );
+					} else {
+						$attachment_id  = media_handle_upload( $key_name, $this->form_id );
+						$url            = wp_get_attachment_url( $attachment_id );
+						$this->fixed_metadata[] = array(
+							'display_name'  => ucwords( str_replace( '_', ' ', $key_name ) ),
+							'variable_name' => $key_name,
+							'type'          => 'link',
+							'value'         => $url,
+						);
+					}
+				} else {
+					$this->fixed_metadata[] = array(
+						'display_name'  => ucwords( str_replace( '_', ' ', $key_name ) ),
+						'variable_name' => $key_name,
+						'type'          => 'text',
+						'value'         => __( 'No file Uploaded', 'pff-paystack' ),
+					);
+				}
+			}
+		}
 	}
 
 	public function submit_action() {
@@ -209,11 +250,6 @@ class Form_Submit {
 		$table           = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 		
 		$this->fixed_metadata = [];
-
-		/*
-		$transaction_charge = '_merchantamount';
-		$transaction_charge = intval( floatval( $transaction_charge ) * 100 );
-		*/
 	
 		$amount = (int) str_replace( ' ', '', $this->form_data['pf-amount'] );
 		$amount = $this->process_amount( $amount );
@@ -230,35 +266,12 @@ class Form_Submit {
 			$amount = $this->helpers->process_transaction_fees( $amount );
 		}
 
-		/*$max_file_size = $file_limit * 1024 * 1024;
-	
-		if ( ! empty( $_FILES ) ) {
-			foreach ( $_FILES as $key_name => $value ) {
-				if ( $value['size'] > 0 ) {
-					if ( $value['size'] > $max_file_size ) {
-						$response['result']  = 'failed';
-						$response['message'] = 'Max upload size is ' . $file_limit . 'MB';
-						exit( wp_json_encode( $response ) );
-					} else {
-						$attachment_id  = media_handle_upload( $key_name, $_POST['pf-id'] );
-						$url            = wp_get_attachment_url( $attachment_id );
-						$fixed_metadata[] = array(
-							'display_name'  => ucwords( str_replace( '_', ' ', $key_name ) ),
-							'variable_name' => $key_name,
-							'type'          => 'link',
-							'value'         => $url,
-						);
-					}
-				} else {
-					$fixed_metadata[] = array(
-						'display_name'  => ucwords( str_replace( '_', ' ', $key_name ) ),
-						'variable_name' => $key_name,
-						'type'          => 'text',
-						'value'         => 'No file Uploaded',
-					);
-				}
-			}
-		}
+		/**
+		 * This function will exit early if one of the images is too large to be uploaded.
+		 */
+		$this->process_images();
+
+		/*
 		$plan_code = 'none';
 		if ( $recur != 'no' ) {
 			if ( $recur == 'optional' ) {
@@ -343,7 +356,7 @@ class Form_Submit {
 		$this->fixed_metadata = json_decode( wp_json_encode( $this->fixed_metadata, JSON_NUMERIC_CHECK ), true );
 		$this->fixed_metadata = array_merge( $this->untouched, $this->fixed_metadata );
 
-		if ( null === $this->meta['plancode'] ) {
+		if ( ! isset( $this->meta['plancode'] )  ) {
 			$this->meta['plancode'] = '';
 		}
 
