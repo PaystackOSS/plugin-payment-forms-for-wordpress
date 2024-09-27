@@ -79,12 +79,17 @@ class Confirm_Payment {
 	 * @return void
 	 */
 	protected function setup_data( $payment ) {
-		$this->payment_meta = $payment[0];
+		$this->payment_meta = $payment;
+		var_dump($this->payment_meta->post_id);
 		$this->helpers      = new Helpers();
 		$this->meta         = $this->helpers->parse_meta_values( get_post( $this->payment_meta->post_id ) );
 		$this->amount       = $this->payment_meta->amount;
 		$this->oamount      = $this->meta['amount'];
 		$this->form_id      = $this->payment_meta->post_id;
+
+		if ( 'customer' === $this->meta['txncharge'] ) {
+			$this->oamount = $this->helpers->process_transaction_fees( $this->oamount );
+		}
 	}
 	
 	/**
@@ -100,16 +105,13 @@ class Confirm_Payment {
 			exit( json_encode( $response ) );
 		}
 	
-		global $wpdb;
-		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
 	
-		$code = sanitize_text_field( $_POST['code'] );
-	
-		$record = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE txn_code = %s", $code ) );
+		$code   = sanitize_text_field( $_POST['code'] );
+		$record = $this->get_db_record( $code );
 
-		if ( array_key_exists( 0, $record ) ) {
+		if ( false !== $record ) {
 			
-			$this->setup_data( $record[0] );
+			$this->setup_data( $record );
 
 			// Verify our transaction with the Paystack API.
 			$transaction = pff_paystack()->classes['transaction-verify']->verify_transaction( $code );
@@ -120,6 +122,11 @@ class Confirm_Payment {
 					$this->update_sold_inventory();
 					$response = $this->update_payment_dates( $transaction['data'] );
 				}
+			} else {
+				$response = [
+					'message' => __( 'Failed to connect to Paystack.', 'pff-paystack' ),
+					'result'  => 'failed',
+				];	
 			}
 	
 		} else {
@@ -230,6 +237,12 @@ class Confirm_Payment {
 		}
 	}
 
+	/**
+	 * Updates the paid Date for the current record.
+	 *
+	 * @param object $data
+	 * @return array
+	 */
 	protected function update_payment_dates( $data ) {
 		global $wpdb;
 		$table  = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
@@ -257,6 +270,7 @@ class Confirm_Payment {
 				'result' => 'success',
 			];
 		} else {
+			// If this the price paid was free, or if it was a variable amount.
 			if ( 0 === $this->amount || 1 === $this->meta['usevariableamount'] ) {
 				$wpdb->update(
 					$table,
@@ -272,6 +286,11 @@ class Confirm_Payment {
 					'result' => 'success',
 				];
 			} else {
+
+				if ($txncharge == 'customer') {
+					$amount = kkd_pff_paystack_add_paystack_charge($amount);
+				}
+
 				if ( $this->oamount !== $amount_paid ) {
 					$return = [
 						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %s<b>%s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
@@ -297,8 +316,23 @@ class Confirm_Payment {
 	}
 
 	private function get_db_record( $code ) {
-		$record = array();
-		return $record;
+		global $wpdb;
+		$return = false;
+		$table  = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$record = $wpdb->get_results(
+			$wpdb->prepare(
+					"SELECT * 
+					FROM %i 
+					WHERE txn_code = %s"
+				,
+				$table,
+				$code
+			), 'OBJECT' );
+
+		if ( ! empty( $record ) && isset( $record[0] ) ) {
+			$return = $record[0];
+		}
+		return $return;
 	}
 
 	private function update_db_record( $code ) {

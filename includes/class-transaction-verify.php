@@ -37,7 +37,7 @@ class Transaction_Verify extends API {
 
 		$this->set_url_args( $code );
 		$response = $this->get_request();
-		$this->verify_response( $response );
+		$return   = $this->verify_response( $response );
 		return $return;
 	}
 
@@ -48,7 +48,7 @@ class Transaction_Verify extends API {
 	 * @return boolean
 	 */
 	public function verify_response( $response ) {
-		$return = [];
+		$return = $response;
 		if ( false === $response ) {
 			$return = [
 				'message' => __( 'Payment Verification Failed', 'pff-paystack' ),

@@ -124,13 +124,9 @@ class API {
 	 */
 	public function get_request() {
 		$response = false;
-		/*print_r('<pre>');
-		print_r($this->get_url());
-		print_r($this->get_args());
-		print_r('</pre>');*/
-		$request  = wp_remote_get( $this->get_url(), $this->get_args() );
-		if ( ! is_wp_error( $request ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-			$response = json_decode( wp_remote_retrieve_body( $request ) );
+		$return   = wp_remote_get( $this->get_url(), $this->get_args() );
+		if ( ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
+			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
 		return $response;
 	}

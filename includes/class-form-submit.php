@@ -227,7 +227,7 @@ class Form_Submit {
 		);
 	
 		if ( 'customer' === $this->meta['txncharge'] ) {
-			$amount = $this->process_transaction_fees( $amount );
+			$amount = $this->helpers->process_transaction_fees( $amount );
 		}
 
 		/*$max_file_size = $file_limit * 1024 * 1024;
@@ -452,22 +452,5 @@ class Form_Submit {
 		} while ( $check );
 
 		return $code;
-	}
-
-	/**
-	 * Takes the amount and processes the "transactional" fees.
-	 *
-	 * @param integer $amount
-	 * @return integer
-	 */
-	public function process_transaction_fees( $amount ) {
-		$fees = $this->helpers->get_fees();
-		$pc   = new Transaction_Fee(
-			$fees['prc'],
-			$fees['adc'],
-			$fees['ths'],
-			$fees['cap']
-		);
-		return $pc->add_for_ngn( $amount );
 	}
 }
