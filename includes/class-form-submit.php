@@ -144,9 +144,15 @@ class Form_Submit {
 	public function process_amount( $amount = 0 ) {
 		$original_amount  = $amount;
 
-		if ( 'no' === $this->meta['recur'] && 0 !== floatval( $this->meta['amount'] ) ) {
-			$amount = (int) str_replace( ' ', '', floatval( $this->meta['amount'] ) );
+		if ( 'no' === $this->meta['recur'] && 1 !== $this->meta['usevariableamount'] ) {
+			if ( 0 !== (int) floatval( $this->meta['amount'] ) ) {
+				$amount = floatval( $this->meta['amount'] );
+			} else {
+				$amount = $this->form_data['pf-amount'];
+			}
+			$amount = (int) str_replace( ' ', '', floatval( $amount ) );
 		}
+
 		if ( 1 === $this->meta['minimum'] && 0 !== floatval( $this->meta['amount'] ) ) {
 			if ( $original_amount < floatval( $this->meta['amount'] ) ) {
 				$amount = floatval( $this->meta['amount'] );
@@ -154,6 +160,7 @@ class Form_Submit {
 				$amount = $original_amount;
 			}
 		}
+
 		if ( 1 === $this->meta['usevariableamount'] ) {
 			$payment_options = explode( ',', $this->meta['variableamount'] );
 			if ( count( $payment_options ) > 0 ) {
@@ -165,6 +172,7 @@ class Form_Submit {
 				}
 			}
 		}
+
 		return $amount;
 	}
 

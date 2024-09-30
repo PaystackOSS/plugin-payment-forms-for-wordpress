@@ -243,7 +243,7 @@ class Confirm_Payment {
 			];
 		} else {
 			// If this the price paid was free, or if it was a variable amount.
-			if ( 0 === $this->amount || 1 === $this->meta['usevariableamount'] ) {
+			if ( 0 === (int) $this->oamount || 1 === $this->meta['usevariableamount'] ) {
 				$wpdb->update(
 					$table,
 					array(
@@ -258,7 +258,6 @@ class Confirm_Payment {
 					'result' => 'success',
 				];
 			} else {
-
 				if ( $this->oamount !== $amount_paid ) {
 					$return = [
 						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %s<b>%s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
@@ -290,7 +289,7 @@ class Confirm_Payment {
 			$body       = array(
 				'start_date' => $start_date,
 				'plan'       => $this->meta['startdate_plan_code'],
-				'customer'   => $this->payment_meta['email'],
+				'customer'   => $this->payment_meta->email,
 			);
 
 			$created_sub = pff_paystack()->classes['request-subscription']->create_subscription( $body );
