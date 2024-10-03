@@ -110,6 +110,8 @@ final class Payment_Forms {
 			'confirm-payment'      => 'Confirm_Payment',
 			'email'                => '',
 			'email-invoice'        => 'Email_Invoice',
+			'email-receipt'        => 'Email_Receipt',
+			'email-receipt-owner'  => 'Email_Receipt_Owner',
 		);
 	}
 

@@ -66,6 +66,10 @@ class Email_Receipt extends Email {
 		$this->merchant    = get_post_meta( $form_id, '_merchant', true );
 		$this->heading     = get_post_meta( $form_id, '_heading', true );
 		$this->sitemessage = get_post_meta( $form_id, '_message', true );
+
+		$this->reply_to   = get_option( 'admin_email' );
+		$this->reply_name = get_option( 'blogname' );
+		$this->send();
 	}
 
 	public function get_html_body() {

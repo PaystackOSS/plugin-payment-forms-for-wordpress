@@ -269,7 +269,6 @@ function PffPaystackFee()
 
                     $.blockUI({ message: "Please wait..." });
 
-					// IS THIS BEING USED?
                     var formdata = new FormData(this);
 
                     $.ajax(
@@ -317,53 +316,44 @@ function PffPaystackFee()
                                                     $.post(
                                                         $form.attr("action"),
                                                         {
-                                                            action: "pff_paystack_confirm_payment",
-                                                            code: response.trxref,
-                                                            quantity: quantity
-                                                            },
+														action: "pff_paystack_confirm_payment",
+														code: response.trxref,
+														quantity: quantity
+														},
                                                         function (newdata) {
-                                                            data = JSON.parse(newdata);
-                                                            if (data.result == "success2") {
-                                                                              window.location.href = data.link;
-                                                            }
-                                                            if (data.result == "success") {
-                                                                        $(".paystack-form")[0].reset();
-                                                                        $("html,body").animate(
-                                                                            { scrollTop: $(".paystack-form").offset().top - 110 },
-                                                                            500
-                                                                        );
+															data = JSON.parse(newdata);
+															if (data.result == "success2") {
+																window.location.href = data.link;
+															}
+															if (data.result == "success") {
+																$(".paystack-form")[0].reset();
+																$("html,body").animate(
+																	{ scrollTop: $(".paystack-form").offset().top - 110 },
+																	500
+																);
 
-                                                                                self.before('<div class="alert-success">' + data.message + '</div>');
-                                                                                $(this)
-                                                                                  .find("input, select, textarea")
-                                                                                .each(
-                                                                                    function () {
-                                                                                        $(this).css(
-                                                                                            {
-                                                                                                "border-color": "#d1d1d1",
-                                                                                                "background-color": "#fff"
-                                                                                            }
-                                                                                        );
-                                                                                    }
-                                                                                );
-                                                                                $(".pf-txncharge")
-                                                                                  .hide()
-                                                                                  .html("NGN0")
-                                                                                  .show()
-                                                                                  .digits();
-                                                                                $(".pf-txntotal")
-                                                                                  .hide()
-                                                                                  .html("NGN0")
-                                                                                  .show()
-                                                                                  .digits();
+																self.before('<div class="alert-success">' + data.message + '</div>');
+																$(this)
+																	.find("input, select, textarea")
+																.each(
+																	function () {
+																		$(this).css(
+																			{
+																				"border-color": "#d1d1d1",
+																				"background-color": "#fff"
+																			}
+																		);
+																	}
+																);
+																calculateFees();
 
-                                                                                $.unblockUI();
-                                                            } else {
-                                                                    self.before('<div class="alert-danger">' + data.message + '</div>');
-                                                                    $.unblockUI();
-                                                            }
-                                                        }
-                                                    );
+																$.unblockUI();
+															} else {
+																self.before('<div class="alert-danger">' + data.message + '</div>');
+																$.unblockUI();
+															}
+														}
+													);
                                                 },
                                                 onClose: function () { }
                                               }
