@@ -108,6 +108,8 @@ final class Payment_Forms {
 			'form-submit'          => 'Form_Submit',
 			'transaction-fee'      => '',
 			'confirm-payment'      => 'Confirm_Payment',
+			'email'                => '',
+			'email-invoice'        => 'Email_Invoice',
 		);
 	}
 
