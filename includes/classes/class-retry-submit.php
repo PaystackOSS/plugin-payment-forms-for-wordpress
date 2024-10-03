@@ -112,6 +112,7 @@ class Retry_Submit {
 			$transaction_charge  = (int) $this->meta['merchantamount'];
 			$transaction_charge *= 100;
 			$fixedmetadata       = json_decode( $this->retry_meta->metadata );
+			$quantity            = 1;
 			foreach ( $fixedmetadata as $nkey => $nvalue ) {
 				if ( 'Quantity' === $nvalue->variable_name ) {
 					$quantity = $nvalue->value;
@@ -131,6 +132,8 @@ class Retry_Submit {
 		if ( empty( $transaction_charge ) || 0 === $transaction_charge ) {
 			$transaction_charge = null;
 		}
+
+		$this->update_retry_code();
 
 		$response = array(
 			'result'             => 'success',
