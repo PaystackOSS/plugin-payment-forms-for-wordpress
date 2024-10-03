@@ -48,7 +48,7 @@ function kkd_format_metadata( $data ) {
 }
 
 global $wpdb;
-$table  = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 $record = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE txn_code = %s", $code ) );
 
 if ( array_key_exists( 0, $record ) ) {

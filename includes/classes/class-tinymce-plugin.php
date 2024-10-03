@@ -52,7 +52,7 @@ class TinyMCE_Plugin {
      * @return array Modified array of registered TinyMCE Plugins
      */
     function add_tinymce_plugin( $plugin_array ) {
-        $plugin_array['custom_class'] = KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/tinymce-plugin.js';
+        $plugin_array['custom_class'] = PFF_PAYSTACK_PLUGIN_URL . '/assets/css/tinymce-plugin.js';
         return $plugin_array;
     }
 

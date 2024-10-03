@@ -22,7 +22,7 @@ class Setup {
 	public function __construct() {
 		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action( 'plugins_loaded', [ $this, 'load_plugin_textdomain' ] );
-		add_action( 'plugin_action_links_' . KKD_PFF_PLUGIN_BASENAME, [ $this, 'add_action_links' ] );
+		add_action( 'plugin_action_links_' . PFF_PLUGIN_BASENAME, [ $this, 'add_action_links' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_styles' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 
@@ -64,7 +64,7 @@ class Setup {
             'show_in_menu'          => true,
 			'show_in_rest'          => false,
             'menu_position'         => 5,
-            'menu_icon'             => KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logo.png',
+            'menu_icon'             => PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logo.png',
             'show_in_nav_menus'     => true,
             'publicly_queryable'    => true,
             'exclude_from_search'   => false,
@@ -82,7 +82,7 @@ class Setup {
 	 * Load the plugin text domain for translation.
 	 */
 	public function load_plugin_textdomain() {
-		load_plugin_textdomain( 'pff-paystack', false, KKD_PFF_PAYSTACK_PLUGIN_PATH . '/languages/' );
+		load_plugin_textdomain( 'pff-paystack', false, PFF_PAYSTACK_PLUGIN_PATH . '/languages/' );
 	}
 
 	/**
@@ -105,7 +105,7 @@ class Setup {
 		if ( $hook != 'paystack_form_page_submissions' && $hook != 'paystack_form_page_settings' ) {
 			return;
 		}
-		wp_enqueue_style( KKD_PFF_PLUGIN_NAME,  KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/paystack-admin.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
+		wp_enqueue_style( PFF_PLUGIN_NAME,  PFF_PAYSTACK_PLUGIN_URL . '/assets/css/paystack-admin.css', array(), PFF_PAYSTACK_VERSION, 'all' );
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Setup {
 	 * @return void
 	 */
 	public function admin_enqueue_scripts() {
-		wp_enqueue_script( KKD_PFF_PLUGIN_NAME, KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array( 'jquery' ), KKD_PFF_PAYSTACK_VERSION, false );
+		wp_enqueue_script( PFF_PLUGIN_NAME, PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-admin.js', array( 'jquery' ), PFF_PAYSTACK_VERSION, false );
 	}
 
 	/**
@@ -123,8 +123,8 @@ class Setup {
 	 * @return void
 	 */
 	public function enqueue_styles() {
-        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-style', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/pff-paystack.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
-        wp_enqueue_style( KKD_PFF_PLUGIN_NAME . '-font-awesome', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), KKD_PFF_PAYSTACK_VERSION, 'all' );
+        wp_enqueue_style( PFF_PLUGIN_NAME . '-style', PFF_PAYSTACK_PLUGIN_URL . '/assets/css/pff-paystack.css', array(), PFF_PAYSTACK_VERSION, 'all' );
+        wp_enqueue_style( PFF_PLUGIN_NAME . '-font-awesome', PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), PFF_PAYSTACK_VERSION, 'all' );
     }
 
 	public function enqueue_scripts() {
@@ -134,19 +134,19 @@ class Setup {
 			return;
 		}
 
-		wp_enqueue_script( 'blockUI', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/jquery.blockUI.min.js', array( 'jquery', 'jquery-ui-core' ), KKD_PFF_PAYSTACK_VERSION, true, true );
+		wp_enqueue_script( 'blockUI', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/jquery.blockUI.min.js', array( 'jquery', 'jquery-ui-core' ), PFF_PAYSTACK_VERSION, true, true );
 
 		wp_register_script( 'Paystack', 'https://js.paystack.co/v1/inline.js', false, '1' );
 		wp_enqueue_script( 'Paystack' );
 
-		wp_enqueue_script( KKD_PFF_PLUGIN_NAME . '-public', KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-public.js', array( 'jquery' ), KKD_PFF_PAYSTACK_VERSION, true, true);
+		wp_enqueue_script( PFF_PLUGIN_NAME . '-public', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-public.js', array( 'jquery' ), PFF_PAYSTACK_VERSION, true, true);
 		
 		$helpers = new Helpers();
 		$js_args = [
 			'key' => $helpers->get_public_key(),
 			'fee' => $helpers->get_fees(),
 		];
-		wp_localize_script( KKD_PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args , KKD_PFF_PAYSTACK_VERSION, true, true);
+		wp_localize_script( PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args , PFF_PAYSTACK_VERSION, true, true);
 	}
 
 
@@ -183,7 +183,7 @@ class Setup {
 	 */
 	public function parse_request( $wp ) {
 		if ( array_key_exists( 'pff_paystack_stats', $wp->query_vars ) ) {
-			include KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/templates/paystack-invoice.php';
+			include PFF_PAYSTACK_PLUGIN_PATH . '/includes/templates/paystack-invoice.php';
 			exit();
 		}
 	}

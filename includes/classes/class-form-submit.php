@@ -255,7 +255,7 @@ class Form_Submit {
 
 		global $wpdb;
 		$code            = $this->generate_code();
-		$table           = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$table           = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		
 		$this->fixed_metadata = [];
 	

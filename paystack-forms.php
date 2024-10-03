@@ -13,13 +13,13 @@
 if (!defined('WPINC')) {
     die;
 }
-define( 'KKD_PFF_PAYSTACK_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
-define( 'KKD_PFF_PAYSTACK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'KKD_PFF_PAYSTACK_MAIN_FILE', __FILE__ );
-define( 'KKD_PFF_PAYSTACK_VERSION', '4.0.0' );
-define( 'KKD_PFF_PAYSTACK_TABLE', 'paystack_forms_payments' );
-define( 'KKD_PFF_PLUGIN_BASENAME', plugin_basename(__FILE__) );
-define( 'KKD_PFF_PLUGIN_NAME', 'pff-paystack' );
+define( 'PFF_PAYSTACK_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'PFF_PAYSTACK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'PFF_PAYSTACK_MAIN_FILE', __FILE__ );
+define( 'PFF_PAYSTACK_VERSION', '4.0.0' );
+define( 'PFF_PAYSTACK_TABLE', 'paystack_forms_payments' );
+define( 'PFF_PLUGIN_BASENAME', plugin_basename(__FILE__) );
+define( 'PFF_PLUGIN_NAME', 'pff-paystack' );
 
 // Transaction definitions
 define( 'PFF_PAYSTACK_PERCENTAGE', 1.5 );
@@ -27,12 +27,12 @@ define( 'PFF_PAYSTACK_CROSSOVER_TOTAL', 2500 );
 define( 'PFF_PAYSTACK_ADDITIONAL_CHARGE', 100 );
 define( 'PFF_PAYSTACK_LOCAL_CAP', 2000 );
 
-/*define('KKD_PFF_PAYSTACK_CHARGE_DIVIDER', floatval( 1 - KKD_PFF_PAYSTACK_PERCENTAGE ) );
-define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval( ( KKD_PFF_PAYSTACK_CROSSOVER_TOTAL * KKD_PFF_PAYSTACK_CHARGE_DIVIDER ) - KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE ) );
-define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval( ( KKD_PFF_PAYSTACK_LOCAL_CAP - KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE ) / KKD_PFF_PAYSTACK_PERCENTAGE ) );
-define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - KKD_PFF_PAYSTACK_LOCAL_CAP );*/
+/*define('PFF_PAYSTACK_CHARGE_DIVIDER', floatval( 1 - PFF_PAYSTACK_PERCENTAGE ) );
+define('PFF_PAYSTACK_CROSSOVER_AMOUNT', intval( ( PFF_PAYSTACK_CROSSOVER_TOTAL * PFF_PAYSTACK_CHARGE_DIVIDER ) - PFF_PAYSTACK_ADDITIONAL_CHARGE ) );
+define('PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval( ( PFF_PAYSTACK_LOCAL_CAP - PFF_PAYSTACK_ADDITIONAL_CHARGE ) / PFF_PAYSTACK_PERCENTAGE ) );
+define('PFF_PAYSTACK_FLATLINE_AMOUNT', PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - PFF_PAYSTACK_LOCAL_CAP );*/
 
-include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-paystack-forms.php';
+include_once PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-paystack-forms.php';
 
 /**
  * Returns an instance of the Paystack Payment forms Object

@@ -215,7 +215,7 @@ class Confirm_Payment {
 	 */
 	protected function update_payment_dates( $data ) {
 		global $wpdb;
-		$table  = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$return = [
 			'message' => __( 'DB not updated.', 'pff-paystack' ),
 			'result' => 'failed',
@@ -300,7 +300,7 @@ class Confirm_Payment {
 	private function get_db_record( $code ) {
 		global $wpdb;
 		$return = false;
-		$table  = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$record = $wpdb->get_results(
 			$wpdb->prepare(
 					"SELECT * 

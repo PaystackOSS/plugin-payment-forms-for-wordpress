@@ -86,7 +86,7 @@ class Submissions {
 		if ( ! class_exists( 'WP_List_Table' ) ) {
 			include_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 		}
-		include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-payments-list-table.php';
+		include_once PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-payments-list-table.php';
 		return new Payments_List_Table();
 	}
 

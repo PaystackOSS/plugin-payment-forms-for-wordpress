@@ -35,14 +35,14 @@ final class Payment_Forms {
 	 *
 	 * @var string
 	 */
-	public $plugin_name = KKD_PFF_PLUGIN_NAME;
+	public $plugin_name = PFF_PLUGIN_NAME;
 
 	/**
 	 * The plugin version number.
 	 *
 	 * @var string
 	 */
-	public $version = KKD_PFF_PAYSTACK_VERSION;
+	public $version = PFF_PAYSTACK_VERSION;
 
 	/**
 	 * Holdes the array of classes key => object.
@@ -122,7 +122,7 @@ final class Payment_Forms {
 	 */
 	private function include_classes() {
 		foreach ( $this->classes as $key => $name ) {
-			include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-' . $key . '.php';
+			include_once PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-' . $key . '.php';
 			if ( '' !== $name ) {
 				$this->classes[ $key ] = new ( $this->namespace . $name );
 			}
@@ -135,6 +135,6 @@ final class Payment_Forms {
 	 * @since 2.3
 	 */
 	private function init_hooks() {
-		register_activation_hook( KKD_PFF_PAYSTACK_MAIN_FILE, array( '\paystack\payment_forms\activation', 'install' ) );
+		register_activation_hook( PFF_PAYSTACK_MAIN_FILE, array( '\paystack\payment_forms\activation', 'install' ) );
 	}
 }

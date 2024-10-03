@@ -184,7 +184,7 @@ class Helpers {
 			'orderby'  => 'created_at',
 		);
 		$args  = wp_parse_args( $args, $defaults );
-        $table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+        $table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$order = strtoupper( $args['order'] );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -212,7 +212,7 @@ class Helpers {
 	 */
 	public function get_payments_count( $form_id ) {
 		global $wpdb;
-		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$num   = wp_cache_get( 'form_payments_' . $form_id, 'pff_paystack' );
 		if ( false === $num ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -708,7 +708,7 @@ class Helpers {
 	 */
 	public function check_code( $code ) {
 		global $wpdb;
-		$table = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 
 		$o_exist = $wpdb->get_results(
 			$wpdb->prepare(

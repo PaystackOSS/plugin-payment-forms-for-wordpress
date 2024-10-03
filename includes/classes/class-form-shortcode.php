@@ -130,7 +130,7 @@ class Form_Shortcode {
 					}
 	
 					// Start form output
-					$html[] = '<form version="' . esc_attr( KKD_PFF_PAYSTACK_VERSION ) . '" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" class="paystack-form j-forms" novalidate>
+					$html[] = '<form version="' . esc_attr( PFF_PAYSTACK_VERSION ) . '" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" class="paystack-form j-forms" novalidate>
 						  <div class="j-row">';
 	
 					// Hidden Fields
@@ -375,7 +375,7 @@ class Form_Shortcode {
 		$html[] = '<div class="span12 unit">
 			<small><span style="color: red;">*</span> are compulsory</small>
 			<br />
-			<img src="' . esc_url( KKD_PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
+			<img src="' . esc_url( PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '" alt="cardlogos" class="paystack-cardlogos size-full wp-image-1096" />
 			<button type="reset" class="secondary-btn">Reset</button>';
 			if ($this->show_btn) {
 				$html[] = '<button type="submit" class="primary-btn">' . esc_html( $this->meta['paybtn'] ) . '</button>';

@@ -21,7 +21,7 @@ class Activation {
 	 */
 	public static function install() {
         global $wpdb;
-        $table_name = $wpdb->prefix . KKD_PFF_PAYSTACK_TABLE;
+        $table_name = $wpdb->prefix . PFF_PAYSTACK_TABLE;
         $table_name = sanitize_text_field( $table_name );
 
 		// Include the DB Functions.
