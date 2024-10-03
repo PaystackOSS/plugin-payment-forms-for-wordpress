@@ -106,7 +106,7 @@ class Confirm_Payment {
 	
 	
 		$code   = sanitize_text_field( $_POST['code'] );
-		$record = $this->get_db_record( $code );
+		$record = $this->helpers->get_db_record( $code );
 
 		if ( false !== $record ) {
 			
@@ -295,30 +295,5 @@ class Confirm_Payment {
 				// Nothing defined for this.
 			}
 		}
-	}
-
-	private function get_db_record( $code ) {
-		global $wpdb;
-		$return = false;
-		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
-		$record = $wpdb->get_results(
-			$wpdb->prepare(
-					"SELECT * 
-					FROM %i 
-					WHERE txn_code = %s"
-				,
-				$table,
-				$code
-			), 'OBJECT' );
-
-		if ( ! empty( $record ) && isset( $record[0] ) ) {
-			$return = $record[0];
-		}
-		return $return;
-	}
-
-	private function update_db_record( $code ) {
-		$updated = false;
-		return $updated;
 	}
 }

@@ -165,7 +165,7 @@ class Helpers {
 	}
 
 	/**
-	 * Fetch an array of the plans by the form ID.
+	 * Fetch an array of the payments by the form ID.
 	 *
 	 * @param integer $form_id
 	 * @param array $args
@@ -666,6 +666,56 @@ class Helpers {
 	}
 
 	/**
+	 * Formats the metadata for output on the retry form page.
+	 *
+	 * @param string $data
+	 * @return string
+	 */
+	public function format_meta_as_display_fields( $data ) {
+		$new  = json_decode( $data );
+		$text = '';
+		
+		if ( is_array( $new ) && array_key_exists( 0, $new ) ) {
+			foreach ( $new as $item ) {
+				if ( 'text' === $item->type ) {
+					$text .= sprintf(
+						'<div class="span12 unit">
+							<label class="label inline">%s:</label>
+							<strong>%s</strong>
+						</div>',
+						esc_html( $item->display_name ),
+						esc_html( $item->value )
+					);
+				} else {
+					$text .= sprintf(
+						'<div class="span12 unit">
+							<label class="label inline">%s:</label>
+							<strong><a target="_blank" href="%s">%s</a></strong>
+						</div>',
+						esc_html( $item->display_name ),
+						esc_url( $item->value ),
+						__( 'link', 'pff-paystack' )
+					);
+				}
+			}
+		} elseif ( is_object( $new ) ) {
+			if ( count( get_object_vars( $new ) ) > 0 ) {
+				foreach ( $new as $key => $item ) {
+					$text .= sprintf(
+						'<div class="span12 unit">
+							<label class="label inline">%s:</label>
+							<strong>%s</strong>
+						</div>',
+						esc_html( $key ),
+						esc_html( $item )
+					);
+				}
+			}
+		}
+		return $text;
+	}
+
+	/**
 	 * Retrieve the user's IP address.
 	 *
 	 * @return string User's IP address.
@@ -718,6 +768,32 @@ class Helpers {
 		);
 
 		return ( count( $o_exist ) > 0 );
+	}
+
+	/**
+	 * Get the DB records by the transaction code supplied.
+	 *
+	 * @param string $code
+	 * @return object
+	 */
+	public function get_db_record( $code ) {
+		global $wpdb;
+		$return = false;
+		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		$record = $wpdb->get_results(
+			$wpdb->prepare(
+					"SELECT * 
+					FROM %i 
+					WHERE txn_code = %s"
+				,
+				$table,
+				$code
+			), 'OBJECT' );
+
+		if ( ! empty( $record ) && isset( $record[0] ) ) {
+			$return = $record[0];
+		}
+		return $return;
 	}
 
 	/**

@@ -28,10 +28,6 @@ class Setup {
 
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-
-		add_action( 'init', [ $this, 'init' ] );
-		add_action( 'parse_request', [ $this, 'parse_request' ] );
-		add_action( 'query_vars', [ $this, 'query_vars' ] );
 	}
 
     /**
@@ -127,6 +123,11 @@ class Setup {
         wp_enqueue_style( PFF_PLUGIN_NAME . '-font-awesome', PFF_PAYSTACK_PLUGIN_URL . '/assets/css/font-awesome.min.css', array(), PFF_PAYSTACK_VERSION, 'all' );
     }
 
+	/**
+	 * Enqueue the frontend scripts.
+	 *
+	 * @return void
+	 */
 	public function enqueue_scripts() {
 
 		$page_content = get_the_content();
@@ -147,44 +148,5 @@ class Setup {
 			'fee' => $helpers->get_fees(),
 		];
 		wp_localize_script( PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args , PFF_PAYSTACK_VERSION, true, true);
-	}
-
-
-	/**
-	 * Register our payment retry rule.
-	 *
-	 * @return void
-	 */
-	public function init(){
-		add_rewrite_rule(
-			'^paystackinvoice/?$',
-			'index.php?pff_paystack_stats=true&code=$matches[1]',
-			'top'
-		);
-	}
-	
-	/**
-	 * Whitelist the our variable.
-	 *
-	 * @param array $query_vars
-	 * @return array
-	 */
-	public function query_vars( $query_vars ){
-		$query_vars[] = 'pff_paystack_stats';
-		//$query_vars[] = 'code';
-		return $query_vars;
-	}
-	
-	/**
-	 * This example checks very early in the process, if the variable is set, we include our page and stop execution after it
-	 *
-	 * @param object $wp
-	 * @return void
-	 */
-	public function parse_request( $wp ) {
-		if ( array_key_exists( 'pff_paystack_stats', $wp->query_vars ) ) {
-			include PFF_PAYSTACK_PLUGIN_PATH . '/includes/templates/paystack-invoice.php';
-			exit();
-		}
 	}
 }

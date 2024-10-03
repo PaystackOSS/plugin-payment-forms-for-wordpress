@@ -343,7 +343,7 @@ class Form_Submit {
 		 * 11: Email_Invoice::send_invoice();
 		 */
 		if ( 'yes' === $this->meta['sendinvoice'] ) {
-			do_action( 'pff_paystack_send_invoice', $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
+			do_action( 'pff_paystack_send_invoice', $this->form_id, $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
 		}
 
 		$transaction_charge = (int) $this->meta['merchantamount'];

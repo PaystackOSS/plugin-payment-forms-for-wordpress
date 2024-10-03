@@ -102,12 +102,17 @@ class Form_Shortcode {
 		$id            = intval( $atts['id'] ); // Ensure $id is an integer
 		$this->helpers = Helpers::get_instance();
 	
-		/*$pk = Pff_Paystack_Public::fetchPublicKey();
-		if (!$pk) {
-			$settingslink = esc_url(get_admin_url(null, 'edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php'));
-			echo "<h5>You must set your Paystack API keys first <a href='{$settingslink}'>settings</a></h5>";
-			return ob_get_clean(); // Return early to avoid further processing
-		}*/
+		// First lets check for a public key.
+		$public_key = $this->helpers->get_public_key();
+		if ( ! $public_key ) {
+			$settings_link = esc_url( get_admin_url( null, 'edit.php?post_type=paystack_form&page=settings' ) );
+			return sprintf(
+				'<h5>%s <a href="%s">%s</a></h5>',
+				esc_html__( 'You must set your Paystack API keys first', 'pff-paystack' ),
+				esc_url( $settings_link ),
+				esc_html__( 'settings', 'pff-paystack' )
+			); // Return early to avoid further processing
+		}
 
 		// Store our items in an array and not an object.
 		$html = [];
@@ -119,6 +124,13 @@ class Form_Shortcode {
 				$this->form = $obj;
 				$this->set_user_details();
 				$this->set_meta_data( $obj );
+
+				// First lets see if this is for a retry payment.
+				$code = $this->get_code();
+				if ( '' !== $code ) {
+					$html = $this->get_retry_form( $code );
+					return implode( '', $html );
+				}
 				
 				// Check if the form should be displayed based on user login status
 				$show_form = $this->should_show_form();
@@ -168,6 +180,16 @@ class Form_Shortcode {
 		$html = implode( '', $html );
 	
 		return $html;
+	}
+
+	/**
+	 * Get the code from the url query vars if it exists.
+	 *
+	 * @return void
+	 */
+	public function get_code() {
+		$code = isset( $_GET['code'] ) ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
+		return $code;
 	}
 
 	/**
@@ -454,4 +476,85 @@ class Form_Shortcode {
 
 		return implode( '', $html );
 	}
+
+	/**
+	 * Gets the retry form.
+	 *
+	 * @param string $code
+	 * @return array
+	 */
+	public function get_retry_form( $code = '' ) {
+		$html = [];
+		$record  = $this->helpers->get_db_record( $code );
+		if ( false !== $record ) {
+			$html[] = 
+				'<div class="content-area main-content" id="primary">
+				    <main role="main" class="site-main" id="main">
+				        <div class="blog_post">
+				            <article class="post-4 page type-page status-publish hentry" id="post-4">
+				                <form action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" enctype="multipart/form-data" class="j-forms retry-form" id="pf-form" novalidate="">';
+
+			$html[] = '<input type="hidden" name="action" value="kkd_pff_paystack_retry_action">
+						<input type="hidden" name="code" value="' . esc_html( $code ) . '" />';
+
+
+			$html[] = '<div class="content">';
+			
+
+			$html[] = '<div class="divider-text gap-top-20 gap-bottom-45">
+							<span>' . __( 'Payment Invoice', 'pff-paystack' ) . '</span>
+						</div>';
+			
+			$html[] = '<div class="j-row">';
+
+			$html[] = '<div class="span12 unit">
+							<label class="label inline">' . __( 'Email:', 'pff-paystack' ) . '</label>
+							<strong><a href="mailto:' . esc_attr( $record->email ) . '">' . esc_html( $record->email ) . '</a></strong>
+						</div>';
+
+			$html[] = '<div class="span12 unit">
+							<label class="label inline">' . __( 'Amount:', 'pff-paystack' ) . '</label>
+							<strong>' . esc_html( $this->meta['currency'] . number_format( $record->amount ) ) . '</strong>
+						</div>';
+
+
+			$html[] = $this->helpers->format_meta_as_display_fields( $record->metadata );
+			
+			$html[] = '<div class="span12 unit">
+							<label class="label inline">' . __( 'Date:', 'pff-paystack' ) . '</label>
+							<strong>' . esc_html( $record->created_at ) . '</strong>
+						</div>';
+
+			if ( 1 === intval( $record->paid ) ) {
+				$html[] = '<div class="span12 unit">
+								<label class="label inline">' . __( 'Payment Status:', 'pff-paystack' ) . '</label>
+								<strong>' . __( 'Successful', 'pff-paystack' ) . '</strong>
+							</div>';
+			}
+		
+			$html[] = '</div>';
+			$html[] = '</div>';
+		
+			$html[] = '<div class="footer">';
+			$html[] = '<small><span style="color: red;">*</span> ' . __( 'are compulsory', 'pff-paystack' ) . '</small><br>';
+			$html[] = '<img class="paystack-cardlogos size-full wp-image-1096" alt="cardlogos" src="' . esc_url( PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '">';
+			if ( 0 === intval( $record->paid ) ) {
+				$html[] = '<button type="submit" class="primary-btn" id="submitbtn">' . __( 'Retry Payment', 'pff-paystack' ) . '</button>';
+			}
+		
+			$html[] = ' </div>';
+			$html[] = '</form>';
+			$html[] = '</article>';
+			$html[] = '</div>';
+			$html[] = '</main>';
+			$html[] = '</div>';
+			
+		} else {
+			$html[] = esc_html__( 'Invoice code invalid', 'pff-paystack' );
+		}
+
+		return $html;
+	}
+
+
 }

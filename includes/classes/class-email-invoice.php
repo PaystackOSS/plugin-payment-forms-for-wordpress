@@ -27,10 +27,22 @@ class Email_Invoice extends Email {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'pff_paystack_send_invoice', [ $this, 'send_invoice' ], 10, 5 );
+		add_action( 'pff_paystack_send_invoice', [ $this, 'send_invoice' ], 10, 6 );
 	}
 
-	public function send_invoice( $currency, $amount, $name, $email, $code ) {
+	/**
+	 * Sends the invoice before payment with the retry link.
+	 *
+	 * @param int $form_id
+	 * @param string $currency
+	 * @param int $amount
+	 * @param string $name
+	 * @param string $email
+	 * @param string $code
+	 * @return void
+	 */
+	public function send_invoice( $form_id, $currency, $amount, $name, $email, $code ) {
+		$this->form_id    = $form_id;
 		$this->amount     = $amount;
 		$this->currency   = $currency;
 		$this->code       = $code;
@@ -151,7 +163,7 @@ class Email_Invoice extends Email {
 																<tbody>
 																	<tr>
 																		<td class="font_default" style="padding:12px 24px;font-family:Helvetica,Arial,sans-serif;font-size:16px;mso-line-height-rule:exactly;text-align:center;vertical-align:middle;-webkit-border-radius:4px;border-radius:4px;background-color:#666">
-																			<a target="_blank" href="<?php echo esc_url( get_site_url() . '/paystackinvoice/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
+																			<a target="_blank" href="<?php echo esc_url( get_permalink( $this->form_id ) . '/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
 																				<span style="text-decoration:none;color:#fff;text-align:center;display:block">
 																					<?php echo esc_html__( 'Try Again', 'pff-paystack' ); ?>
 																				</span>
