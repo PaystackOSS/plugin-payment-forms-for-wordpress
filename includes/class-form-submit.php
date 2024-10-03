@@ -335,10 +335,13 @@ class Form_Submit {
 				$table,
 				$insert
 			);
+		}
 
-			if ( 'yes' == get_post_meta( $insert['post_id'], '_sendinvoice', true ) ) {
-				//kkd_pff_paystack_send_invoice( $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
-			}
+		/**
+		 * Allow 3rd party plugins to send off an invoice as well
+		 */
+		if ( 'yes' === $this->meta['sendinvoice'] ) {
+			do_action( 'pff_paystack_send_invoice', $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
 		}
 
 		$transaction_charge = (int) $this->meta['merchantamount'];

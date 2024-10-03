@@ -38,11 +38,18 @@ class Email_Invoice extends Email {
 	public $amount = '';
 
 	/**
-	 * THe currency payment code.
+	 * The currency payment code.
 	 *
 	 * @var string
 	 */
 	public $code = '';
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		add_action( 'pff_paystack_send_invoice', [ $this, 'send_invoice' ], 10, 5 );
+	}
 
 	public function send_invoice( $currency, $amount, $name, $email, $code ) {
 		$this->amount     = $amount;
@@ -97,7 +104,7 @@ class Email_Invoice extends Email {
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:28px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">
-																	<a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5">Invoice #<?php echo esc_html( $this->code ); ?></strong></a></p>
+																	<a href="#" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#ffb26b"><strong class="text-muted" style="color:#b3b3b5"><?php echo esc_html__( 'Invoice', 'pff-paystack' ); ?> #<?php echo esc_html( $this->code ); ?></strong></a></p>
 														</td>
 													</tr>
 												</tbody>
@@ -152,20 +159,33 @@ class Email_Invoice extends Email {
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">You're getting this email because <br />you tried making a payment to <?php echo get_option('blogname'); ?>.</p>
+															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">
+																<?php 
+																	printf( 
+																		/* translators: %s: Blog name */
+																		esc_html__( "You're getting this email because you tried making a payment to %s.", 'pff-paystack' ), 
+																		esc_html( get_option( 'blogname' ) )
+																	); 
+																?>
+															</p>
 															<table class="primary_btn" align="center" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;clear:both;margin:0 auto">
 																<tbody>
 																	<tr>
-																		<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">Use this link below to try again, if you encountered <br />any issue while trying to make the payment.</small><br>
-																		</p>
 																		<td class="font_default" style="padding:12px 24px;font-family:Helvetica,Arial,sans-serif;font-size:16px;mso-line-height-rule:exactly;text-align:center;vertical-align:middle;-webkit-border-radius:4px;border-radius:4px;background-color:#666">
-																			<a href="<?php echo get_site_url() . '/paystackinvoice/?code=' . $this->code; ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
-																				<span style="text-decoration:none;color:#fff;text-align:center;display:block">Try Again</span>
+																			<a href="<?php echo esc_url( get_site_url() . '/paystackinvoice/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
+																				<span style="text-decoration:none;color:#fff;text-align:center;display:block">
+																					<?php echo esc_html__( 'Try Again', 'pff-paystack' ); ?>
+																				</span>
 																			</a>
 																		</td>
 																	</tr>
 																</tbody>
 															</table>
+															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">
+																<small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5">
+																	<?php echo esc_html__( 'Use this link below to try again if you encountered any issue while trying to make the payment.', 'pff-paystack' ); ?>
+																</small>
+															</p>
 														</td>
 													</tr>
 												</tbody>
