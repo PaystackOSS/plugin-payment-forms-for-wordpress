@@ -28,6 +28,10 @@ class Setup {
 
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+		add_action( 'init', [ $this, 'init' ] );
+		add_action( 'parse_request', [ $this, 'parse_request' ] );
+		add_action( 'query_vars', [ $this, 'query_vars' ] );
 	}
 
     /**
@@ -143,5 +147,39 @@ class Setup {
 			'fee' => $helpers->get_fees(),
 		];
 		wp_localize_script( KKD_PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args , KKD_PFF_PAYSTACK_VERSION, true, true);
+	}
+
+
+	/**
+	 * Register our payment retry rule.
+	 *
+	 * @return void
+	 */
+	public function init(){
+		add_rewrite_rule( '^paystackinvoice$', 'index.php?pff_paystack_stats=true', 'top' );
+	}
+	
+	/**
+	 * Whitelist the our variable.
+	 *
+	 * @param array $query_vars
+	 * @return array
+	 */
+	public function query_vars( $query_vars ){
+		$query_vars[] = 'pff_paystack_stats';
+		return $query_vars;
+	}
+	
+	/**
+	 * This example checks very early in the process, if the variable is set, we include our page and stop execution after it
+	 *
+	 * @param object $wp
+	 * @return void
+	 */
+	public function parse_request( $wp ) {
+		if ( array_key_exists( 'pff_paystack_stats', $wp->query_vars ) ) {
+			include dirname(__FILE__) . '/includes/paystack-invoice.php';
+			exit();
+		}
 	}
 }
