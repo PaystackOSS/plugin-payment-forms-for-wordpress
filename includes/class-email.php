@@ -145,6 +145,8 @@ class Email {
 
 	public function get_headers() {
 		return array(
+			"MIME-Version: 1.0",
+			"Content-type:text/html;charset=UTF-8",
 			"Reply-To: {$this->reply_to}",
 			"From: {$this->reply_name} <{$this->reply_to}>"
 		);
