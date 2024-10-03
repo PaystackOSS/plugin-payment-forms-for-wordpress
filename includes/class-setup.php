@@ -156,7 +156,11 @@ class Setup {
 	 * @return void
 	 */
 	public function init(){
-		add_rewrite_rule( '^paystackinvoice$', 'index.php?pff_paystack_stats=true', 'top' );
+		add_rewrite_rule(
+			'^paystackinvoice/?$',
+			'index.php?pff_paystack_stats=true&code=$matches[1]',
+			'top'
+		);
 	}
 	
 	/**
@@ -167,6 +171,7 @@ class Setup {
 	 */
 	public function query_vars( $query_vars ){
 		$query_vars[] = 'pff_paystack_stats';
+		//$query_vars[] = 'code';
 		return $query_vars;
 	}
 	
@@ -178,7 +183,7 @@ class Setup {
 	 */
 	public function parse_request( $wp ) {
 		if ( array_key_exists( 'pff_paystack_stats', $wp->query_vars ) ) {
-			include dirname(__FILE__) . '/includes/paystack-invoice.php';
+			include KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/templates/paystack-invoice.php';
 			exit();
 		}
 	}

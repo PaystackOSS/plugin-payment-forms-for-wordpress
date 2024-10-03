@@ -151,7 +151,7 @@ class Email_Invoice extends Email {
 																<tbody>
 																	<tr>
 																		<td class="font_default" style="padding:12px 24px;font-family:Helvetica,Arial,sans-serif;font-size:16px;mso-line-height-rule:exactly;text-align:center;vertical-align:middle;-webkit-border-radius:4px;border-radius:4px;background-color:#666">
-																			<a href="<?php echo esc_url( get_site_url() . '/paystackinvoice/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
+																			<a target="_blank" href="<?php echo esc_url( get_site_url() . '/paystackinvoice/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
 																				<span style="text-decoration:none;color:#fff;text-align:center;display:block">
 																					<?php echo esc_html__( 'Try Again', 'pff-paystack' ); ?>
 																				</span>
