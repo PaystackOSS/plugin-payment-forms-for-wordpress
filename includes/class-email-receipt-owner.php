@@ -34,7 +34,7 @@ class Email_Receipt_Owner extends Email {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'pff_paystack_send_receipt_owner', [ $this, 'send_receipt_owner' ], 10, 7 );
+		add_action( 'pff_paystack_send_receipt', [ $this, 'send_receipt_owner' ], 11, 7 );
 	}
 
 	function send_receipt_owner( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
@@ -69,7 +69,6 @@ class Email_Receipt_Owner extends Email {
 							</tr>
 						</tbody>
 					</table>
-
 					<table class="content" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
@@ -92,7 +91,6 @@ class Email_Receipt_Owner extends Email {
 							</tr>
 						</tbody>
 					</table>
-
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
@@ -151,7 +149,6 @@ class Email_Receipt_Owner extends Email {
 							</tr>
 						</tbody>
 					</table>
-
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>

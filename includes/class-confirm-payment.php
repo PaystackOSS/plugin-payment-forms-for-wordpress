@@ -146,30 +146,28 @@ class Confirm_Payment {
 
 			$this->maybe_create_subscription();
 	
-			/*
-			$sendreceipt = get_post_meta( $payment_array->post_id, '_sendreceipt', true );
+			
+			$sendreceipt = $this->meta['sendreceipt'];
 			if ( 'yes' === $sendreceipt ) {
-				$decoded = json_decode( $payment_array->metadata );
+				$decoded = json_decode( $this->payment_meta->metadata );
 				$fullname = $decoded[1]->value;
-				kkd_pff_paystack_send_receipt(
-					$payment_array->post_id,
-					$currency,
-					$amount_paid,
+
+				/**
+				 * Allow 3rd Party Plugins to hook into the email sending.
+				 * 
+				 * 10: Email_Receipt::send_receipt();
+				 * 11: Email_Receipt_Owner::send_receipt_owner();
+				 */
+				do_action( 'pff_paystack_send_receipt',
+					$this->payment_meta->post_id,
+					$this->payment_meta->currency,
+					$this->payment_meta->amount_paid,
 					$fullname,
-					$payment_array->email,
-					$paystack_ref,
-					$payment_array->metadata
+					$this->payment_meta->email,
+					$this->payment_meta->reference,
+					$this->payment_meta->metadata
 				);
-				kkd_pff_paystack_send_receipt_owner(
-					$payment_array->post_id,
-					$currency,
-					$amount_paid,
-					$fullname,
-					$payment_array->email,
-					$paystack_ref,
-					$payment_array->metadata
-				);
-			}*/
+			}
 		}
 	
 		if ( 'success' === $response['result'] && '' !== $this->meta['redirect'] ) {

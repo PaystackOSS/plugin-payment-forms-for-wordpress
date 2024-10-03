@@ -339,6 +339,8 @@ class Form_Submit {
 
 		/**
 		 * Allow 3rd party plugins to send off an invoice as well
+		 * 
+		 * 11: Email_Invoice::send_invoice();
 		 */
 		if ( 'yes' === $this->meta['sendinvoice'] ) {
 			do_action( 'pff_paystack_send_invoice', $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
