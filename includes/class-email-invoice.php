@@ -24,27 +24,6 @@ class Email_Invoice extends Email {
 	public $slug = 'invoice';
 
 	/**
-	 * The current currency
-	 *
-	 * @var string
-	 */
-	public $currency = '';
-
-	/**
-	 * The amount to be paid
-	 *
-	 * @var string
-	 */
-	public $amount = '';
-
-	/**
-	 * The currency payment code.
-	 *
-	 * @var string
-	 */
-	public $code = '';
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {

@@ -23,11 +23,75 @@ class Email {
 	 */
 	public $slug;
 
+	/**
+	 * The name to whom you are sending the email.
+	 *
+	 * @var string
+	 */
 	public $name = '';
+
+	/**
+	 * The email address you are sending it to.
+	 *
+	 * @var string
+	 */
 	public $email = '';
+
+	/**
+	 * The reply to email address.
+	 *
+	 * @var string
+	 */
 	public $reply_to = '';
+
+	/**
+	 * The reply to name or website name.
+	 *
+	 * @var string
+	 */
 	public $reply_name = '';
+
+	/**
+	 * The subject of the email.
+	 *
+	 * @var string
+	 */
 	public $subject = '';
+
+	/**
+	 * The current currency
+	 *
+	 * @var string
+	 */
+	public $currency = '';
+
+	/**
+	 * The amount to be displayed
+	 *
+	 * @var string
+	 */
+	public $amount = '';
+
+	/**
+	 * The currency payment code.
+	 *
+	 * @var string
+	 */
+	public $code = '';
+
+	/**
+	 * Holds the Form ID
+	 *
+	 * @var integer
+	 */
+	public $form_id = 0;
+
+	/**
+	 * Holds the meta data.
+	 *
+	 * @var string
+	 */
+	public $metadata = '';
 
 	/**
 	 * Constructor
