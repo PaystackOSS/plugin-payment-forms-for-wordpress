@@ -34,6 +34,7 @@ class Email_Receipt_Owner extends Email {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'pff_paystack_send_receipt_owner', [ $this, 'send_receipt_owner' ], 10, 7 );
 	}
 
 	function send_receipt_owner( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
@@ -44,9 +45,10 @@ class Email_Receipt_Owner extends Email {
 		$this->code       = $code;
 		$this->name       = $name;
 		$this->email      = stripslashes( $email );
+		$this->metadata   = $metadata;
 
 		// Custom Values
-		$this->subject     = 'You just received a payment';
+		$this->subject     = __( 'You just received a payment' , 'pff-paystack' );
 		$this->heading     = get_post_meta( $form_id, '_heading', true );
 		$this->sitemessage = get_post_meta( $form_id, '_message', true );
 
@@ -63,44 +65,39 @@ class Email_Receipt_Owner extends Email {
 						<tbody>
 							<tr>
 								<td class="header_cell col-bottom-0" align="center" valign="top" style="padding:0;text-align:center;padding-bottom:16px;border-top:4px solid;border-bottom:0 solid;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="content" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
 								<td class="content_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	
 									<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	
 										<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px">
 											<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
-															<h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42">You just received a payment</h5>
+															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp;</p>
+															<h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php esc_html_e( 'You just received a payment', 'pff-paystack' ); ?></h5>
 														</td>
 													</tr>
 												</tbody>
 											</table>
 										</div>
-	
 									</div>
-	
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
 								<td class="jumbotron_cell invoice_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fafafa;font-size:0!important">
-	
 									<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	
 										<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:left">
 											<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 												<tbody>
@@ -115,32 +112,34 @@ class Email_Receipt_Owner extends Email {
 																		<td class="hspace" style="padding:0;font-size:0;height:8px;overflow:hidden">&nbsp;</td>
 																	</tr>
 																	<tr>
-																		<td class="font_default" style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff">Payment Details</td>
+																		<td class="font_default" style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff">
+																			<?php esc_html_e( 'Payment Details', 'pff-paystack' ); ?>
+																		</td>
 																	</tr>
 																</tbody>
 															</table>
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-																Amount <strong> : <?php echo esc_html($this->currency) . ' ' . number_format($this->amount); ?></strong><br>
-																Email <strong> : <?php echo esc_html($this->email); ?></strong><br>
+																<?php esc_html_e( 'Amount', 'pff-paystack' ); ?> <strong>: <?php echo esc_html( $this->currency ) . ' ' . number_format( $this->amount ); ?></strong><br>
+																<?php esc_html_e( 'Email', 'pff-paystack' ); ?> <strong>: <?php echo esc_html( $this->email ); ?></strong><br>
 																<?php
-																	$new = json_decode($this->metadata);
-																if (array_key_exists("0", $new)) {
-																	foreach ($new as $key => $item) {
-																		if ($item->type == 'text') {
-																			echo esc_html($item->display_name) . "<strong>  :" . $item->value . "</strong><br>";
-																		} else {
-																			echo esc_html($item->display_name) . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
+																	$new = json_decode( $this->metadata );
+																	if ( array_key_exists( "0", $new ) ) {
+																		foreach ( $new as $key => $item ) {
+																			if ( 'text' === $item->type ) {
+																				echo esc_html( $item->display_name ) . '<strong> :' . esc_html( $item->value ) . '</strong><br>';
+																			} else {
+																				echo esc_html( $item->display_name ) . '<strong> : <a target="_blank" href="' . esc_url( $item->value ) . '">' . esc_html__( 'link', 'pff-paystack' ) . '</a></strong><br>';
+																			}
+																		}
+																	} else {
+																		if ( count( $new ) > 0 ) {
+																			foreach ( $new as $key => $item ) {
+																				echo esc_html( $key ) . '<strong> :' . esc_html( $item ) . '</strong><br />';
+																			}
 																		}
 																	}
-																} else {
-																	$text = '';
-																	if (count($new) > 0) {
-																		foreach ($new as $key => $item) {
-																			echo esc_html($key) . "<strong>  :" . $item . "</strong><br />";
-																		}
-																	}
-																} ?>
-																Transaction code: <strong> <?php echo esc_html($this->code); ?></strong><br>
+																?>
+																<?php esc_html_e( 'Transaction code', 'pff-paystack' ); ?>: <strong><?php echo esc_html( $this->code ); ?></strong><br>
 															</p>
 														</td>
 													</tr>
@@ -148,11 +147,11 @@ class Email_Receipt_Owner extends Email {
 											</table>
 										</div>
 									</div>
-	
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>

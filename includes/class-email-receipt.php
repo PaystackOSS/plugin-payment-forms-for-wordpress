@@ -48,6 +48,7 @@ class Email_Receipt extends Email {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'pff_paystack_send_receipt', [ $this, 'send_receipt' ], 10, 7 );
 	}
 
 	public function send_receipt( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
@@ -58,6 +59,7 @@ class Email_Receipt extends Email {
 		$this->code       = $code;
 		$this->name       = $name;
 		$this->email      = stripslashes( $email );
+		$this->metadata   = $metadata;
 
 		// Custom Values
 		$this->subject     = get_post_meta( $form_id, '_subject', true );
@@ -76,47 +78,61 @@ class Email_Receipt extends Email {
 						<tbody>
 							<tr>
 								<td class="header_cell col-bottom-0" align="center" valign="top" style="padding:0;text-align:center;padding-bottom:16px;border-top:4px solid;border-bottom:0 solid;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	
+									<!-- Header content can be included here -->
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="content" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
 								<td class="content_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fff;border-left:4px solid;border-right:4px solid;border-color:#d8dde4;font-size:0!important">
-	
+
 									<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	
+
 										<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px">
 											<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
-															<h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42"><?php echo esc_html($this->heading); ?></h5>
-															<p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">Hello <?php echo strstr($this->name . " ", " ", true); ?>,</p>
-															<p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px"><?php echo esc_html($this->sitemessage); ?></p>
-															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp; </p>
+															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp;</p>
+															<h5 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:16px;margin-bottom:8px;padding:0;font-size:18px;line-height:26px;font-weight:bold;color:#383d42">
+																<?php echo esc_html( $this->heading ); ?>
+															</h5>
+															<p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">
+																<?php 
+																printf(
+																	/* translators: %s: Customer's first name */
+																	esc_html__( 'Hello %s,', 'pff-paystack' ),
+																	esc_html( strstr( $this->name . ' ', ' ', true ) )
+																); 
+																?>
+															</p>
+															<p align="left" style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">
+																<?php echo esc_html( $this->sitemessage ); ?>
+															</p>
+															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:16px;margin-bottom:24px">&nbsp;</p>
 														</td>
 													</tr>
 												</tbody>
 											</table>
 										</div>
-	
+
 									</div>
-	
+
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
 								<td class="jumbotron_cell invoice_cell" align="center" valign="top" style="padding:0;text-align:center;background-color:#fafafa;font-size:0!important">
-	
+
 									<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	
+
 										<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:left">
 											<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 												<tbody>
@@ -131,32 +147,66 @@ class Email_Receipt extends Email {
 																		<td class="hspace" style="padding:0;font-size:0;height:8px;overflow:hidden">&nbsp;</td>
 																	</tr>
 																	<tr>
-																		<td class="font_default" style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff">Your Details</td>
+																		<td class="font_default" style="padding:3px 7px;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:2px;-webkit-border-radius:2px;border-radius:2px;white-space:nowrap;background-color:#666;color:#fff">
+																			<?php esc_html_e( 'Your Details', 'pff-paystack' ); ?>
+																		</td>
 																	</tr>
 																</tbody>
 															</table>
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
-																Amount <strong> : <?php echo esc_html($this->currency) . ' ' . number_format($this->amount); ?></strong><br>
-																Email <strong> : <?php echo esc_html($this->email); ?></strong><br>
+																<?php 
+																printf(
+																	/* translators: %s: Amount */
+																	esc_html__( 'Amount : %s %s', 'pff-paystack' ),
+																	esc_html( $this->currency ),
+																	number_format_i18n( $this->amount )
+																);
+																?><br>
+																<?php 
+																printf(
+																	/* translators: %s: Email */
+																	esc_html__( 'Email : %s', 'pff-paystack' ),
+																	esc_html( $this->email )
+																);
+																?><br>
 																<?php
-																	$new = json_decode($this->metadata);
-																if (array_key_exists("0", $new)) {
-																	foreach ($new as $key => $item) {
-																		if ($item->type == 'text') {
-																			echo esc_html($item->display_name) . "<strong>  :" . $item->value . "</strong><br>";
+																$new = json_decode( $this->metadata );
+																if ( array_key_exists( '0', $new ) ) {
+																	foreach ( $new as $key => $item ) {
+																		if ( 'text' === $item->type ) {
+																			echo sprintf(
+																				/* translators: %1$s: Display name, %2$s: Value */
+																				'%1$s <strong> : %2$s</strong><br>',
+																				esc_html( $item->display_name ),
+																				esc_html( $item->value )
+																			);
 																		} else {
-																			echo esc_html($item->display_name) . "<strong>  : <a target='_blank' href='" . $item->value . "'>link</a></strong><br>";
+																			echo sprintf(
+																				/* translators: %s: Display name */
+																				'%1$s <strong> : <a target="_blank" href="%2$s">link</a></strong><br>',
+																				esc_html( $item->display_name ),
+																				esc_url( $item->value )
+																			);
 																		}
 																	}
 																} else {
-																	$text = '';
-																	if (count($new) > 0) {
-																		foreach ($new as $key => $item) {
-																			echo esc_html($key) . "<strong>  :" . $item . "</strong><br />";
+																	if ( count( (array) $new ) > 0 ) {
+																		foreach ( $new as $key => $item ) {
+																			echo sprintf(
+																				/* translators: %1$s: Key, %2$s: Item */
+																				'%1$s <strong> : %2$s</strong><br>',
+																				esc_html( $key ),
+																				esc_html( $item )
+																			);
 																		}
 																	}
-																} ?>
-																Transaction code: <strong> <?php echo esc_html($this->code); ?></strong><br>
+																}
+																printf(
+																	/* translators: %s: Transaction code */
+																	esc_html__( 'Transaction code: %s', 'pff-paystack' ),
+																	esc_html( $this->code )
+																);
+																?><br>
 															</p>
 														</td>
 													</tr>
@@ -164,36 +214,49 @@ class Email_Receipt extends Email {
 											</table>
 										</div>
 									</div>
-	
+
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="jumbotron" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
 								<td class="jumbotron_cell product_row" align="center" valign="top" style="padding:0 0 16px;text-align:center;background-color:#f2f2f5;border-left:4px solid;border-right:4px solid;border-top:1px solid;border-color:#d8dde4;font-size:0!important">
-	
+
 									<div class="row" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px;margin:0 auto">
-	
+
 										<div class="col-3" style="display:inline-block;width:100%;vertical-align:top;text-align:center;max-width:580px">
 											<table class="column" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;width:100%;vertical-align:top">
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
-															<small style="font-size:86%;font-weight:normal"><strong>Notice</strong><br>
-																You're getting this email because you've made a payment of <?php $this->currency . ' ' . number_format($this->amount); ?> to <a href="<?php echo get_bloginfo('url') ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo get_option('blogname'); ?></a>.</small>
+															<small style="font-size:86%;font-weight:normal">
+																<strong><?php esc_html_e( 'Notice', 'pff-paystack' ); ?></strong><br>
+																<?php
+																printf(
+																	/* translators: %s: Payment amount */
+																	esc_html__( "You're getting this email because you've made a payment of %s to ", 'pff-paystack' ),
+																	esc_html( $this->currency . ' ' . number_format_i18n( $this->amount ) )
+																);
+																?>
+																<a href="<?php echo esc_url( get_bloginfo( 'url' ) ); ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4">
+																	<?php echo esc_html( get_option( 'blogname' ) ); ?>
+																</a>.
+															</small>
 														</td>
 													</tr>
 												</tbody>
 											</table>
 										</div>
-	
+
 									</div>
 								</td>
 							</tr>
 						</tbody>
 					</table>
+
 					<table class="footer" width="100%" border="0" cellspacing="0" cellpadding="0" style="border-spacing:0;mso-table-lspace:0;mso-table-rspace:0">
 						<tbody>
 							<tr>
@@ -204,7 +267,7 @@ class Email_Receipt extends Email {
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#b3b3b5;padding-bottom:0;padding-top:16px">
-															<strong><?php echo get_option('blogname'); ?></strong><br>
+															<strong><?php echo esc_html( get_option( 'blogname' ) ); ?></strong><br>
 														</td>
 													</tr>
 												</tbody>
@@ -225,6 +288,7 @@ class Email_Receipt extends Email {
 							</tr>
 						</tbody>
 					</table>
+
 				</div>
 			</div>
 		</body>
