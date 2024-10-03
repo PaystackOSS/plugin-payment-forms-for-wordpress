@@ -112,6 +112,7 @@ final class Payment_Forms {
 			'email-invoice'        => 'Email_Invoice',
 			'email-receipt'        => 'Email_Receipt',
 			'email-receipt-owner'  => 'Email_Receipt_Owner',
+			'retry-submit'         => 'Retry_Submit',
 		);
 	}
 

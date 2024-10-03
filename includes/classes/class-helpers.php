@@ -555,6 +555,48 @@ class Helpers {
 		return $this->allowed_html;
 	}
 
+	/**
+	 * Retrieve the user's IP address.
+	 *
+	 * @return string User's IP address.
+	 */
+	public function get_the_user_ip() {
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
+	}
+	
+	/**
+	 * Get the DB records by the transaction code supplied.
+	 *
+	 * @param string $code
+	 * @return object
+	 */
+	public function get_db_record( $code ) {
+		global $wpdb;
+		$return = false;
+		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		$record = $wpdb->get_results(
+			$wpdb->prepare(
+					"SELECT * 
+					FROM %i 
+					WHERE txn_code = %s"
+				,
+				$table,
+				$code
+			), 'OBJECT' );
+
+		if ( ! empty( $record ) && isset( $record[0] ) ) {
+			$return = $record[0];
+		}
+		return $return;
+	}
+
 	// FUNCTIONS
 
 	/**
@@ -716,22 +758,6 @@ class Helpers {
 	}
 
 	/**
-	 * Retrieve the user's IP address.
-	 *
-	 * @return string User's IP address.
-	 */
-	public function get_the_user_ip() {
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip;
-	}
-
-	/**
 	 * Generate a new Paystack code.
 	 *
 	 * @param int $length Length of the code to generate. Default 10.
@@ -768,32 +794,6 @@ class Helpers {
 		);
 
 		return ( count( $o_exist ) > 0 );
-	}
-
-	/**
-	 * Get the DB records by the transaction code supplied.
-	 *
-	 * @param string $code
-	 * @return object
-	 */
-	public function get_db_record( $code ) {
-		global $wpdb;
-		$return = false;
-		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
-		$record = $wpdb->get_results(
-			$wpdb->prepare(
-					"SELECT * 
-					FROM %i 
-					WHERE txn_code = %s"
-				,
-				$table,
-				$code
-			), 'OBJECT' );
-
-		if ( ! empty( $record ) && isset( $record[0] ) ) {
-			$return = $record[0];
-		}
-		return $return;
 	}
 
 	/**

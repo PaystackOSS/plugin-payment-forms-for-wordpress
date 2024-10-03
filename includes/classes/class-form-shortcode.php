@@ -487,15 +487,14 @@ class Form_Shortcode {
 		$html = [];
 		$record  = $this->helpers->get_db_record( $code );
 		if ( false !== $record ) {
-			$html[] = 
-				'<div class="content-area main-content" id="primary">
-				    <main role="main" class="site-main" id="main">
-				        <div class="blog_post">
-				            <article class="post-4 page type-page status-publish hentry" id="post-4">
-				                <form action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" enctype="multipart/form-data" class="j-forms retry-form" id="pf-form" novalidate="">';
+			$html[] = '<div class="content-area main-content" id="primary">';
+			$html[] = '<main role="main" class="site-main" id="main">';
+			$html[] = '<div class="blog_post">';
+			$html[] = '<article class="post-4 page type-page status-publish hentry" id="post-4">';
+			$html[] = '<form action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" enctype="multipart/form-data" class="j-forms retry-form" id="pf-form" novalidate="">';
 
-			$html[] = '<input type="hidden" name="action" value="kkd_pff_paystack_retry_action">
-						<input type="hidden" name="code" value="' . esc_html( $code ) . '" />';
+			$html[] = '<input type="hidden" name="action" value="pff_paystack_retry_action">';
+			$html[] = '<input type="hidden" name="code" value="' . esc_html( $code ) . '" />';
 
 
 			$html[] = '<div class="content">';
