@@ -122,7 +122,7 @@ final class Payment_Forms {
 	 */
 	private function include_classes() {
 		foreach ( $this->classes as $key => $name ) {
-			include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-' . $key . '.php';
+			include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-' . $key . '.php';
 			if ( '' !== $name ) {
 				$this->classes[ $key ] = new ( $this->namespace . $name );
 			}

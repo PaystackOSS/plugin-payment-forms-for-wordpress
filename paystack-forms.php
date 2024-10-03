@@ -32,7 +32,7 @@ define('KKD_PFF_PAYSTACK_CROSSOVER_AMOUNT', intval( ( KKD_PFF_PAYSTACK_CROSSOVER
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE', intval( ( KKD_PFF_PAYSTACK_LOCAL_CAP - KKD_PFF_PAYSTACK_ADDITIONAL_CHARGE ) / KKD_PFF_PAYSTACK_PERCENTAGE ) );
 define('KKD_PFF_PAYSTACK_FLATLINE_AMOUNT', KKD_PFF_PAYSTACK_FLATLINE_AMOUNT_PLUS_CHARGE - KKD_PFF_PAYSTACK_LOCAL_CAP );*/
 
-include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/class-paystack-forms.php';
+include_once KKD_PFF_PAYSTACK_PLUGIN_PATH . '/includes/classes/class-paystack-forms.php';
 
 /**
  * Returns an instance of the Paystack Payment forms Object
