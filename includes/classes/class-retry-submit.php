@@ -97,6 +97,8 @@ class Retry_Submit {
 			exit( wp_json_encode( $response ) );	
 		}
 
+		// False positive, we are using isset() to verify it exists before sanitization.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		if ( isset( $_POST['code'] ) && '' !== trim( wp_unslash( $_POST['code'] ) ) ) {
 			$this->code = sanitize_text_field( wp_unslash( $_POST['code'] ) );
 		} else {
@@ -157,6 +159,12 @@ class Retry_Submit {
 			'txnbearer'          => $txnbearer,
 			'transaction_charge' => $transaction_charge,
 		);
+
+		// We create 2 nonces here
+		// 1 incase the payment fails, and the user needs to try again.
+		// 2 if the payment is successful and the confirmation ajax needs to run. 
+		$response['retryNonce'] = wp_create_nonce( 'pff-paystack-retry' );
+		$response['confirmNonce'] = wp_create_nonce( 'pff-paystack-confirm' );
 
 		echo wp_json_encode( $response );
 

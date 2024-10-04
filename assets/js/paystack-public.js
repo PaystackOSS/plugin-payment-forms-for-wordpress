@@ -475,7 +475,9 @@ function PffPaystackFee()
                                     var firstName = names[0] || "";
                                     var lastName = names[1] || "";
                                     var quantity = data.quantity;
-                                    // console.log(firstName+ " - "+lastName);
+                                    
+									$("#pf-nonce").val(data.retryNonce);
+
                                     if (data.plan == "none" || data.plan == "" || data.plan == "no") {
                                         var handler = PaystackPop.setup(
                                             {
@@ -499,6 +501,7 @@ function PffPaystackFee()
                                                             code: response.trxref,
                                                             quantity: quantity,
 															retry: true,
+															nonce: data.confirmNonce
                                                         },
                                                         function (newdata) {
                                                             data = JSON.parse(newdata);
@@ -546,6 +549,7 @@ function PffPaystackFee()
                                                             action: "pff_paystack_confirm_payment",
                                                             code: response.trxref,
 															retry: true,
+															nonce: data.confirmNonce
                                                         },
                                                         function (newdata) {
                                                             data = JSON.parse(newdata);
