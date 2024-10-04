@@ -296,6 +296,8 @@ function PffPaystackFee()
                                     var firstName = names[0] || "";
                                     var lastName = names[1] || "";
                                     var quantity = data.quantity;
+
+									$("#pf-nonce").val(data.invoiceNonce);
                                     
                                     if (data.plan == "none" || data.plan == "" || data.plan == "no") {
                                         var handler = PaystackPop.setup(
@@ -316,9 +318,10 @@ function PffPaystackFee()
                                                     $.post(
                                                         $form.attr("action"),
                                                         {
-														action: "pff_paystack_confirm_payment",
-														code: response.trxref,
-														quantity: quantity
+															action: "pff_paystack_confirm_payment",
+															code: response.trxref,
+															quantity: quantity,
+															nonce: data.confirmNonce
 														},
                                                         function (newdata) {
 															data = JSON.parse(newdata);
@@ -378,7 +381,8 @@ function PffPaystackFee()
                                                         $form.attr("action"),
                                                         {
                                                             action: "pff_paystack_confirm_payment",
-                                                            code: response.trxref
+                                                            code: response.trxref,
+															nonce: data.confirmNonce
                                                           },
                                                         function (newdata) {
                                                             data = JSON.parse(newdata);
@@ -422,7 +426,7 @@ function PffPaystackFee()
 
                                     handler.openIframe();
                                 } else {
-                                    alert(data.message);
+                                    alert(data.error_message);
                                 }
 
                             },

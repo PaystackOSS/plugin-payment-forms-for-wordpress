@@ -101,7 +101,6 @@ class Form_Submit {
 			return false;			
 		}
 
-
 		if ( ! isset( $_POST['pf-id'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-id'] ) ) ) ) {
 			$this->response['result']  = 'failed';
 			$this->response['message'] = __( 'A form ID is required', 'pff-paystack' );
@@ -249,9 +248,6 @@ class Form_Submit {
 	}
 
 	public function submit_action() {
-		/**
-		 * TODO - Needs better security checks - NONCE
-		 */
 		if ( ! $this->valid_submission() ) {
 			// Exit here, for not processing further because of the error
 			exit( wp_json_encode( $this->response ) );
@@ -299,13 +295,9 @@ class Form_Submit {
 		 * This function will exit early if one of the images is too large to be uploaded.
 		 */
 		$this->process_images();
-
 		$this->process_recurring_plans( $amount );
-
 		$this->fixed_metadata = json_decode( wp_json_encode( $this->fixed_metadata, JSON_NUMERIC_CHECK ), true );
 		$this->fixed_metadata = array_merge( $this->untouched, $this->fixed_metadata );
-
-
 
 		$insert = array(
 			'post_id'  => $this->form_data['pf-id'],
@@ -400,10 +392,11 @@ class Form_Submit {
 			'transaction_charge' => $transaction_charge,
 		);
 
-		//-------------------------------------------------------------------------------------------
-
-		// $pstk_logger = new paystack_plugin_tracker('pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey());
-		// $pstk_logger->log_transaction_attempt($code);*/
+		// We create 2 nonces here
+		// 1 incase the payment fails, and the user needs to try again.
+		// 2 if the payment is successful and the confirmation ajax needs to run. 
+		$response['invoiceNonce'] = wp_create_nonce( 'pff-paystack-invoice' );
+		$response['confirmNonce'] = wp_create_nonce( 'pff-paystack-confirm' );
 
 		echo wp_json_encode( $response );
 		die();

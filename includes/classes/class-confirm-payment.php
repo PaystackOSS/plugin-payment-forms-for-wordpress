@@ -102,6 +102,18 @@ class Confirm_Payment {
 	 * Confirm Payment Functionality.
 	 */
 	public function confirm_payment() {
+
+		if ( ! isset( $_POST['nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'pff-paystack-confirm' ) ) {
+			$response = array(
+				'error' => true,
+				'error_message' => __( 'Nonce verification is required.', 'pff-paystack' ),
+			);
+	
+			exit( wp_json_encode( $response ) );	
+		}
+
+		// This is a false positive, we are using isset as WPCS suggest in the PCP plugin.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		if ( ! isset( $_POST['code'] ) || '' === trim( wp_unslash( $_POST['code'] ) ) ) {
 			$response = array(
 				'error' => true,
@@ -202,7 +214,10 @@ class Confirm_Payment {
 
 		if ( 'yes' === $usequantity ) {
 			$quantity = 1;
+			// Nonce is checked above in the parent function confirm_payment().
+			// phpcs:ignore WordPress.Security.NonceVerification
 			if ( isset( $_POST['quantity'] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification
 				$quantity = (int) sanitize_text_field( wp_unslash( $_POST['quantity'] ) );
 			}
 			$sold     = $this->meta['sold'];

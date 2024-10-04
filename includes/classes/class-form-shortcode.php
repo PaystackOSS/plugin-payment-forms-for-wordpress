@@ -499,7 +499,7 @@ class Form_Shortcode {
 
 			$html[] = '<input type="hidden" name="action" value="pff_paystack_retry_action">';
 			$html[] = '<input type="hidden" name="code" value="' . esc_html( $code ) . '" />';
-
+			$html[] = wp_nonce_field( 'pff-paystack-retry', 'pf-nonce', true, false );
 
 			$html[] = '<div class="content">';
 			

@@ -88,6 +88,15 @@ class Retry_Submit {
 	 * @return void
 	 */
 	public function retry_action() {
+		if ( ! isset( $_POST['pf-nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pf-nonce'] ) ), 'pff-paystack-retry' ) ) {
+			$response = array(
+				'result'  => 'failed',
+				'message' => __( 'Nonce verification is required.', 'pff-paystack' ),
+			);
+			// Exit here, for not processing further because of the error.
+			exit( wp_json_encode( $response ) );	
+		}
+
 		if ( isset( $_POST['code'] ) && '' !== trim( wp_unslash( $_POST['code'] ) ) ) {
 			$this->code = sanitize_text_field( wp_unslash( $_POST['code'] ) );
 		} else {
