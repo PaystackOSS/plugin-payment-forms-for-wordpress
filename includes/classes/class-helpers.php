@@ -577,7 +577,7 @@ class Helpers {
 	 * @param string $code
 	 * @return object
 	 */
-	public function get_db_record( $code ) {
+	public function get_db_record( $code, $column = 'txn_code' ) {
 		global $wpdb;
 		$return = false;
 		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
@@ -585,9 +585,10 @@ class Helpers {
 			$wpdb->prepare(
 					"SELECT * 
 					FROM %i 
-					WHERE txn_code = %s"
+					WHERE %i = %s"
 				,
 				$table,
+				$column,
 				$code
 			), 'OBJECT' );
 
