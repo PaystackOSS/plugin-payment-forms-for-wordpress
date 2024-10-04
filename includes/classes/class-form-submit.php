@@ -95,7 +95,7 @@ class Form_Submit {
 	 */
 	protected function valid_submission() {
 		
-		if ( ! isset( $_POST['pf-nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pf-nonce'] ) ) ) ) {
+		if ( ! isset( $_POST['pf-nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pf-nonce'] ) ), 'pff-paystack-invoice' ) ) {
 			$this->response['result']  = 'failed';
 			$this->response['message'] = __( 'Nonce verification is required.', 'pff-paystack' );
 			return false;			
