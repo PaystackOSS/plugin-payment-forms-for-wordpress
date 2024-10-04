@@ -94,7 +94,10 @@ class Field_Shortcodes {
 
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . '" ' . esc_attr( $required ) . '></textarea></div></div>';
+		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . 
+		// translators: %s: textarea field to be entered by the user
+		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
+		'" ' . esc_attr( $required ) . '></textarea></div></div>';
 
 		return $code;
 	}
@@ -210,7 +213,10 @@ class Field_Shortcodes {
 	
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . '" ' . esc_attr( $required ) . ' /></div></div>';
+		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . 
+		// translators: %s: datepicker field to be selected by the user
+		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
+		'" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}

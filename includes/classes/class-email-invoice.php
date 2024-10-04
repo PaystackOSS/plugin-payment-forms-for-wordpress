@@ -125,7 +125,7 @@ class Email_Invoice extends Email {
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#888">
-															<small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo date('F j,Y'); ?></small>
+															<small class="text-muted" style="font-size:86%;font-weight:normal;color:#b3b3b5"><?php echo esc_html( gmdate('F j,Y') ); ?></small>
 															<h6 style="font-family:Helvetica,Arial,sans-serif;margin-left:0;margin-right:0;margin-top:0;margin-bottom:8px;padding:0;font-size:16px;line-height:24px;font-weight:bold;color:#666"><?php echo esc_html( $this->name ); ?></h6>
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:8px"><?php echo esc_html( $this->email ); ?></p>
 														</td>
@@ -206,7 +206,7 @@ class Email_Invoice extends Email {
 												<tbody>
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:left;vertical-align:top;color:#b3b3b5;padding-bottom:0;padding-top:16px">
-															<strong><?php echo get_option('blogname'); ?></strong><br>
+															<strong><?php echo esc_html( get_option('blogname') ); ?></strong><br>
 														</td>
 													</tr>
 												</tbody>

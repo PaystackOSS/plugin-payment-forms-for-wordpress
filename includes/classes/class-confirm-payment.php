@@ -269,7 +269,8 @@ class Confirm_Payment {
 			} else {
 				if ( $this->oamount !== $amount_paid ) {
 					$return = [
-						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %s<b>%s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
+						// translators: %1$s: currency, %2$s: formatted amount required
+						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %1$s<b>%2$s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
 						'result' => 'failed',
 					];
 				} else {

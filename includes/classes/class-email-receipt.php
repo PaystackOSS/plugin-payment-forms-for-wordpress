@@ -163,7 +163,7 @@ class Email_Receipt extends Email {
 																	// translators: %1$s is the currency code, %2$s is the formatted amount
 																	esc_html__( 'Amount : %1$s %2$s', 'pff-paystack' ),
 																	esc_html( $this->currency ),
-																	number_format_i18n( $this->amount )
+																	esc_html( number_format_i18n( $this->amount ) )
 																);
 																?><br>
 																<?php 

@@ -561,15 +561,19 @@ class Helpers {
 	 * @return string User's IP address.
 	 */
 	public function get_the_user_ip() {
+		$ip = '';
+
 		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
 		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
 		}
+
 		return $ip;
 	}
+
 	
 	/**
 	 * Get the DB records by the transaction code supplied.
@@ -770,7 +774,7 @@ class Helpers {
 		$random_string     = '';
 
 		for ( $i = 0; $i < $length; $i++ ) {
-			$random_string .= $characters[ rand( 0, $characters_length - 1 ) ];
+			$random_string .= $characters[ wp_rand( 0, $characters_length - 1 ) ];
 		}
 
 		return time() . '_' . $random_string;
@@ -786,16 +790,16 @@ class Helpers {
 	public function check_code( $code ) {
 		global $wpdb;
 		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
-
 		$o_exist = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$table} WHERE txn_code = %s",
+				"SELECT * FROM %i WHERE txn_code = %s",
+				$table,
 				$code
 			)
 		);
-
 		return ( count( $o_exist ) > 0 );
 	}
+
 
 	/**
 	 * Takes the amount and processes the "transactional" fees.
