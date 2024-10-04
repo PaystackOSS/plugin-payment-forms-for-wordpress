@@ -19,7 +19,7 @@ class Confirm_Payment {
 	/**
 	 * The helpers class.
 	 *
-	 * @var object
+	 * @var \paystack\payment_forms\Helpers
 	 */
 	public $helpers;
 
@@ -66,6 +66,14 @@ class Confirm_Payment {
 	protected $oamount = 0;
 
 	/**
+	 * The transaction column to update.
+	 * Defaults to 'txn_code' and 'txn_code_2' when a payment retry is triggered.
+	 *
+	 * @var integer
+	 */
+	protected $txn_column = 'txn_code';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -74,13 +82,12 @@ class Confirm_Payment {
 	}
 
 	/**
-	 * Undocumented function
+	 * Sets up our data for processing.
 	 *
 	 * @return void
 	 */
 	protected function setup_data( $payment ) {
 		$this->payment_meta = $payment;
-		$this->helpers      = new Helpers();
 		$this->meta         = $this->helpers->parse_meta_values( get_post( $this->payment_meta->post_id ) );
 		$this->amount       = $this->payment_meta->amount;
 		$this->oamount      = $this->meta['amount'];
@@ -103,13 +110,18 @@ class Confirm_Payment {
 	
 			exit( wp_json_encode( $response ) );
 		}
+
+		// If this is a retry payment then set the colum accordingly.
+		if ( isset( $_POST['retry'] ) ) {
+			$this->txn_column = 'txn_code_2';
+		}
 	
-	
-		$code   = sanitize_text_field( $_POST['code'] );
-		$record = $this->helpers->get_db_record( $code );
+		$this->helpers = new Helpers();
+		$code          = sanitize_text_field( $_POST['code'] );
+		$record        = $this->helpers->get_db_record( $code, $this->txn_column );
 
 		if ( false !== $record ) {
-			
+
 			$this->setup_data( $record );
 
 			// Verify our transaction with the Paystack API.
@@ -221,7 +233,6 @@ class Confirm_Payment {
 			'result' => 'failed',
 		];
 
-		$customer_code  = $data->customer->customer_code;
 		$amount_paid    = $data->amount / 100;
 		$paystack_ref   = $data->reference;
 		$paid_at        = $data->transaction_date;
@@ -233,7 +244,7 @@ class Confirm_Payment {
 					'amount'  => $amount_paid,
 					'paid_at' => $paid_at,
 				),
-				array( 'txn_code' => $paystack_ref )
+				array( $this->txn_column => $paystack_ref )
 			);
 			$return = [
 				'message' => $this->meta['successmsg'],
@@ -249,7 +260,7 @@ class Confirm_Payment {
 						'amount'  => $amount_paid,
 						'paid_at' => $paid_at,
 					),
-					array( 'txn_code' => $paystack_ref )
+					array( $this->txn_column => $paystack_ref )
 				);
 				$return = [
 					'message' => $this->meta['successmsg'],
@@ -268,7 +279,7 @@ class Confirm_Payment {
 							'paid'    => 1,
 							'paid_at' => $paid_at,
 						),
-						array( 'txn_code' => $paystack_ref )
+						array( $this->txn_column => $paystack_ref )
 					);
 					$return = [
 						'message' => $this->meta['successmsg'],

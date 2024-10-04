@@ -74,6 +74,13 @@ class Form_Submit {
 	protected $fixed_metadata = array();
 
 	/**
+	 * The URL from where this was submitted.
+	 *
+	 * @var string
+	 */
+	protected $referer_url = '';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -132,6 +139,11 @@ class Form_Submit {
 		// Make sure we always have 1 quantity being purchased.
 		if ( ! isset( $this->form_data['pf-quantity'] ) ) {
 			$this->form_data['pf-quantity'] = 1;
+		}
+
+		if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+			// Get the referer URL
+			$this->referer_url = sanitize_url( $_SERVER['HTTP_REFERER'] );
 		}
 	}
 
@@ -343,7 +355,7 @@ class Form_Submit {
 		 * 11: Email_Invoice::send_invoice();
 		 */
 		if ( 'yes' === $this->meta['sendinvoice'] ) {
-			do_action( 'pff_paystack_send_invoice', $this->form_id, $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code );
+			do_action( 'pff_paystack_send_invoice', $this->form_id, $this->meta['currency'], $insert['amount'], $this->form_data['pf-fname'], $insert['email'], $code, $this->referer_url );
 		}
 
 		$transaction_charge = (int) $this->meta['merchantamount'];

@@ -24,10 +24,17 @@ class Email_Invoice extends Email {
 	public $slug = 'invoice';
 
 	/**
+	 * The form in which this was submitted.
+	 *
+	 * @var string
+	 */
+	public $referer_url = '';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'pff_paystack_send_invoice', [ $this, 'send_invoice' ], 10, 6 );
+		add_action( 'pff_paystack_send_invoice', [ $this, 'send_invoice' ], 10, 7 );
 	}
 
 	/**
@@ -41,13 +48,15 @@ class Email_Invoice extends Email {
 	 * @param string $code
 	 * @return void
 	 */
-	public function send_invoice( $form_id, $currency, $amount, $name, $email, $code ) {
-		$this->form_id    = $form_id;
-		$this->amount     = $amount;
-		$this->currency   = $currency;
-		$this->code       = $code;
-		$this->name       = $name;
-		$this->email      = stripslashes( $email );
+	public function send_invoice( $form_id, $currency, $amount, $name, $email, $code, $referer_url ) {
+		$this->form_id     = $form_id;
+		$this->amount      = $amount;
+		$this->currency    = $currency;
+		$this->code        = $code;
+		$this->name        = $name;
+		$this->email       = stripslashes( $email );
+		$this->referer_url = $referer_url;
+
 		/* Translators: %1$s is the currency code, %2$s is the formatted amount */
 		$this->subject = sprintf(
 			__( 'Payment Invoice for %1$s %2$s', 'text-domain' ),
@@ -163,7 +172,7 @@ class Email_Invoice extends Email {
 																<tbody>
 																	<tr>
 																		<td class="font_default" style="padding:12px 24px;font-family:Helvetica,Arial,sans-serif;font-size:16px;mso-line-height-rule:exactly;text-align:center;vertical-align:middle;-webkit-border-radius:4px;border-radius:4px;background-color:#666">
-																			<a target="_blank" href="<?php echo esc_url( get_permalink( $this->form_id ) . '/?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
+																			<a target="_blank" href="<?php echo esc_url( $this->referer_url . '?code=' . $this->code ); ?>" style="display:block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#fff;font-weight:bold;text-align:center">
 																				<span style="text-decoration:none;color:#fff;text-align:center;display:block">
 																					<?php echo esc_html__( 'Try Again', 'pff-paystack' ); ?>
 																				</span>
