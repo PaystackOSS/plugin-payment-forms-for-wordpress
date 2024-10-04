@@ -405,18 +405,9 @@ function PffPaystackFee()
                                                                         );
                                                                     }
                                                                 );
-                                                                  $(".pf-txncharge")
-                                                                  .hide()
-                                                                  .html("NGN0")
-                                                                  .show()
-                                                                  .digits();
-                                                                  $(".pf-txntotal")
-                                                                  .hide()
-                                                                  .html("NGN0")
-                                                                  .show()
-                                                                  .digits();
+																calculateFees();
 
-                                                                  $.unblockUI();
+                                                            	$.unblockUI();
                                                             } else {
                                                                 self.before('<div class="alert-danger">' + data.message + '</div>');
                                                                 $.unblockUI();
@@ -500,47 +491,25 @@ function PffPaystackFee()
                                                     $.post(
                                                         $form.attr("action"),
                                                         {
-                                                            action: "kkd_pff_paystack_rconfirm_payment",
+                                                            action: "pff_paystack_confirm_payment",
                                                             code: response.trxref,
-                                                            quantity: quantity
-                                                              },
+                                                            quantity: quantity,
+															retry: true,
+                                                        },
                                                         function (newdata) {
                                                             data = JSON.parse(newdata);
                                                             if (data.result == "success2") {
                                                                 window.location.href = data.link;
                                                             }
                                                             if (data.result == "success") {
-                                                                $(".retry-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".retry-form").offset().top - 110 },
-                                                                    500
-                                                                );
+																// Get the current URL
+																const currentUrl = window.location.href;
 
-                                                                self.before('<div class="alert-success">' + data.message + '</div>');
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
-                                                                    function () {
-                                                                        $(this).css(
-                                                                            {
-                                                                                "border-color": "#d1d1d1",
-                                                                                "background-color": "#fff"
-                                                                                      }
-                                                                        );
-                                                                    }
-                                                                );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $("#submitbtn").remove();
-                                                                $.unblockUI();
+																// Use URL object to parse the current URL
+																const url = new URL( currentUrl );
+
+																// Redirect to the same URL without query parameters
+																window.location.href = url.origin + url.pathname;
                                                             } else {
                                                                 self.before('<div class="alert-success">' + data.message + '</div>');
                                                                 $.unblockUI();
@@ -570,8 +539,9 @@ function PffPaystackFee()
                                                     $.post(
                                                         $form.attr("action"),
                                                         {
-                                                            action: "kkd_pff_paystack_rconfirm_payment",
-                                                            code: response.trxref
+                                                            action: "pff_paystack_confirm_payment",
+                                                            code: response.trxref,
+															retry: true,
                                                         },
                                                         function (newdata) {
                                                             data = JSON.parse(newdata);
@@ -579,37 +549,14 @@ function PffPaystackFee()
                                                                 window.location.href = data.link;
                                                             }
                                                             if (data.result == "success") {
-                                                                $(".retry-form")[0].reset();
-                                                                $("html,body").animate(
-                                                                    { scrollTop: $(".retry-form").offset().top - 110 },
-                                                                    500
-                                                                );
+																// Get the current URL
+																const currentUrl = window.location.href;
 
-                                                                self.before('<div class="alert-success">' + data.message + '</div>');
-                                                                $(this)
-                                                                .find("input, select, textarea")
-                                                                .each(
-                                                                    function () {
-                                                                            $(this).css(
-                                                                                {
-                                                                                    "border-color": "#d1d1d1",
-                                                                                    "background-color": "#fff"
-                                                                                }
-                                                                            );
-                                                                    }
-                                                                );
-                                                                $(".pf-txncharge")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $(".pf-txntotal")
-                                                                .hide()
-                                                                .html("NGN0")
-                                                                .show()
-                                                                .digits();
-                                                                $("#submitbtn").remove();
-                                                                $.unblockUI();
+																// Use URL object to parse the current URL
+																const url = new URL(currentUrl);
+
+																// Redirect to the same URL without query parameters
+																window.location.href = url.origin + url.pathname;
                                                             } else {
                                                                 self.before('<div class="alert-danger">' + data.message + '</div>');
                                                                 $.unblockUI();
