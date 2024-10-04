@@ -237,6 +237,7 @@ class Confirm_Payment {
 		$paystack_ref   = $data->reference;
 		$paid_at        = $data->transaction_date;
 		if ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->update(
 				$table,
 				array(
@@ -253,6 +254,7 @@ class Confirm_Payment {
 		} else {
 			// If this the price paid was free, or if it was a variable amount.
 			if ( 0 === (int) $this->oamount || 1 === $this->meta['usevariableamount'] ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$wpdb->update(
 					$table,
 					array(
@@ -274,6 +276,7 @@ class Confirm_Payment {
 						'result' => 'failed',
 					];
 				} else {
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 					$wpdb->update(
 						$table,
 						array(

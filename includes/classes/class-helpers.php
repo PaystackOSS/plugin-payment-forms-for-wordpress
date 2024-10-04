@@ -585,6 +585,7 @@ class Helpers {
 		global $wpdb;
 		$return = false;
 		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$record = $wpdb->get_results(
 			$wpdb->prepare(
 					"SELECT * 
@@ -790,6 +791,7 @@ class Helpers {
 	public function check_code( $code ) {
 		global $wpdb;
 		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$o_exist = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM %i WHERE txn_code = %s",

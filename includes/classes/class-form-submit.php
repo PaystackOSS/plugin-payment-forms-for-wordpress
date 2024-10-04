@@ -309,7 +309,8 @@ class Form_Submit {
 			'txn_code' => $code,
 			'metadata' => wp_json_encode( $this->fixed_metadata ),
 		);
-
+		
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$exist = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * 
@@ -333,6 +334,7 @@ class Form_Submit {
 		);
 
 		if ( count( $exist ) > 0 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->update(
 				$table,
 				array(
@@ -344,6 +346,7 @@ class Form_Submit {
 				)
 			);
 		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->insert(
 				$table,
 				$insert

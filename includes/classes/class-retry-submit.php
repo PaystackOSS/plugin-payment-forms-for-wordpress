@@ -184,6 +184,7 @@ class Retry_Submit {
 			$this->new_code,
 			$this->code
 		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$return = $wpdb->query( $sql );
 		return $return;
 	}
