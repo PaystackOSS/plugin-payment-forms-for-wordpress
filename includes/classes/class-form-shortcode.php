@@ -373,11 +373,11 @@ class Form_Shortcode {
 	 */
 	public function get_agreement_field() {
 		$html = '';
-		if ( $this->meta['useagreement'] == 'yes' ) {
+		if ( 'yes' === $this->meta['useagreement'] ) {
 		$html = '<div class="span12 unit">
 					<label class="checkbox">
 						<input type="checkbox" name="agreement" id="pf-agreement" required value="yes">
-						<i></i>
+						<i id="pf-agreementicon"></i>
 						Accept terms <a target="_blank" href="' . esc_url( $this->meta['agreementlink'] ) . '">Link</a>
 					</label>
 				</div><br>';

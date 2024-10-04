@@ -215,6 +215,7 @@ class Form_Submit {
 				if ( $value['size'] > 0 ) {
 					if ( $value['size'] > $max_file_size ) {
 						$response['result']  = 'failed';
+						// translators: %s: maximum upload file size in MB
 						$response['message'] = sprintf( __( 'Max upload size is %sMB', 'pff-paystack' ), $this->meta['filelimit'] );
 						exit( wp_json_encode( $response ) );
 					} else {

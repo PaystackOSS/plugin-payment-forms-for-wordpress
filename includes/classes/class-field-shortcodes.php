@@ -57,7 +57,10 @@ class Field_Shortcodes {
 	
 		$code .= '</label>
 			<div class="input">
-				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . '" ' . esc_attr( $required ) . ' /></div></div>';
+				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . 
+				// translators: %s: input field name to be entered by the user
+				sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
+				'" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}

@@ -160,16 +160,16 @@ class Email_Receipt extends Email {
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
 																<?php 
 																printf(
-																	/* translators: %s: Amount */
-																	esc_html__( 'Amount : %s %s', 'pff-paystack' ),
+																	// translators: %1$s is the currency code, %2$s is the formatted amount
+																	esc_html__( 'Amount : %1$s %2$s', 'pff-paystack' ),
 																	esc_html( $this->currency ),
 																	number_format_i18n( $this->amount )
 																);
 																?><br>
 																<?php 
 																printf(
-																	/* translators: %s: Email */
-																	esc_html__( 'Email : %s', 'pff-paystack' ),
+																	/* translators: %1$s is the Email */
+																	esc_html__( 'Email : %1$s', 'pff-paystack' ),
 																	esc_html( $this->email )
 																);
 																?><br>
