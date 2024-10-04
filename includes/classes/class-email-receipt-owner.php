@@ -164,7 +164,7 @@ class Email_Receipt_Owner extends Email {
 													<tr>
 														<td class="column_cell font_default" align="center" valign="top" style="padding:16px 16px 0;font-family:Helvetica,Arial,sans-serif;font-size:15px;text-align:center;vertical-align:top;color:#888">
 															<small style="font-size:86%;font-weight:normal"><strong><?php echo esc_html__( 'Notice', 'pff-paystack' ); ?></strong><br>
-															<?php echo esc_html__( 'You\'re getting this email because someone made a payment of', 'pff-paystack' ); ?> <?php $this->currency . ' ' . number_format($this->amount); ?> <?php echo esc_html__( 'to', 'pff-paystack' ); ?> <a href="<?php echo get_bloginfo( 'url' ) ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo esc_html( get_option( 'blogname' ) ); ?></a>.</small>
+															<?php echo esc_html__( 'You\'re getting this email because someone made a payment of', 'pff-paystack' ); ?> <?php echo esc_html( $this->currency . ' ' . number_format( $this->amount ) ); ?> <?php echo esc_html__( 'to', 'pff-paystack' ); ?> <a href="<?php echo esc_html( get_bloginfo( 'url' ) ); ?>" style="display:inline-block;text-decoration:none;font-family:Helvetica,Arial,sans-serif;color:#2f68b4"><?php echo esc_html( get_option( 'blogname' ) ); ?></a>.</small>
 														</td>
 													</tr>
 												</tbody>

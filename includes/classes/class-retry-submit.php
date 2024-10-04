@@ -73,9 +73,7 @@ class Retry_Submit {
 	 */
 	protected function setup_data() {
 		$this->helpers   = new Helpers();
-		$this->code      = sanitize_text_field( $_POST['code'] );
 		$this->new_code  = $this->generate_code() . '_2';
-
 		$retry_record    = $this->helpers->get_db_record( $this->code );
 		if ( false !== $retry_record ) {
 			$this->retry_meta = $retry_record;
@@ -90,12 +88,13 @@ class Retry_Submit {
 	 * @return void
 	 */
 	public function retry_action() {
-		if ( '' === trim( $_POST['code'] ) ) {
+		if ( isset( $_POST['code'] ) && '' !== trim( wp_unslash( $_POST['code'] ) ) ) {
+			$this->code = sanitize_text_field( wp_unslash( $_POST['code'] ) );
+		} else {
 			$response = array(
 				'result'  => 'failed',
 				'message' => __( 'Code is required', 'pff-paystack' ),
 			);
-
 			// Exit here, for not processing further because of the error.
 			exit( wp_json_encode( $response ) );
 		}
@@ -178,14 +177,15 @@ class Retry_Submit {
 		global $wpdb;
 		$return = false;
 		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
-		$sql = $wpdb->prepare(
-			"UPDATE %i SET txn_code_2 = %s WHERE txn_code = %s",
-			$table,
-			$this->new_code,
-			$this->code
-		);
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$return = $wpdb->query( $sql );
+		$return = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE %i SET txn_code_2 = %s WHERE txn_code = %s",
+				$table,
+				$this->new_code,
+				$this->code
+			)
+		);
 		return $return;
 	}
 }

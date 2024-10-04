@@ -137,7 +137,7 @@ class Setup {
 
 		wp_enqueue_script( 'blockUI', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/jquery.blockUI.min.js', array( 'jquery', 'jquery-ui-core' ), PFF_PAYSTACK_VERSION, true, true );
 
-		wp_register_script( 'Paystack', 'https://js.paystack.co/v1/inline.js', false, '1' );
+		wp_register_script( 'Paystack', 'https://js.paystack.co/v1/inline.js', false, true );
 		wp_enqueue_script( 'Paystack' );
 
 		wp_enqueue_script( PFF_PLUGIN_NAME . '-public', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-public.js', array( 'jquery' ), PFF_PAYSTACK_VERSION, true, true);

@@ -188,6 +188,8 @@ class Form_Shortcode {
 	 * @return void
 	 */
 	public function get_code() {
+		// We ignore this as we are not performing any update action with the data 
+		// phpcs:ignore WordPress.Security.NonceVerification
 		$code = isset( $_GET['code'] ) ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
 		return $code;
 	}
@@ -268,7 +270,9 @@ class Form_Shortcode {
 				<input type="hidden" name="pf-id" value="' . esc_attr( $this->form->ID ) . '" />
 				<input type="hidden" name="pf-user_id" value="' . esc_attr( $this->user['id'] ) . '" />
 				<input type="hidden" name="pf-recur" value="' . esc_attr( $this->meta['recur'] ) . '" />
-				<input type="hidden" name="pf-currency" id="pf-currency" value="' . $this->meta['currency'] . '" />';
+				<input type="hidden" name="pf-currency" id="pf-currency" value="' . $this->meta['currency'] . '" />' . 
+				wp_nonce_field( 'pff-paystack-invoice', 'pf-nonce', true, false );
+				;
 		return $html;
 	}
 	

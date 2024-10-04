@@ -98,15 +98,15 @@ class Form_Submit {
 		/**
 		 * TODO - Needs better security checks - NONCE
 		 */
-		if ( ! isset( $_POST['pf-id'] ) || '' == trim( sanitize_text_field( $_POST['pf-id'] ) ) ) {
+		if ( ! isset( $_POST['pf-id'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-id'] ) ) ) ) {
 			$this->response['result']  = 'failed';
 			$this->response['message'] = 'A form ID is required';
 			return false;
 		} else {
-			$this->form_id = sanitize_text_field( $_POST['pf-id'] );
+			$this->form_id = sanitize_text_field( wp_unslash( $_POST['pf-id'] ) );
 		}
 
-		if ( '' == trim( sanitize_text_field( $_POST['pf-pemail'] ) ) ) {
+		if ( ! isset( $_POST['pf-pemail'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-pemail'] ) ) ) ) {
 			$this->response['result']  = 'failed';
 			$this->response['message'] = 'Email is required';
 			return false;
@@ -143,7 +143,7 @@ class Form_Submit {
 
 		if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
 			// Get the referer URL
-			$this->referer_url = sanitize_url( $_SERVER['HTTP_REFERER'] );
+			$this->referer_url = sanitize_url( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
 		}
 	}
 
@@ -314,7 +314,7 @@ class Form_Submit {
 		$exist = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * 
-					FROM {$table} 
+					FROM %i
 					WHERE post_id = %s 
 					AND email = %s 
 					AND user_id = %s 
@@ -323,6 +323,7 @@ class Form_Submit {
 					AND ip = %s 
 					AND paid = '0' 
 					AND metadata = %s",
+				$table,
 				$insert['post_id'], 
 				$insert['email'],
 				$insert['user_id'],

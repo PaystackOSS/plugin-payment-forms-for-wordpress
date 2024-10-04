@@ -102,7 +102,7 @@ class Confirm_Payment {
 	 * Confirm Payment Functionality.
 	 */
 	public function confirm_payment() {
-		if ( trim( $_POST['code'] ) === '' ) {
+		if ( ! isset( $_POST['code'] ) || '' === trim( wp_unslash( $_POST['code'] ) ) ) {
 			$response = array(
 				'error' => true,
 				'error_message' => __( 'Did you make a payment?', 'pff-paystack' ),
@@ -117,7 +117,7 @@ class Confirm_Payment {
 		}
 	
 		$this->helpers = new Helpers();
-		$code          = sanitize_text_field( $_POST['code'] );
+		$code          = sanitize_text_field( wp_unslash( $_POST['code'] ) );
 		$record        = $this->helpers->get_db_record( $code, $this->txn_column );
 
 		if ( false !== $record ) {
@@ -198,10 +198,13 @@ class Confirm_Payment {
 	 */
 	protected function update_sold_inventory() {
 		$usequantity = $this->meta['usequantity'];
-		$sold        = $this->meta['sold'];
+		$sold        = (int) $this->meta['sold'];
 
 		if ( 'yes' === $usequantity ) {
-			$quantity = $_POST['quantity'];
+			$quantity = 1;
+			if ( isset( $_POST['quantity'] ) ) {
+				$quantity = (int) sanitize_text_field( wp_unslash( $_POST['quantity'] ) );
+			}
 			$sold     = $this->meta['sold'];
 
 			if ( '' === $sold ) {
@@ -298,7 +301,7 @@ class Confirm_Payment {
 	protected function maybe_create_subscription() {
 		// Create a "subscription" and attach it to the current plan code.
 		if ( 1 == $this->meta['startdate_enabled'] && ! empty( $this->meta['startdate_days'] ) && ! empty( $this->meta['startdate_plan_code'] ) ) {
-			$start_date = date( 'c', strtotime( '+' . $this->meta['startdate_days'] . ' days' ) );
+			$start_date = gmdate( 'c', strtotime( '+' . $this->meta['startdate_days'] . ' days' ) );
 			$body       = array(
 				'start_date' => $start_date,
 				'plan'       => $this->meta['startdate_plan_code'],
