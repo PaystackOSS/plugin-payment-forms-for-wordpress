@@ -95,12 +95,16 @@ class Form_Submit {
 	 */
 	protected function valid_submission() {
 		
-		/**
-		 * TODO - Needs better security checks - NONCE
-		 */
+		if ( ! isset( $_POST['pf-nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pf-nonce'] ) ) ) ) {
+			$this->response['result']  = 'failed';
+			$this->response['message'] = __( 'Nonce verification is required.', 'pff-paystack' );
+			return false;			
+		}
+
+
 		if ( ! isset( $_POST['pf-id'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-id'] ) ) ) ) {
 			$this->response['result']  = 'failed';
-			$this->response['message'] = 'A form ID is required';
+			$this->response['message'] = __( 'A form ID is required', 'pff-paystack' );
 			return false;
 		} else {
 			$this->form_id = sanitize_text_field( wp_unslash( $_POST['pf-id'] ) );
@@ -108,7 +112,7 @@ class Form_Submit {
 
 		if ( ! isset( $_POST['pf-pemail'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-pemail'] ) ) ) ) {
 			$this->response['result']  = 'failed';
-			$this->response['message'] = 'Email is required';
+			$this->response['message'] = __( 'Email is required', 'pff-paystack' );
 			return false;
 		}
 		return true;
@@ -210,7 +214,11 @@ class Form_Submit {
 	 */
 	public function process_images() {
 		$max_file_size = $this->meta['filelimit'] * 1024 * 1024;
+
+		// Our nonce is checked in the Form_Submit::valid_submission() function
+		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( ! empty( $_FILES ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification
 			foreach ( $_FILES as $key_name => $value ) {
 				if ( $value['size'] > 0 ) {
 					if ( $value['size'] > $max_file_size ) {
