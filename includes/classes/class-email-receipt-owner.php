@@ -40,6 +40,7 @@ class Email_Receipt_Owner extends Email {
 	function send_receipt_owner( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
 
 		// Default Values
+		$this->slug       = 'receipt_owner';
 		$this->amount     = $amount;
 		$this->currency   = $currency;
 		$this->code       = $code;

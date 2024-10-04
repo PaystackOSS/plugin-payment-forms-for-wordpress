@@ -49,6 +49,7 @@ class Email_Invoice extends Email {
 	 * @return void
 	 */
 	public function send_invoice( $form_id, $currency, $amount, $name, $email, $code, $referer_url ) {
+		$this->slug        = 'invoice';
 		$this->form_id     = $form_id;
 		$this->amount      = $amount;
 		$this->currency    = $currency;

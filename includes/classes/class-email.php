@@ -127,7 +127,7 @@ class Email {
 					// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>
 				<link href="http://fonts.googleapis.com/css?family=Noto+Sans:400,700" rel="stylesheet" type="text/css">
 				<style type="text/css">
-					<?php include( KKD_PFF_PAYSTACK_PLUGIN_PATH . '/assets/css/email-' . $this->slug . '.css' ); ?>
+					<?php include( PFF_PAYSTACK_PLUGIN_PATH . '/assets/css/email-' . $this->slug . '.css' ); ?>
 				</style>
 			</head>
 		<?php	

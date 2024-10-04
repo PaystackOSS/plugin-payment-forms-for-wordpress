@@ -54,6 +54,7 @@ class Email_Receipt extends Email {
 	public function send_receipt( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
 		
 		// Default Values
+		$this->slug       = 'receipt';
 		$this->amount     = $amount;
 		$this->currency   = $currency;
 		$this->code       = $code;
