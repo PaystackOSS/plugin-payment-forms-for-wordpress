@@ -251,7 +251,7 @@ class Forms_Update {
 	 */
 	public function metabox_action( $post ) {
 		$this->parse_meta_values( $post );
-		do_meta_boxes( null, 'pff-paystack-metabox-holder', $post );
+		do_meta_boxes( 'paystack_form', 'pff', $post );
 	}
 
 	/**
@@ -262,9 +262,9 @@ class Forms_Update {
 	public function register_meta_boxes() {
 		// Register the information boxes.
 		if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
+			add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff' );
 		}
-		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'pff-paystack' ), [ $this, 'help_details' ], 'paystack_form', 'pff-paystack-metabox-holder' );
+		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'pff-paystack' ), [ $this, 'help_details' ], 'paystack_form', 'pff' );
 
 		// Add in our "normal" meta boxes
 		add_meta_box( 'form_data', __( 'Extra Form Description', 'pff-paystack' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
@@ -303,8 +303,6 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function help_details( $post ) {
-			// We shall output 1 Nonce Field for all of our metaboxes.
-			wp_nonce_field( 'pff-paystack-save-form', 'pff_paystack_save' );
 			?>
 			<div class="awesome-meta-admin">
 				<?php echo wp_kses_post( __( 'Email and Full Name field is added automatically, no need to include that.<br /><br />
@@ -334,6 +332,9 @@ class Forms_Update {
 	 */
 	public function form_data() {
 		$html = [];
+
+		// We shall output 1 Nonce Field for all of our metaboxes.
+		$html[] = wp_nonce_field( 'pff-paystack-save-form', 'pff_paystack_save', true, false );
 
 		if ($this->meta['hidetitle'] == 1) {
 			$html[] = '<label><input name="_hidetitle" type="checkbox" value="1" checked> ' . __('Hide the form title', 'pff-paystack') . ' </label>';
