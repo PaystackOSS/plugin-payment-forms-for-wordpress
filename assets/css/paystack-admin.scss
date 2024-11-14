@@ -1,0 +1,459 @@
+#titlediv {
+	.inside {
+		p.description {
+			margin: 8px 2px 0;
+
+			label {
+				cursor: pointer;
+			}
+		}
+	}
+}
+  
+span.shortcode {
+	display: block;
+	margin: 2px 0;
+
+	&.old {
+		background: #777;
+		color: #fff;
+	}
+
+	> input {
+		background: inherit;
+		color: inherit;
+		font-size: 12px;
+		border: none;
+		box-shadow: none;
+		padding: 4px 8px;
+		margin: 0;
+	}
+}
+  
+#submitpost {
+	input.copy {
+		margin-bottom: 10px;
+	}
+
+	input.delete {
+		padding: 0;
+		margin: 0;
+		border: none;
+		cursor: pointer;
+		background: inherit;
+		color: #a00;
+
+		&:hover {
+			color: #f00;
+		}
+
+		&:focus {
+			outline: thin dotted;
+		}
+	}
+}
+  
+.postbox-container .postbox h3 {
+	border-bottom: 1px solid transparent;
+}
+
+.keyboard-interaction {
+	visibility: hidden;
+	color: #23282d;
+}
+  
+#misc-publishing-actions {
+	.misc-pub-section {
+		&::before {
+			content: "\f488";
+			-moz-osx-font-smoothing: grayscale;
+			display: inline-block;
+			font: 20px/1 dashicons;
+			left: -1px;
+			padding: 0 2px 0 0;
+			position: relative;
+			text-decoration: none !important;
+			top: 0;
+			vertical-align: top;
+			color: #82878c;
+		}
+
+		&.warning::before {
+			content: "\f534";
+		}
+
+		&.warning a.external {
+			font-style: italic;
+		}
+	}
+}
+  
+.config-error {
+	color: #d00;
+	font-style: normal;
+	font-size: 13px;
+
+	ul, 
+	span,
+	div {
+		margin: 0;
+
+		li {
+			padding: 0 4px;
+			margin: 0;
+
+			a.external {
+				font-style: italic;
+			}
+		}
+	}
+}
+  
+[data-config-field][aria-invalid="true"] {
+	border-color: #d00;
+}
+
+/*
+ * Tabs
+ */
+ #contact-form-editor-tabs {
+    border-bottom: 1px solid #aaa;
+    padding: 9px 15px 0 10px;
+    margin: 0;
+
+    li {
+        display: inline-block;
+        list-style: none;
+        border: 1px solid #ccc;
+        border-bottom: 1px solid #aaa;
+        padding: 0;
+        margin: 0 4px -1px;
+        background-color: #e4e4e4;
+
+        &:hover {
+            background-color: #fff;
+        }
+
+        &.ui-tabs-active,
+        &.ui-tabs-active:hover {
+            border-top: 1px solid #aaa;
+            border-right: 1px solid #aaa;
+            border-left: 1px solid #aaa;
+            border-bottom: 1px solid #f5f5f5;
+            background-color: #f5f5f5;
+        }
+
+        a {
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 30px;
+            color: #333;
+            text-decoration: none;
+
+            &:hover {
+                color: #000;
+            }
+        }
+
+        &.ui-tabs-active a {
+            color: #000;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    }
+}
+
+#contact-form-editor {
+    .contact-form-editor-panel {
+        background-color: #f5f5f5;
+        border: 1px solid #aaa;
+        border-top: none;
+        padding: 16px;
+        
+        h2 {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 24px;
+            margin: 8px 0;
+            padding: 0;
+        }
+
+        fieldset legend {
+            line-height: 1.5;
+            margin: .6em 0 .4em;
+        }
+    }
+
+    .form-table th {
+        width: 100px;
+    }
+}
+
+/*
+ * Form Panel
+ */
+ #tag-generator-list {
+    a.button {
+        font-size: 12px;
+        height: 26px;
+        line-height: 24px;
+        margin: 2px;
+        padding: 0 8px 1px;
+    }
+}
+
+.tag-generator-panel {
+    position: relative;
+    height: 495px;
+
+    .control-box {
+        padding: 0;
+        margin: 0;
+        height: 380px;
+        overflow: auto;
+
+        > fieldset legend {
+            border: 1px solid #dfdfdf;
+            border-left: 4px solid #00a0d2;
+            background: #f7fcfe;
+            padding: 4px 12px;
+            margin: 4px 0;
+            line-height: 1.4em;
+            width: 95%;
+        }
+
+        input.oneline {
+            width: 200px;
+        }
+
+        textarea.values {
+            width: 200px;
+            height: 6em;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 88px;
+        }
+
+        table {
+            width: 100%;
+
+            .form-table {
+                th {
+                    width: 120px;
+                    padding: 4px 10px 4px 0;
+                    font-size: 13px;
+                }
+
+                td {
+                    padding: 4px 10px;
+                    font-size: 13px;
+
+                    label {
+                        line-height: 1.1em;
+
+                        .description {
+                            line-height: 1.4em;
+                        }
+                    }
+                }
+            }
+
+            caption {
+                text-align: left;
+                font-size: 110%;
+                font-weight: bold;
+                color: #777;
+                margin: 10px 0 5px;
+            }
+        }
+    }
+
+    .insert-box {
+        position: absolute;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        width: 100%;
+        height: 84px;
+        margin: 0;
+        padding: 8px 16px;
+        background-color: #fcfcfc;
+        border-top: 1px solid #dfdfdf;
+        overflow: auto;
+
+        input.tag {
+            width: 480px;
+            float: left;
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        .submitbox {
+            padding: 2px 4px;
+
+            input[type="button"] {
+                float: right;
+            }
+        }
+
+        .description label {
+            cursor: text;
+        }
+    }
+}
+
+/*
+ * Mail Panel
+ */
+ .contact-form-editor-box-mail {
+    span.mailtag {
+        display: inline-block;
+        margin: 0 0 0 4px;
+        padding: 1px 2px;
+        cursor: pointer;
+        color: #000;
+
+        &.used {
+            color: #666;
+        }
+    }
+}
+
+/*
+ * Messages Panel
+ */
+#messages-panel {
+    p.description {
+        margin: 5px 0 10px;
+    }
+}
+
+/*
+ * List Table
+ */
+.fixed {
+    .column-title {
+        width: 38%;
+    }
+
+    .column-shortcode {
+        width: 38%;
+    }
+}
+
+/*
+ * Welcome Panel
+ */
+.welcome-panel {
+    h3 {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 2.1em;
+        margin: 1.33em 0 0;
+    }
+
+    p.message {
+        line-height: 1.4em;
+        margin-right: 25px;
+    }
+
+    li {
+        margin-bottom: 12px;
+    }
+
+    &-close {
+        z-index: 2;
+    }
+}
+
+/*
+ * Integration
+ */
+.card {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #e5e5e5;
+    border-left: 4px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin-top: 20px;
+    max-width: 520px;
+    min-width: 255px;
+    padding: 0.7em 2em 1em;
+    position: relative;
+
+    &.active {
+        border-color: #00a0d2;
+    }
+
+    img.icon {
+        float: left;
+        margin: 8px 8px 8px -8px;
+    }
+
+    h2.title {
+        float: left;
+        max-width: 240px;
+        font-size: 1.3em;
+        font-weight: 600;
+    }
+
+    .infobox {
+        float: right;
+        font-size: 13px;
+        color: #666;
+        margin: 2px 0 5px;
+        line-height: 1.5;
+        max-width: 240px;
+    }
+
+    .inside {
+        .form-table {
+            th {
+                padding: 15px 10px 15px 0;
+                width: 160px;
+            }
+
+            td {
+                padding: 10px 10px;
+            }
+        }
+    }
+}
+
+.paystack_setting_page {
+    input {
+        width: 50%;
+    }
+}
+
+#custom-metabox-holder-sortables {
+    margin-top: 30px;
+}
+
+.wp-list-table {
+    .column-id {
+        width: 5%;
+    }
+
+    .column-email {
+        width: 20%;
+    }
+
+    .column-metadata {
+        width: 35%;
+    }
+
+    .column-amount {
+        width: 10%;
+    }
+
+    .column-txn_code {
+        width: 15%;
+    }
+
+    .column-date {
+        width: 10%;
+    }
+} 
