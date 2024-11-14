@@ -164,34 +164,46 @@ class Confirm_Payment {
 		if ( 'success' === $response['result'] ) {
 			
 			// Create a plan that the user will be subscribed to.
-			
-			/*$pstk_logger = new kkd_pff_paystack_plugin_tracker( 'pff-paystack', Kkd_Pff_Paystack_Public::fetchPublicKey() );
-			$pstk_logger->log_transaction_success( $code );*/
-
 			$this->maybe_create_subscription();
 	
-			
 			$sendreceipt = $this->meta['sendreceipt'];
-			if ( 'yes' === $sendreceipt ) {
-				$decoded = json_decode( $this->payment_meta->metadata );
-				$fullname = $decoded[1]->value;
+			$decoded     = json_decode( $this->payment_meta->metadata );
+			$fullname    = $decoded[1]->value;
 
+			if ( 'yes' === $sendreceipt ) {
 				/**
 				 * Allow 3rd Party Plugins to hook into the email sending.
 				 * 
 				 * 10: Email_Receipt::send_receipt();
 				 * 11: Email_Receipt_Owner::send_receipt_owner();
 				 */
+
 				do_action( 'pff_paystack_send_receipt',
 					$this->payment_meta->post_id,
 					$this->payment_meta->currency,
-					$this->payment_meta->amount_paid,
+					$this->payment_meta->amount,
 					$fullname,
 					$this->payment_meta->email,
 					$this->payment_meta->reference,
 					$this->payment_meta->metadata
 				);
 			}
+
+			/**
+			 * Allow 3rd Party Plugins to hook into the email sending.
+			 * 11: Email_Receipt_Owner::send_receipt_owner();
+			 */
+
+			do_action( 'pff_paystack_send_receipt_owner',
+				$this->payment_meta->post_id,
+				$this->payment_meta->currency,
+				$this->payment_meta->amount,
+				$fullname,
+				$this->payment_meta->email,
+				$this->payment_meta->reference,
+				$this->payment_meta->metadata
+			);
+
 		}
 	
 		if ( 'success' === $response['result'] && '' !== $this->meta['redirect'] ) {
@@ -287,7 +299,7 @@ class Confirm_Payment {
 					'result' => 'success',
 				];
 			} else {
-				if ( $this->oamount !== $amount_paid ) {
+				if ( (int) $this->oamount !== (int) $amount_paid ) {
 					$return = [
 						// translators: %1$s: currency, %2$s: formatted amount required
 						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %1$s<b>%2$s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),

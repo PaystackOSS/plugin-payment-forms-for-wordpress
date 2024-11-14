@@ -324,23 +324,24 @@ class Form_Shortcode {
 
 			// If the amount is set.
 			if ( 0 === $this->meta['usevariableamount'] ) {
-
+				$min_text = '';
 				if ($this->meta['minimum'] == 1) {
 					$html[] = '<small> Minimum payable amount <b style="font-size:87% !important;">' . esc_html($this->meta['currency']) . '  ' . esc_html(number_format($this->meta['amount'])) . '</b></small>';
+					$min_text = 'min="'. $this->meta['amount'] .'"';
 				}
 
 				if ($this->meta['recur'] == 'plan') {
 					if ( $this->show_btn ) {
-						$html[] = '<input type="text" name="pf-amount" value="' . esc_attr( $this->meta['planamount'] ) . '" id="pf-amount" readonly required />';
+						$html[] = '<input type="number" name="pf-amount" value="' . esc_attr( $this->meta['planamount'] ) . '" id="pf-amount" readonly required />';
 					} else {
 						$html[] = '<div class="span12 unit">
 									<label class="label" style="font-size:18px;font-weight:600;line-height: 20px;">' . esc_html( $this->meta['planerrorcode'] ) . '</label>
 									</div>';
 					}
 				} elseif ( $this->meta['recur'] == 'optional' ) {
-					$html[] = '<input type="text" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
+					$html[] = '<input type="number" name="pf-amount" class="pf-number" id="pf-amount" value="0" required />';
 				} else {
-					$html[] = '<input type="text" name="pf-amount" class="pf-number" value="' . esc_attr( 0 === $this->meta['amount'] ? "0" : $this->meta['amount'] ) . '" id="pf-amount" ' . ( 0 !== $this->meta['amount'] && 1 !== $this->meta['minimum'] ? 'readonly' : '' ) . ' required />';
+					$html[] = '<input type="number" name="pf-amount" class="pf-number" value="' . esc_attr( 0 === $this->meta['amount'] ? "0" : $this->meta['amount'] ) . '" ' . $min_text . ' id="pf-amount" required />';
 				}
 
 			} else {

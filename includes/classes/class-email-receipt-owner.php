@@ -34,7 +34,7 @@ class Email_Receipt_Owner extends Email {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'pff_paystack_send_receipt', [ $this, 'send_receipt_owner' ], 11, 7 );
+		add_action( 'pff_paystack_send_receipt_owner', [ $this, 'send_receipt_owner' ], 11, 7 );
 	}
 
 	function send_receipt_owner( $form_id, $currency, $amount, $name, $email, $code, $metadata ) {
@@ -55,6 +55,7 @@ class Email_Receipt_Owner extends Email {
 
 		$this->reply_to   = get_option( 'admin_email' );
 		$this->reply_name = get_option( 'blogname' );
+		$this->email      = stripslashes( $this->reply_to );
 		$this->send();
 	}
 

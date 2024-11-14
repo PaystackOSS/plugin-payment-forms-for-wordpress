@@ -366,10 +366,14 @@ class Form_Submit {
 		$transaction_charge = (int) $this->meta['merchantamount'];
         $transaction_charge = $transaction_charge * 100;
 
+		$txn_bearer = $this->meta['txnbearer'];
+
 		if ( '' == $this->meta['subaccount'] || ! isset( $this->meta['subaccount'] ) ) {
 			$subaccount         = null;
 			$txn_bearer         = null;
 			$transaction_charge = null;
+		} else {
+			$subaccount = $this->meta['subaccount'];
 		}
 		if ( '' == $transaction_charge || 0 == $transaction_charge || null == $transaction_charge ) {
 			$transaction_charge = null;
