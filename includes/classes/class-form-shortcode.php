@@ -559,6 +559,4 @@ class Form_Shortcode {
 
 		return $html;
 	}
-
-
 }

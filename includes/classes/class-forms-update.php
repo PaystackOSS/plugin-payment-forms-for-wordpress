@@ -370,15 +370,16 @@ class Forms_Update {
 		$html[] = '<p>' . __('Pay button Description:', 'pff-paystack') . '</p>';
 		$html[] = '<input type="text" name="_paybtn" value="' . $this->meta['paybtn'] . '" class="widefat" />';
 		$html[] = '<p>' . __('Add Extra Charge:', 'pff-paystack') . '</p>';
+
 		$html[] = '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
-							<option value="merchant"' . $this->is_option_selected('merchant', $this->meta['txncharge']) . '> ' . __('No, do not add', 'pff-paystack') . '</option>
+							<option value="merchant" ' . $this->is_option_selected('merchant', $this->meta['txncharge']) . '> ' . __('No, do not add', 'pff-paystack') . '</option>
 							<option value="customer" ' . $this->is_option_selected('customer', $this->meta['txncharge']) . '> ' . __('Yes, add it', 'pff-paystack') . '</option>
 						</select>
 					<br><small>' . __('This allows you include an extra charge to cushion the effect of the transaction fee. <a href="', 'pff-paystack') . get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees" . '">' . __('Configure', 'pff-paystack') . '</a></small>';
 		$html[] = '<p>' . __('User logged In:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 							<option value="no" ' . $this->is_option_selected('no', $this->meta['loggedin']) . '> ' . __('User must not be logged in', 'pff-paystack') . '</option>
-							<option value="yes"' . $this->is_option_selected('yes', $this->meta['loggedin']) . '> ' . __('User must be logged In', 'pff-paystack') . '</option>
+							<option value="yes" ' . $this->is_option_selected('yes', $this->meta['loggedin']) . '> ' . __('User must be logged In', 'pff-paystack') . '</option>
 						</select>';
 		$html[] = '<p>' . __('Success Message after Payment', 'pff-paystack') . '</p>';
 		$html[] = '<textarea rows="3"  name="_successmsg"  class="widefat" >' . $this->meta['successmsg'] . '</textarea>';
@@ -585,6 +586,8 @@ class Forms_Update {
 		if ( ! current_user_can('edit_post', $form_id ) ) {
 			return $form_id;
 		}
+
+		do_action( 'qm/debug', $this->defaults );
 
 		// Cycle through our fields and save the information.
 		foreach ( $this->defaults as $key => $default ) { 
