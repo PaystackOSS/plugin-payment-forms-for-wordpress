@@ -74,6 +74,14 @@ class Confirm_Payment {
 	protected $txn_column = 'txn_code';
 
 	/**
+	 * The transaction reference
+	 * Defaults to the 'txn_code' and 'txn_code_2' when a payment retry is triggered.
+	 *
+	 * @var integer
+	 */
+	protected $reference = '';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -95,6 +103,11 @@ class Confirm_Payment {
 
 		if ( 'customer' === $this->meta['txncharge'] ) {
 			$this->oamount = $this->helpers->process_transaction_fees( $this->oamount );
+		}
+
+		$this->reference = $this->payment_meta->txn_code;
+		if ( isset( $this->payment_meta->txn_code_2 ) && ! empty( $this->payment_meta->txn_code_2 ) ) {
+			$this->reference = $this->payment_meta->txn_code_2;
 		}
 	}
 	
@@ -158,7 +171,6 @@ class Confirm_Payment {
 				'result'  => 'failed',
 			];
 		}
-	
 
 		// Create plan and send reciept.
 		if ( 'success' === $response['result'] ) {
@@ -184,7 +196,7 @@ class Confirm_Payment {
 					$this->payment_meta->amount,
 					$fullname,
 					$this->payment_meta->email,
-					$this->payment_meta->reference,
+					$this->reference,
 					$this->payment_meta->metadata
 				);
 			}
@@ -200,7 +212,7 @@ class Confirm_Payment {
 				$this->payment_meta->amount,
 				$fullname,
 				$this->payment_meta->email,
-				$this->payment_meta->reference,
+				$this->reference,
 				$this->payment_meta->metadata
 			);
 
@@ -208,11 +220,44 @@ class Confirm_Payment {
 	
 		if ( 'success' === $response['result'] && '' !== $this->meta['redirect'] ) {
 			$response['result'] = 'success2';
-			$response['link']   = $this->meta['redirect'];
+			$response['link']   = $this->add_param_to_url( $this->meta['redirect'], $this->reference );
 		}
 	
 		echo wp_json_encode( $response );
 		die();
+	}
+
+	/**
+	 * Adds parameters to a URL.
+	 *
+	 * @param string $url The original URL.
+	 * @param string $ref The reference value to add as a parameter.
+	 * @return string The modified URL with added parameters.
+	 */
+	public function add_param_to_url( $url, $ref ) {
+		// Parse the URL.
+		$parsed_url = parse_url( $url );
+
+		// Parse query parameters into an array.
+		parse_str( isset( $parsed_url['query'] ) ? $parsed_url['query'] : '', $query_params );
+
+		// Add the "trxref" and "reference" parameters to the query parameters.
+		$query_params['trxref']    = $ref;
+		$query_params['reference'] = $ref;
+
+		// Rebuild the query string.
+		$query_string = http_build_query( $query_params );
+
+		// Construct the new URL.
+		$new_url  = ( isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] . '://' : '' );
+		$new_url .= ( isset( $parsed_url['user'] ) ? $parsed_url['user'] . ( isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass'] : '' ) . '@' : '' );
+		$new_url .= ( isset( $parsed_url['host'] ) ? $parsed_url['host'] : '' );
+		$new_url .= ( isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '' );
+		$new_url .= ( isset( $parsed_url['path'] ) ? $parsed_url['path'] : '' );
+		$new_url .= ( ! empty( $query_string ) ? '?' . $query_string : '' );
+		$new_url .= ( isset( $parsed_url['fragment'] ) ? '#' . $parsed_url['fragment'] : '' );
+
+		return $new_url;
 	}
 
 	/**
