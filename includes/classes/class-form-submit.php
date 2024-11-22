@@ -198,10 +198,10 @@ class Form_Submit {
 	 * @return integer
 	 */
 	public function process_amount_quantity( $amount = 0 ) {
-		if ( $this->meta['use_quantity'] === 'yes' && ! ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) ) {
+		if ( $this->meta['usequantity'] === 'yes' && ! ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) ) {
 			$quantity   = $this->form_data['pf-quantity'];
 			$unit_amt   = (int) str_replace( ' ', '', $amount );
-			$amount     = $quantity * $unit_amt;
+			$amount     = (int) $quantity * $unit_amt;
 		}
 		return $amount;
 	}
@@ -278,6 +278,7 @@ class Form_Submit {
 	
 		$amount = (int) str_replace( ' ', '', $this->form_data['pf-amount'] );
 		$amount = $this->process_amount( $amount );
+		$amount = $this->process_amount_quantity( $amount );
 
 		// Store the single unit price.
 		$this->fixed_metadata[] = array(
