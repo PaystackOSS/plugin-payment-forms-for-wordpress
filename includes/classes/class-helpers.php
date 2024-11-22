@@ -58,7 +58,6 @@ class Helpers {
 			'recur'               => 'no',
 			'recurplan'           => '',
 			'subject'             => __( 'Thank you for your payment', 'pff-paystack' ),
-			'merchant'            => '',
 			'heading'             => __( 'We\'ve received your payment', 'pff-paystack' ),
 			'message'             => __( 'Your payment was received and we appreciate it.', 'pff-paystack' ),
 			'sendreceipt'         => 'yes',
