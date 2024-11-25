@@ -45,6 +45,13 @@ class Forms_Update {
 	public $helpers = [];
 
 	/**
+	 * Returns true if this is the paystack screen.
+	 *
+	 * @var boolean
+	 */
+	public $is_screen = false;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -99,13 +106,18 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function setup_actions() {
-		add_filter( 'user_can_richedit', '__return_false', 50 );
-		add_filter( 'quicktags_settings', [ $this, 'remove_fullscreen' ], 10, 1 );
+		$screen = get_current_screen();
+		if ( null !== $screen && isset( $screen->post_type ) && 'paystack_form' === $screen->post_type ) {
+			$this->is_screen = true;
 
-		remove_action( 'media_buttons', 'media_buttons' );
-		remove_meta_box( 'postimagediv', 'post', 'side' );
-
-		add_action( 'admin_print_footer_scripts', [ $this, 'shortcode_buttons_script' ] );
+			add_filter( 'user_can_richedit', '__return_false', 50 );
+			add_filter( 'quicktags_settings', [ $this, 'remove_fullscreen' ], 10, 1 );
+	
+			remove_action( 'media_buttons', 'media_buttons' );
+			remove_meta_box( 'postimagediv', 'post', 'side' );
+	
+			add_action( 'admin_print_footer_scripts', [ $this, 'shortcode_buttons_script' ] );
+		}
 	}
 
 	/**
@@ -130,7 +142,9 @@ class Forms_Update {
 	 * @return array
 	 */
 	public function remove_fullscreen( $arguments ) {
-		$arguments['buttons'] = 'fullscreen';
+		if ( $this->is_screen ) {
+			$arguments['buttons'] = 'fullscreen';
+		}
 		return $arguments;
 	}
 
@@ -140,7 +154,7 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function shortcode_buttons_script() {
-		if ( wp_script_is( 'quicktags' ) ) {
+		if ( $this->is_screen && wp_script_is( 'quicktags' ) ) {
 			?>
 			<script type="text/javascript">
 			//this function is used to retrieve the selected text from the text editor
@@ -250,8 +264,11 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function metabox_action( $post ) {
-		$this->parse_meta_values( $post );
-		do_meta_boxes( 'paystack_form', 'pff', $post );
+		if ( $this->is_screen ) {
+			$this->parse_meta_values( $post );
+			do_meta_boxes( 'paystack_form', 'pff', $post );
+		}
+		
 	}
 
 	/**
@@ -260,23 +277,27 @@ class Forms_Update {
 	 * @return void
 	 */
 	public function register_meta_boxes() {
-		// Register the information boxes.
-		if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff' );
-		}
-		add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'pff-paystack' ), [ $this, 'help_details' ], 'paystack_form', 'pff' );
+		$screen = get_current_screen();
+		if ( null !== $screen && isset( $screen->post_type ) && 'paystack_form' === $screen->post_type ) {
+			$this->is_screen = true;
 
-		// Add in our "normal" meta boxes
-		add_meta_box( 'form_data', __( 'Extra Form Description', 'pff-paystack' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
-		add_meta_box( 'email_data', __( 'Email Receipt Settings', 'pff-paystack' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
+			// Register the information boxes.
+			if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				add_meta_box( 'pff_paystack_editor_details_box', __( 'Paste shortcode on preferred page', 'paystack_form' ), [ $this, 'shortcode_details' ], 'paystack_form', 'pff' );
+			}
+			add_meta_box( 'pff_paystack_editor_help_box', __( 'Help Section', 'pff-paystack' ), [ $this, 'help_details' ], 'paystack_form', 'pff' );
 
-		// Add in our "side" meta boxes
-		add_meta_box( 'recuring_data', __( 'Recurring Payment', 'pff-paystack' ), [ $this, 'recur_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'quantity_data', __( 'Quantity Payment', 'pff-paystack' ), [ $this, 'quantity_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'agreement_data', __( 'Agreement checkbox', 'pff-paystack' ), [ $this, 'agreement_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'subaccount_data', __( 'Sub Account', 'pff-paystack' ), [ $this, 'subaccount_data' ], 'paystack_form', 'side', 'default' );
-		add_meta_box( 'plan_data', __( '*Special: Subscribe to plan after time', 'pff-paystack' ), [ $this, 'plan_data' ], 'paystack_form', 'side', 'default' );		
-			
+			// Add in our "normal" meta boxes
+			add_meta_box( 'form_data', __( 'Extra Form Description', 'pff-paystack' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
+			add_meta_box( 'email_data', __( 'Email Receipt Settings', 'pff-paystack' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
+
+			// Add in our "side" meta boxes
+			add_meta_box( 'recuring_data', __( 'Recurring Payment', 'pff-paystack' ), [ $this, 'recur_data' ], 'paystack_form', 'side', 'default' );
+			add_meta_box( 'quantity_data', __( 'Quantity Payment', 'pff-paystack' ), [ $this, 'quantity_data' ], 'paystack_form', 'side', 'default' );
+			add_meta_box( 'agreement_data', __( 'Agreement checkbox', 'pff-paystack' ), [ $this, 'agreement_data' ], 'paystack_form', 'side', 'default' );
+			add_meta_box( 'subaccount_data', __( 'Sub Account', 'pff-paystack' ), [ $this, 'subaccount_data' ], 'paystack_form', 'side', 'default' );
+			add_meta_box( 'plan_data', __( '*Special: Subscribe to plan after time', 'pff-paystack' ), [ $this, 'plan_data' ], 'paystack_form', 'side', 'default' );		
+		}	
 	}
 	
 	/**
@@ -578,37 +599,40 @@ class Forms_Update {
 	 */
 	public function save_post_meta( $form_id, $post ) {
 
-		if ( ! isset( $_POST['pff_paystack_save'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pff_paystack_save'] ) ), 'pff-paystack-save-form' ) ) {
-			return $form_id;
-		}
+		$screen = get_current_screen();
+		if ( null !== $screen && isset( $screen->post_type ) && 'paystack_form' === $screen->post_type ) {
+			$this->is_screen = true;
 
-		// Is the user allowed to edit the post or page?
-		if ( ! current_user_can('edit_post', $form_id ) ) {
-			return $form_id;
-		}
-
-		do_action( 'qm/debug', $this->defaults );
-
-		// Cycle through our fields and save the information.
-		foreach ( $this->defaults as $key => $default ) { 
-			if ( $post->post_type == 'revision' ) {
-				return; // Don't store custom data twice
+			if ( ! isset( $_POST['pff_paystack_save'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pff_paystack_save'] ) ), 'pff-paystack-save-form' ) ) {
+				return $form_id;
 			}
-
-			if ( isset( $_POST[ '_' . $key ] ) ) {
-				$value = sanitize_text_field( wp_unslash( $_POST[ '_' . $key ] ) );
-			} else {
-				$value = $default;
+			
+			// Is the user allowed to edit the post or page?
+			if ( ! current_user_can('edit_post', $form_id ) ) {
+				return $form_id;
 			}
-
-			$value = implode( ',', (array) $value ); // If $value is an array, make it a CSV (unlikely)
-			if ( get_post_meta( $form_id, '_' . $key, false ) ) { // If the custom field already has a value
-				update_post_meta( $form_id, '_' . $key, $value );
-			} else { // If the custom field doesn't have a value
-				add_post_meta( $form_id, '_' . $key, $value );
-			}
-			if ( ! $value ) {
-				delete_post_meta( $form_id, '_' . $key ); // Delete if blank
+			
+			// Cycle through our fields and save the information.
+			foreach ( $this->defaults as $key => $default ) { 
+				if ( $post->post_type == 'revision' ) {
+					return; // Don't store custom data twice
+				}
+			
+				if ( isset( $_POST[ '_' . $key ] ) ) {
+					$value = sanitize_text_field( wp_unslash( $_POST[ '_' . $key ] ) );
+				} else {
+					$value = $default;
+				}
+			
+				$value = implode( ',', (array) $value ); // If $value is an array, make it a CSV (unlikely)
+				if ( get_post_meta( $form_id, '_' . $key, false ) ) { // If the custom field already has a value
+					update_post_meta( $form_id, '_' . $key, $value );
+				} else { // If the custom field doesn't have a value
+					add_post_meta( $form_id, '_' . $key, $value );
+				}
+				if ( ! $value ) {
+					delete_post_meta( $form_id, '_' . $key ); // Delete if blank
+				}
 			}
 		}
 	}
