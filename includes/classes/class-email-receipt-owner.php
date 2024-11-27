@@ -31,6 +31,13 @@ class Email_Receipt_Owner extends Email {
 	public $sitemessage = '';
 
 	/**
+	 * The email address for the body.
+	 *
+	 * @var string
+	 */
+	public $html_email = '';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -45,7 +52,7 @@ class Email_Receipt_Owner extends Email {
 		$this->currency   = $currency;
 		$this->code       = $code;
 		$this->name       = $name;
-		$this->email      = stripslashes( $email );
+		$this->html_email = stripslashes( $email );
 		$this->metadata   = $metadata;
 
 		// Custom Values
@@ -122,7 +129,7 @@ class Email_Receipt_Owner extends Email {
 															</table>
 															<p style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:23px;margin-top:8px;margin-bottom:16px">
 																<?php esc_html_e( 'Amount', 'pff-paystack' ); ?> <strong>: <?php echo esc_html( $this->currency ) . ' ' . number_format( $this->amount ); ?></strong><br>
-																<?php esc_html_e( 'Email', 'pff-paystack' ); ?> <strong>: <?php echo esc_html( $this->email ); ?></strong><br>
+																<?php esc_html_e( 'Email', 'pff-paystack' ); ?> <strong>: <?php echo esc_html( $this->html_email ); ?></strong><br>
 																<?php
 																	$new = json_decode( $this->metadata );
 																	if ( array_key_exists( "0", $new ) ) {

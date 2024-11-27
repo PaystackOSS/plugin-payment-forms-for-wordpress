@@ -66,6 +66,13 @@ class Confirm_Payment {
 	protected $oamount = 0;
 
 	/**
+	 * The quantity bought.
+	 *
+	 * @var integer
+	 */
+	protected $quantity = 1;
+
+	/**
 	 * The transaction column to update.
 	 * Defaults to 'txn_code' and 'txn_code_2' when a payment retry is triggered.
 	 *
@@ -101,6 +108,9 @@ class Confirm_Payment {
 		$this->oamount      = $this->meta['amount'];
 		$this->form_id      = $this->payment_meta->post_id;
 
+		// First Process our quantity amount
+		$this->oamount = $this->process_amount_quantity( $this->oamount );
+		
 		if ( 'customer' === $this->meta['txncharge'] ) {
 			$this->oamount = $this->helpers->process_transaction_fees( $this->oamount );
 		}
@@ -137,8 +147,15 @@ class Confirm_Payment {
 		}
 
 		// If this is a retry payment then set the colum accordingly.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		if ( isset( $_POST['retry'] ) ) {
 			$this->txn_column = 'txn_code_2';
+		}
+
+		// This is a false positive, we are using isset as WPCS suggest in the PCP plugin.
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( isset( $_POST['quantity'] ) ) {
+			$this->quantity = sanitize_text_field( wp_unslash( $_POST['quantity'] ) );
 		}
 	
 		$this->helpers = new Helpers();
@@ -199,23 +216,22 @@ class Confirm_Payment {
 					$this->reference,
 					$this->payment_meta->metadata
 				);
+
+				/**
+				 * Allow 3rd Party Plugins to hook into the email sending.
+				 * 11: Email_Receipt_Owner::send_receipt_owner();
+				 */
+
+				do_action( 'pff_paystack_send_receipt_owner',
+					$this->payment_meta->post_id,
+					$this->payment_meta->currency,
+					$this->payment_meta->amount,
+					$fullname,
+					$this->payment_meta->email,
+					$this->reference,
+					$this->payment_meta->metadata
+				);
 			}
-
-			/**
-			 * Allow 3rd Party Plugins to hook into the email sending.
-			 * 11: Email_Receipt_Owner::send_receipt_owner();
-			 */
-
-			do_action( 'pff_paystack_send_receipt_owner',
-				$this->payment_meta->post_id,
-				$this->payment_meta->currency,
-				$this->payment_meta->amount,
-				$fullname,
-				$this->payment_meta->email,
-				$this->reference,
-				$this->payment_meta->metadata
-			);
-
 		}
 	
 		if ( 'success' === $response['result'] && '' !== $this->meta['redirect'] ) {
@@ -385,5 +401,19 @@ class Confirm_Payment {
 				// Nothing defined for this.
 			}
 		}
+	}
+
+	/**
+	 * This will adjust the amount if the quantity fields are being used.
+	 *
+	 * @param integer $amount
+	 * @return integer
+	 */
+	public function process_amount_quantity( $amount = 0 ) {
+		if ( $this->meta['usequantity'] === 'yes' && ! ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) ) {
+			$unit_amt   = (int) str_replace( ' ', '', $amount );
+			$amount     = (int) $this->quantity * $unit_amt;
+		}
+		return $amount;
 	}
 }
