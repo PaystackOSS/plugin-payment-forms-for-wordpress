@@ -66,6 +66,12 @@ class Form_Shortcode {
 	public $plan = false;
 
 	/**
+	 * The variable to hold the stock value.
+	 * @var int
+	 */
+	public $stock = 0;
+
+	/**
 	 * Holds the array of payment options available.
 	 *
 	 * @var array
@@ -136,37 +142,43 @@ class Form_Shortcode {
 				$show_form = $this->should_show_form();
 	
 				if ( $show_form ) {
-					// Form title
-					if ( $this->meta['hidetitle'] != 1 ) {
-						$html[] = "<h1 id='pf-form" . esc_attr( $id ) . "'>" . esc_html( $obj->post_title ) . "</h1>";
+
+					if ( 'yes' === $this->meta['useinventory'] && 0 >= $this->stock ) {
+						echo '<h1>' . __( 'Out of Stock', 'pff-paystack' ) . '</h1>';
+					} else {
+						// Form title
+						if ( $this->meta['hidetitle'] != 1 ) {
+							$html[] = "<h1 id='pf-form" . esc_attr( $id ) . "'>" . esc_html( $obj->post_title ) . "</h1>";
+						}
+		
+						// Start form output
+						$html[] = '<form version="' . esc_attr( PFF_PAYSTACK_VERSION ) . '" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" class="paystack-form j-forms" novalidate>
+							<div class="j-row">';
+		
+						// Hidden Fields
+						$html[] = $this->get_hidden_fields();
+						// User fields
+						$html[] = $this->get_fullname_field();
+						$html[] = $this->get_email_field();
+
+						// Amount selection with consideration for variable amounts, minimum payments, and recurring plans
+						$html[] = $this->get_amount_field();
+
+						$html[] = $this->get_quantity_field();
+		
+						// Recurring payment options
+						$html[] = $this->get_recurring_field();
+						$html[] = $this->get_recurring_plan_fields();
+						
+						$html[] = do_shortcode( $obj->post_content );
+
+						$html[] = $this->get_agreement_field();
+
+						$html[] = $this->get_form_footer();
+		
+						$html[] = '</div></form>';
 					}
-	
-					// Start form output
-					$html[] = '<form version="' . esc_attr( PFF_PAYSTACK_VERSION ) . '" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '" method="post" class="paystack-form j-forms" novalidate>
-						  <div class="j-row">';
-	
-					// Hidden Fields
-					$html[] = $this->get_hidden_fields();
-					// User fields
-					$html[] = $this->get_fullname_field();
-					$html[] = $this->get_email_field();
 
-					// Amount selection with consideration for variable amounts, minimum payments, and recurring plans
-					$html[] = $this->get_amount_field();
-
-					$html[] = $this->get_quantity_field();
-	
-					// Recurring payment options
-					$html[] = $this->get_recurring_field();
-					$html[] = $this->get_recurring_plan_fields();
-					
-					$html[] = do_shortcode( $obj->post_content );
-
-					$html[] = $this->get_agreement_field();
-
-					$html[] = $this->get_form_footer();
-	
-					$html[] = '</div></form>';
 				} else {
 					$html[] = '<h5>' . __( 'You must be logged in to make a payment.', 'pff-paystack' ) . '</h5>';
 				}
@@ -245,6 +257,18 @@ class Form_Shortcode {
 				}
 			}
 		}
+
+		if ( '' == $this->meta['inventory'] ) {
+			$this->meta['inventory'] = 1;
+		}
+		if ( '' == $this->meta['sold'] ) {
+			$this->meta['sold'] = 0;
+		}
+		if ( '' == $this->meta['useinventory'] ) {
+			$this->meta['useinventory'] = "no";
+		}
+
+		$this->stock = $this->meta['inventory'] - $this->meta['sold'];
 	}
 
 	/**
@@ -418,15 +442,23 @@ class Form_Shortcode {
 	public function get_quantity_field() {
 		$html = [];
 		// Quantity selection
-		if ( 'no' === $this->meta['recur'] && 'yes' === $this->meta['usequantity'] && ( 1 === $this->meta['usevariableamount'] || 0 !== $this->meta['amount'] ) ) {
+		if ( 'no' === $this->meta['recur'] && 'yes' === $this->meta['usequantity'] ) {
 			$html[] = '<div class="span12 unit">
-				<label class="label">Quantity</label>
+				<label class="label">' . $this->meta['quantityunit'] . '</label>
 				<div class="select">
 					<input type="hidden" value="' . esc_attr( $this->meta['amount'] ) . '" id="pf-qamount"/>
 					<select class="form-control" id="pf-quantity" name="pf-quantity">';
-				for ( $i = 1; $i <= $this->meta['quantity']; $i++ ) {
+
+				$max = $this->meta['quantity'] + 1;
+			
+				if ( $max > ( $this->stock + 1 ) && $this->meta['useinventory'] == 'yes' ) {
+					$max = $this->stock + 1;
+				}
+
+				for ( $i = 1; $i < $max; $i++ ) {
 					$html[] = '<option value="' . esc_attr( $i ) . '">' . esc_html( $i ) . '</option>';
 				}
+
 			$html[] = '</select> <i></i> </div></div>';
 		}
 		return implode( '', $html );

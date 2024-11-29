@@ -293,10 +293,10 @@ class Confirm_Payment {
 				// phpcs:ignore WordPress.Security.NonceVerification
 				$quantity = (int) sanitize_text_field( wp_unslash( $_POST['quantity'] ) );
 			}
-			$sold     = $this->meta['sold'];
+			$sold = $this->meta['sold'];
 
 			if ( '' === $sold ) {
-				$sold = '0';
+				$sold = 0;
 			}
 			$sold += $quantity;
 		} else {
