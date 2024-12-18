@@ -326,11 +326,11 @@ class Forms_Update {
 	public function help_details( $post ) {
 			?>
 			<div class="awesome-meta-admin">
-				<?php echo wp_kses_post( esc_html__( 'Email and Full Name field is added automatically, no need to include that.<br /><br />
+				<?php echo wp_kses_post( __( 'Email and Full Name field is added automatically, no need to include that.<br /><br />
 				To make an input field compulsory add <code> required="required" </code> to the shortcode <br /><br />
 				It should look like this <code> [text name="Full Name" required="required" ]</code><br /><br />' ) ) ; ?>
 
-				<?php echo wp_kses_post( esc_html__( '<b style="color:red;">Warning:</b> Using the file input field may cause data overload on your server.
+				<?php echo wp_kses_post( __( '<b style="color:red;">Warning:</b> Using the file input field may cause data overload on your server.
 				Be sure you have enough server space before using it. You also have the ability to set file upload limits.' ) ) ; ?>
 			</div>
 		<?php
@@ -375,7 +375,7 @@ class Forms_Update {
 					<option value="USD" ' . $this->is_option_selected( 'USD', $this->meta['currency'] ) . '>' . esc_html__('US Dollars', 'pff-paystack') . '</option>
 			  </select>';
 
-		$html[] = '<small>' . esc_html__('Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.', 'pff-paystack') . '</small>';
+		$html[] = wp_kses_post( '<small>' . __('Ensure you are activated for the currency you are selecting. Check <a href="https://support.paystack.com/hc/en-us/articles/360009973799-Can-I-accept-payments-in-US-Dollars-USD" target="_blank">here</a> for more information.', 'pff-paystack') . '</small>' );
 		$html[] = '<p>' . esc_html__('Amount to be paid(Set 0 for customer input):', 'pff-paystack') . '</p>';
 		$html[] = '<input type="number" min="0" name="_amount" value="' . $this->meta['amount'] . '" class="widefat pf-number" />';
 		if ($this->meta['minimum'] == 1) {
@@ -392,11 +392,11 @@ class Forms_Update {
 		$html[] = '<input type="text" name="_paybtn" value="' . $this->meta['paybtn'] . '" class="widefat" />';
 		$html[] = '<p>' . esc_html__('Add Extra Charge:', 'pff-paystack') . '</p>';
 
-		$html[] = '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
+		$html[] = wp_kses_post( '<select class="form-control" name="_txncharge" id="parent_id" style="width:100%;">
 							<option value="merchant" ' . $this->is_option_selected('merchant', $this->meta['txncharge']) . '> ' . esc_html__('No, do not add', 'pff-paystack') . '</option>
 							<option value="customer" ' . $this->is_option_selected('customer', $this->meta['txncharge']) . '> ' . esc_html__('Yes, add it', 'pff-paystack') . '</option>
 						</select>
-					<br><small>' . esc_html__('This allows you include an extra charge to cushion the effect of the transaction fee. <a href="', 'pff-paystack') . get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees" . '">' . esc_html__('Configure', 'pff-paystack') . '</a></small>';
+					<br><small>' . __('This allows you include an extra charge to cushion the effect of the transaction fee. <a href="', 'pff-paystack') . get_admin_url() . "edit.php?post_type=paystack_form&page=class-paystack-forms-admin.php#paystack_setting_fees" . '">' . esc_html__('Configure', 'pff-paystack') . '</a></small>' );
 		$html[] = '<p>' . esc_html__('User logged In:', 'pff-paystack') . '</p>';
 		$html[] = '<select class="form-control" name="_loggedin" id="parent_id" style="width:100%;">
 							<option value="no" ' . $this->is_option_selected('no', $this->meta['loggedin']) . '> ' . esc_html__('User must not be logged in', 'pff-paystack') . '</option>
@@ -508,7 +508,7 @@ class Forms_Update {
 			$html[] = '<p>' . esc_html__('Max payable quantity:', 'pff-paystack') . '</p>';
 			$html[] = '<input type="number" min="1"  name="_quantity" value="' . $this->meta['quantity'] . '" class="widefat  pf-number" /><small>' . esc_html__('Your users only get to pay in quantities if the from amount is not set to zero and recur is set to none.', 'pff-paystack') . '</small>';
 			$html[] = '<p>' . esc_html__('Unit of quantity:', 'pff-paystack') . '</p>';
-			$html[] = '<input type="text" name="_quantityunit" value="' . $this->meta['quantityunit'] . '" class="widefat" /><small>' . esc_html__('What is the unit of this quantity? Default is <code>Quantity</code>.', 'pff-paystack') . '</small>';
+			$html[] = wp_kses_post( '<input type="text" name="_quantityunit" value="' . $this->meta['quantityunit'] . '" class="widefat" /><small>' . __('What is the unit of this quantity? Default is <code>Quantity</code>.', 'pff-paystack') . '</small>' );
 
 			$html[] = '<p>' . esc_html__('Inventory Payment:', 'pff-paystack') . '</p>';
 			$html[] = '<select class="form-control" name="_useinventory" style="width:100%;">
