@@ -127,6 +127,8 @@ class Form_Submit {
 		$this->meta      = $this->helpers->parse_meta_values( get_post( $this->form_id ) );
 		$this->form_data = filter_input_array( INPUT_POST );
 
+		$this->sanitize_form_data();
+
 		$this->metadata = $this->form_data;
 		unset(
 			$this->metadata['action'],
@@ -147,6 +149,33 @@ class Form_Submit {
 		if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
 			// Get the referer URL
 			$this->referer_url = sanitize_url( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
+		}
+	}
+
+	/**
+	 * Iterates through the $form_data and sanitizes it.
+	 *
+	 * @return void
+	 */
+	public function sanitize_form_data() {
+		foreach ( $this->form_data as $key => $value ) {
+			switch ( $key ) {
+				case 'pf-amount':
+				case 'pf-vamount':
+				case 'pf-quantity':
+				case 'pf-id':
+				case 'pf-user_id':
+					$this->form_data[ $key ] = sanitize_text_field( $value );
+				break;
+
+				case 'pf-pemail':
+					$this->form_data[ $key ] = sanitize_email( $value );
+				break;
+				
+
+				default:
+					$this->form_data[ $key ] = sanitize_text_field( $value );
+			}
 		}
 	}
 
