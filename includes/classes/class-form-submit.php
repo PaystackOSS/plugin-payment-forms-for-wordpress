@@ -97,13 +97,13 @@ class Form_Submit {
 		
 		if ( ! isset( $_POST['pf-nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pf-nonce'] ) ), 'pff-paystack-invoice' ) ) {
 			$this->response['result']  = 'failed';
-			$this->response['message'] = __( 'Nonce verification is required.', 'pff-paystack' );
+			$this->response['message'] = esc_html__( 'Nonce verification is required.', 'pff-paystack' );
 			return false;			
 		}
 
 		if ( ! isset( $_POST['pf-id'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-id'] ) ) ) ) {
 			$this->response['result']  = 'failed';
-			$this->response['message'] = __( 'A form ID is required', 'pff-paystack' );
+			$this->response['message'] = esc_html__( 'A form ID is required', 'pff-paystack' );
 			return false;
 		} else {
 			$this->form_id = sanitize_text_field( wp_unslash( $_POST['pf-id'] ) );
@@ -111,7 +111,7 @@ class Form_Submit {
 
 		if ( ! isset( $_POST['pf-pemail'] ) || '' == trim( sanitize_text_field( wp_unslash( $_POST['pf-pemail'] ) ) ) ) {
 			$this->response['result']  = 'failed';
-			$this->response['message'] = __( 'Email is required', 'pff-paystack' );
+			$this->response['message'] = esc_html__( 'Email is required', 'pff-paystack' );
 			return false;
 		}
 		return true;
@@ -248,7 +248,7 @@ class Form_Submit {
 					if ( $value['size'] > $max_file_size ) {
 						$response['result']  = 'failed';
 						// translators: %s: maximum upload file size in MB
-						$response['message'] = sprintf( __( 'Max upload size is %sMB', 'pff-paystack' ), $this->meta['filelimit'] );
+						$response['message'] = sprintf( esc_html__( 'Max upload size is %sMB', 'pff-paystack' ), $this->meta['filelimit'] );
 						exit( wp_json_encode( $response ) );
 					} else {
 						$attachment_id  = media_handle_upload( $key_name, $this->form_id );
@@ -265,7 +265,7 @@ class Form_Submit {
 						'display_name'  => ucwords( str_replace( '_', ' ', $key_name ) ),
 						'variable_name' => $key_name,
 						'type'          => 'text',
-						'value'         => __( 'No file Uploaded', 'pff-paystack' ),
+						'value'         => esc_html__( 'No file Uploaded', 'pff-paystack' ),
 					);
 				}
 			}
@@ -307,7 +307,7 @@ class Form_Submit {
 
 		// Store the single unit price.
 		$this->fixed_metadata[] = array(
-			'display_name'  => __( 'Unit Price', 'pff-paystack' ),
+			'display_name'  => esc_html__( 'Unit Price', 'pff-paystack' ),
 			'variable_name' => 'Unit_Price',
 			'type'          => 'text',
 			'value'         => $this->meta['currency'] . number_format( $amount ),
@@ -478,7 +478,7 @@ class Form_Submit {
 		if ( 'none' !== $plan_code ) {
 			$this->meta['plancode'] = $plan_code;
 			$this->fixed_metadata[] = array(
-				'display_name'  => __( 'Plan', 'pff-paystack' ),
+				'display_name'  => esc_html__( 'Plan', 'pff-paystack' ),
 				'variable_name' => 'Plan',
 				'type'          => 'text',
 				'value'         => $plan_code,
@@ -486,7 +486,7 @@ class Form_Submit {
 
 			if ( false !== $has_interval ) {
 				$this->fixed_metadata[] = array(
-					'display_name'  => __( 'Plan Interval', 'pff-paystack' ),
+					'display_name'  => esc_html__( 'Plan Interval', 'pff-paystack' ),
 					'variable_name' => 'Plan Interval',
 					'type'          => 'text',
 					'value'         => $has_interval,

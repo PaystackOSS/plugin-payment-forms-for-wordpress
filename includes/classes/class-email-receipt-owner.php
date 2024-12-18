@@ -56,7 +56,7 @@ class Email_Receipt_Owner extends Email {
 		$this->metadata   = $metadata;
 
 		// Custom Values
-		$this->subject     = __( 'You just received a payment' , 'pff-paystack' );
+		$this->subject     = esc_html__( 'You just received a payment' , 'pff-paystack' );
 		$this->heading     = get_post_meta( $form_id, '_heading', true );
 		$this->sitemessage = get_post_meta( $form_id, '_message', true );
 

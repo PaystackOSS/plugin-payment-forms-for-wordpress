@@ -37,7 +37,7 @@ class Field_Shortcodes {
 	public function text_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
@@ -71,7 +71,7 @@ class Field_Shortcodes {
 	public function textarea_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
@@ -106,7 +106,7 @@ class Field_Shortcodes {
 	public function checkbox_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),
@@ -150,7 +150,7 @@ class Field_Shortcodes {
 	public function input_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
@@ -172,7 +172,7 @@ class Field_Shortcodes {
 		$code .= '</label>';
 		$code .= '<div class="input append-small-btn">';
 		$code .= '<div class="file-button">';
-		$code .= __( 'Browse', 'pff-paystack' );
+		$code .= esc_html__( 'Browse', 'pff-paystack' );
 		$code .= '<input type="file" id="' . esc_attr( $fileInputId ) . '" name="' . esc_attr( $name ) . '" onchange="document.getElementById(\'' . esc_attr( $textInputId ) . '\').value = this.value;" ' . esc_attr( $required ) . '>';
 		$code .= '</div>';
 		$code .= '<input type="text" id="' . esc_attr( $textInputId ) . '" readonly="" placeholder="' . esc_attr__( 'No file selected', 'pff-paystack' ) . '">';
@@ -189,7 +189,7 @@ class Field_Shortcodes {
 	public function datepicker_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
@@ -223,7 +223,7 @@ class Field_Shortcodes {
 	public function select_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),
@@ -264,7 +264,7 @@ class Field_Shortcodes {
 	public function radio_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),

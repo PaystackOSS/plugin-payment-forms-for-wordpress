@@ -121,7 +121,7 @@ class Confirm_Payment {
 		if ( ! isset( $_POST['nonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'pff-paystack-confirm' ) ) {
 			$response = array(
 				'error' => true,
-				'error_message' => __( 'Nonce verification is required.', 'pff-paystack' ),
+				'error_message' => esc_html__( 'Nonce verification is required.', 'pff-paystack' ),
 			);
 	
 			exit( wp_json_encode( $response ) );	
@@ -132,7 +132,7 @@ class Confirm_Payment {
 		if ( ! isset( $_POST['code'] ) || '' === trim( wp_unslash( $_POST['code'] ) ) ) {
 			$response = array(
 				'error' => true,
-				'error_message' => __( 'Did you make a payment?', 'pff-paystack' ),
+				'error_message' => esc_html__( 'Did you make a payment?', 'pff-paystack' ),
 			);
 	
 			exit( wp_json_encode( $response ) );
@@ -169,14 +169,14 @@ class Confirm_Payment {
 				}
 			} else {
 				$response = [
-					'message' => __( 'Failed to connect to Paystack.', 'pff-paystack' ),
+					'message' => esc_html__( 'Failed to connect to Paystack.', 'pff-paystack' ),
 					'result'  => 'failed',
 				];	
 			}
 	
 		} else {
 			$response = [
-				'message' => __( 'Payment Verification Failed', 'pff-paystack' ),
+				'message' => esc_html__( 'Payment Verification Failed', 'pff-paystack' ),
 				'result'  => 'failed',
 			];
 		}
@@ -244,7 +244,7 @@ class Confirm_Payment {
 	 */
 	public function add_param_to_url( $url, $ref ) {
 		// Parse the URL.
-		$parsed_url = parse_url( $url );
+		$parsed_url = wp_parse_url( $url );
 
 		// Parse query parameters into an array.
 		parse_str( isset( $parsed_url['query'] ) ? $parsed_url['query'] : '', $query_params );
@@ -312,7 +312,7 @@ class Confirm_Payment {
 		global $wpdb;
 		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$return = [
-			'message' => __( 'DB not updated.', 'pff-paystack' ),
+			'message' => esc_html__( 'DB not updated.', 'pff-paystack' ),
 			'result' => 'failed',
 		];
 
@@ -355,7 +355,7 @@ class Confirm_Payment {
 				if ( (int) $this->oamount !== (int) $amount_paid ) {
 					$return = [
 						// translators: %1$s: currency, %2$s: formatted amount required
-						'message' => sprintf( __( 'Invalid amount Paid. Amount required is %1$s<b>%2$s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
+						'message' => sprintf( esc_html__( 'Invalid amount Paid. Amount required is %1$s<b>%2$s</b>', 'pff-paystack' ), $this->meta['currency'], number_format( $this->oamount ) ),
 						'result' => 'failed',
 					];
 				} else {

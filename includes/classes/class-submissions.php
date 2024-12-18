@@ -24,7 +24,7 @@ class Submissions {
 	 * @return void
 	 */
 	public function register_submissions_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', __( 'Submissions', 'pff-paystack' ), __( 'Submissions', 'pff-paystack' ), 'administrator', 'submissions', [ $this, 'output_submissions_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Submissions', 'pff-paystack' ), esc_html__( 'Submissions', 'pff-paystack' ), 'administrator', 'submissions', [ $this, 'output_submissions_page' ] );
 		remove_submenu_page( 'edit.php?post_type=paystack_form', 'submissions' );
 	}
 
@@ -36,7 +36,7 @@ class Submissions {
 	public function output_submissions_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['form'] ) ) { 
-			return __( 'No form set', 'pff-paystack' );
+			return esc_html__( 'No form set', 'pff-paystack' );
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$form_id  = sanitize_text_field( wp_unslash( $_GET['form'] ) );

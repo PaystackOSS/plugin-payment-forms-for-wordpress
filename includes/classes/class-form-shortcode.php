@@ -144,7 +144,7 @@ class Form_Shortcode {
 				if ( $show_form ) {
 
 					if ( 'yes' === $this->meta['useinventory'] && 0 >= $this->stock ) {
-						echo '<h1>' . __( 'Out of Stock', 'pff-paystack' ) . '</h1>';
+						$html[] = '<h1>' . esc_html__( 'Out of Stock', 'pff-paystack' ) . '</h1>';
 					} else {
 						// Form title
 						if ( $this->meta['hidetitle'] != 1 ) {
@@ -180,13 +180,13 @@ class Form_Shortcode {
 					}
 
 				} else {
-					$html[] = '<h5>' . __( 'You must be logged in to make a payment.', 'pff-paystack' ) . '</h5>';
+					$html[] = '<h5>' . esc_html__( 'You must be logged in to make a payment.', 'pff-paystack' ) . '</h5>';
 				}
 			} else {
-				$html[] = '<h5>' . __( 'Invalid Paystack form ID or the form does not exist.', 'pff-paystack' ) . '</h5>';
+				$html[] = '<h5>' . esc_html__( 'Invalid Paystack form ID or the form does not exist.', 'pff-paystack' ) . '</h5>';
 			}
 		} else {
-			$html[] = '<h5>' . __( 'No Paystack form ID provided.', 'pff-paystack' ) . '</h5>';
+			$html[] = '<h5>' . esc_html__( 'No Paystack form ID provided.', 'pff-paystack' ) . '</h5>';
 		}
 
 		$html = implode( '', $html );
@@ -242,7 +242,7 @@ class Form_Shortcode {
 			$this->meta['paymentoptions'] = array_map( 'sanitize_text_field', $this->meta['paymentoptions'] );
 		}
 
-		$this->meta['planerrorcode'] = __( 'Input Correct Recurring Plan Code', 'pff-paystack' );
+		$this->meta['planerrorcode'] = esc_html__( 'Input Correct Recurring Plan Code', 'pff-paystack' );
 
 		if ( 'plan' === $this->meta['recur'] ) {
 			if ( '' === $this->meta['recurplan'] ) {
@@ -307,9 +307,9 @@ class Form_Shortcode {
 	 */
 	public function get_fullname_field() {
 		$html = '<div class="span12 unit">
-			<label class="label">' . __( 'Full Name', 'pff-paystack' ) . ' <span>*</span></label>
+			<label class="label">' . esc_html__( 'Full Name', 'pff-paystack' ) . ' <span>*</span></label>
 			<div class="input">
-				<input type="text" name="pf-fname" placeholder="' . __( 'First & Last Name', 'pff-paystack' ) . '" value="' . esc_attr( $this->user['fullname'] ) . '" required>
+				<input type="text" name="pf-fname" placeholder="' . esc_html__( 'First & Last Name', 'pff-paystack' ) . '" value="' . esc_attr( $this->user['fullname'] ) . '" required>
 			</div>
 		</div>';
 		return $html;
@@ -322,9 +322,9 @@ class Form_Shortcode {
 	 */
 	public function get_email_field() {
 		$html = '<div class="span12 unit">
-			<label class="label">' . __( 'Email', 'pff-paystack' ) . ' <span>*</span></label>
+			<label class="label">' . esc_html__( 'Email', 'pff-paystack' ) . ' <span>*</span></label>
 			<div class="input">
-				<input type="email" name="pf-pemail" placeholder="' . __( 'Enter Email Address', 'pff-paystack' ) . '" id="pf-email" value="' . esc_attr( $this->user['email'] ) . '" ' . ( $this->meta['loggedin'] == 'yes' ? 'readonly' : '' ) . ' required>
+				<input type="email" name="pf-pemail" placeholder="' . esc_html__( 'Enter Email Address', 'pff-paystack' ) . '" id="pf-email" value="' . esc_attr( $this->user['email'] ) . '" ' . ( $this->meta['loggedin'] == 'yes' ? 'readonly' : '' ) . ' required>
 			</div>
 		</div>';
 		return $html;
@@ -371,7 +371,7 @@ class Form_Shortcode {
 			} else {
 
 				if ( '' === $this->meta['variableamount'] || 0 === $this->meta['variableamount'] || ! is_array( $this->meta['paymentoptions'] ) ) {
-					$html[] = __( 'Form Error, set variable amount string', 'pff-paystack' );
+					$html[] = esc_html__( 'Form Error, set variable amount string', 'pff-paystack' );
 				} else if ( count( $this->meta['paymentoptions'] ) > 0 ) {
 					$html[] = '<div class="select">
 							<input type="hidden"  id="pf-vname" name="pf-vname" />
@@ -538,18 +538,18 @@ class Form_Shortcode {
 			
 
 			$html[] = '<div class="divider-text gap-top-20 gap-bottom-45">
-							<span>' . __( 'Payment Invoice', 'pff-paystack' ) . '</span>
+							<span>' . esc_html__( 'Payment Invoice', 'pff-paystack' ) . '</span>
 						</div>';
 			
 			$html[] = '<div class="j-row">';
 
 			$html[] = '<div class="span12 unit">
-							<label class="label inline">' . __( 'Email:', 'pff-paystack' ) . '</label>
+							<label class="label inline">' . esc_html__( 'Email:', 'pff-paystack' ) . '</label>
 							<strong><a href="mailto:' . esc_attr( $record->email ) . '">' . esc_html( $record->email ) . '</a></strong>
 						</div>';
 
 			$html[] = '<div class="span12 unit">
-							<label class="label inline">' . __( 'Amount:', 'pff-paystack' ) . '</label>
+							<label class="label inline">' . esc_html__( 'Amount:', 'pff-paystack' ) . '</label>
 							<strong>' . esc_html( $this->meta['currency'] . number_format( $record->amount ) ) . '</strong>
 						</div>';
 
@@ -557,14 +557,14 @@ class Form_Shortcode {
 			$html[] = $this->helpers->format_meta_as_display_fields( $record->metadata );
 			
 			$html[] = '<div class="span12 unit">
-							<label class="label inline">' . __( 'Date:', 'pff-paystack' ) . '</label>
+							<label class="label inline">' . esc_html__( 'Date:', 'pff-paystack' ) . '</label>
 							<strong>' . esc_html( $record->created_at ) . '</strong>
 						</div>';
 
 			if ( 1 === intval( $record->paid ) ) {
 				$html[] = '<div class="span12 unit">
-								<label class="label inline">' . __( 'Payment Status:', 'pff-paystack' ) . '</label>
-								<strong>' . __( 'Successful', 'pff-paystack' ) . '</strong>
+								<label class="label inline">' . esc_html__( 'Payment Status:', 'pff-paystack' ) . '</label>
+								<strong>' . esc_html__( 'Successful', 'pff-paystack' ) . '</strong>
 							</div>';
 			}
 		
@@ -572,10 +572,10 @@ class Form_Shortcode {
 			$html[] = '</div>';
 		
 			$html[] = '<div class="footer">';
-			$html[] = '<small><span style="color: red;">*</span> ' . __( 'are compulsory', 'pff-paystack' ) . '</small><br>';
+			$html[] = '<small><span style="color: red;">*</span> ' . esc_html__( 'are compulsory', 'pff-paystack' ) . '</small><br>';
 			$html[] = '<img class="paystack-cardlogos size-full wp-image-1096" alt="cardlogos" src="' . esc_url( PFF_PAYSTACK_PLUGIN_URL . '/assets/images/logos@2x.png' ) . '">';
 			if ( 0 === intval( $record->paid ) ) {
-				$html[] = '<button type="submit" class="primary-btn" id="submitbtn">' . __( 'Retry Payment', 'pff-paystack' ) . '</button>';
+				$html[] = '<button type="submit" class="primary-btn" id="submitbtn">' . esc_html__( 'Retry Payment', 'pff-paystack' ) . '</button>';
 			}
 		
 			$html[] = ' </div>';
