@@ -193,16 +193,35 @@ class Retry_Submit {
 	protected function update_retry_code() {
 		global $wpdb;
 		$return = false;
-		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		$table  = esc_sql( $wpdb->prefix . PFF_PAYSTACK_TABLE );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$return = $wpdb->query(
-			$wpdb->prepare(
-				"UPDATE %i SET txn_code_2 = %s WHERE txn_code = %s",
-				$table,
-				$this->new_code,
-				$this->code
-			)
-		);
+
+		$current_version = get_bloginfo('version');
+		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$return = $wpdb->query(
+				$wpdb->prepare(
+					"UPDATE %i SET txn_code_2 = %s WHERE txn_code = %s",
+					$table,
+					$this->new_code,
+					$this->code
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		} else {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$return = $wpdb->query(
+				$wpdb->prepare(
+					"UPDATE `%s` SET txn_code_2 = '%s' WHERE txn_code = '%s'",
+					$table,
+					$this->new_code,
+					$this->code
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		}
+
+
 		return $return;
 	}
 }

@@ -62,17 +62,17 @@ class Settings {
 					'default' => 1.5,
 				),
 				'ths' => array(	
-					'title'   => esc_html__( 'Threshold <br> <small>(amount above which Paystack adds the fixed amount below)</small>', 'pff-paystack' ),
+					'title'   => wp_kses_post( __( 'Threshold <br> <small>(amount above which Paystack adds the fixed amount below)</small>', 'pff-paystack' ) ),
 					'type'    => 'text',
 					'default' => 2500,
 				),
 				'adc' => array(	
-					'title'   => esc_html__( 'Additional Charge <br> <small> (amount added to percentage fee when transaction amount is above threshold) </small>', 'pff-paystack' ),
+					'title'   => wp_kses_post( __( 'Additional Charge <br> <small> (amount added to percentage fee when transaction amount is above threshold) </small>', 'pff-paystack' ) ),
 					'type'    => 'text',
 					'default' => 100,
 				),
 				'cap' => array(	
-					'title'   => esc_html__( 'Cap <br> <small> (maximum charge paystack can charge on your transactions)', 'pff-paystack' ),
+					'title'   => wp_kses_post( __( 'Cap <br> <small> (maximum charge paystack can charge on your transactions)', 'pff-paystack' ) ),
 					'type'    => 'text',
 					'default' => 2000,
 				),
@@ -112,7 +112,7 @@ class Settings {
 			<h1><?php esc_html_e( 'Paystack Forms Settings', 'pff-paystack' ); ?></h1>
 			<h2><?php esc_html_e( 'API Keys Settings', 'pff-paystack' ); ?></h2>
 
-			<span><?php echo wp_kses_post( esc_html__( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'pff-paystack' ) ); ?> </span>
+			<span><?php echo wp_kses_post( __( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'pff-paystack' ) ); ?> </span>
 			
 			<form method="post" action="options.php">
 				<?php 

@@ -183,23 +183,47 @@ class Helpers {
 			'orderby'  => 'created_at',
 		);
 		$args  = wp_parse_args( $args, $defaults );
-        $table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+        $table = esc_sql( $wpdb->prefix . PFF_PAYSTACK_TABLE );
 		$order = strtoupper( $args['order'] );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * 
-				FROM %i 
-				WHERE post_id = %d 
-				AND paid = %s
-				ORDER BY %i $order", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$table,
-				$form_id,
-				$args['paid'],
-				$args['orderby'],
-			)
-		);
+		$current_version = get_bloginfo('version');
+		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * 
+					FROM %i 
+					WHERE post_id = %d 
+					AND paid = %s
+					ORDER BY %i $order",
+					$table,
+					$form_id,
+					$args['paid'],
+					$args['orderby'],
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+
+		} else {
+
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$results = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * 
+					FROM `%s` 
+					WHERE post_id = '%d'
+					AND paid = '%s'
+					ORDER BY '%s' $order",
+					$table,
+					$form_id,
+					$args['paid'],
+					$args['orderby'],
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		}
+
 		return $results;
 	}
 
@@ -214,17 +238,37 @@ class Helpers {
 		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
 		$num   = wp_cache_get( 'form_payments_' . $form_id, 'pff_paystack' );
 		if ( false === $num ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			$num = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT COUNT(*)
-					FROM %i
-					WHERE post_id = %d
-					AND paid = '1'",
-					$table,
-					$form_id
-				)
-			);
+
+			$current_version = get_bloginfo('version');
+			if ( version_compare( '6.2', $current_version, '<=' ) ) {
+	
+				// phpcs:disable WordPress.DB -- Start ignoring
+				$num = $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT COUNT(*)
+						FROM %i
+						WHERE post_id = %d
+						AND paid = '1'",
+						$table,
+						$form_id
+					)
+				);
+				// phpcs:enable -- Stop ignoring
+			} else {
+				// phpcs:disable WordPress.DB -- Start ignoring
+				$num = $wpdb->get_var(
+					$wpdb->prepare(
+						"SELECT COUNT(*)
+						FROM `%s`
+						WHERE post_id = '%d'
+						AND paid = '1'",
+						$table,
+						$form_id
+					)
+				);
+				// phpcs:enable -- Stop ignoring
+			}
+
 			wp_cache_set( 'form_payments_' . $form_id, $num, 'pff_paystack', 60*5 );
 		}
 		return $num;
@@ -572,7 +616,6 @@ class Helpers {
 
 		return $ip;
 	}
-
 	
 	/**
 	 * Get the DB records by the transaction code supplied.
@@ -583,18 +626,36 @@ class Helpers {
 	public function get_db_record( $code, $column = 'txn_code' ) {
 		global $wpdb;
 		$return = false;
-		$table  = $wpdb->prefix . PFF_PAYSTACK_TABLE;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$record = $wpdb->get_results(
-			$wpdb->prepare(
-					"SELECT * 
-					FROM %i 
-					WHERE %i = %s"
-				,
-				$table,
-				$column,
-				$code
-			), 'OBJECT' );
+		$table  = esc_sql( $wpdb->prefix . PFF_PAYSTACK_TABLE );
+
+		$current_version = get_bloginfo('version');
+		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$record = $wpdb->get_results(
+				$wpdb->prepare(
+						"SELECT * 
+						FROM %i 
+						WHERE %i = %s"
+					,
+					$table,
+					$column,
+					$code
+				), 'OBJECT' );
+			// phpcs:enable -- Stop ignoring
+		} else {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$record = $wpdb->get_results(
+				$wpdb->prepare(
+						"SELECT * 
+						FROM `%s`
+						WHERE '%s' = '%s'"
+					,
+					$table,
+					$column,
+					$code
+				), 'OBJECT' );
+			// phpcs:enable -- Stop ignoring
+		}
 
 		if ( ! empty( $record ) && isset( $record[0] ) ) {
 			$return = $record[0];
@@ -789,15 +850,32 @@ class Helpers {
 	 */
 	public function check_code( $code ) {
 		global $wpdb;
-		$table = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		$table = esc_sql( $wpdb->prefix . PFF_PAYSTACK_TABLE );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$o_exist = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM %i WHERE txn_code = %s",
-				$table,
-				$code
-			)
-		);
+
+		$current_version = get_bloginfo('version');
+		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$o_exist = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM %i WHERE txn_code = %s",
+					$table,
+					$code
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		} else {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$o_exist = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM `%s` WHERE txn_code = %s",
+					$table,
+					$code
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		}
+
 		return ( count( $o_exist ) > 0 );
 	}
 

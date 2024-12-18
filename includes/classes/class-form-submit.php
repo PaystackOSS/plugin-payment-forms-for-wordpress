@@ -297,7 +297,7 @@ class Form_Submit {
 
 		global $wpdb;
 		$code            = $this->generate_code();
-		$table           = $wpdb->prefix . PFF_PAYSTACK_TABLE;
+		$table           = esc_sql( $wpdb->prefix . PFF_PAYSTACK_TABLE );
 		
 		$this->fixed_metadata = [];
 	
@@ -336,29 +336,58 @@ class Form_Submit {
 			'metadata' => wp_json_encode( $this->fixed_metadata ),
 		);
 		
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$exist = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * 
-					FROM %i
-					WHERE post_id = %s 
-					AND email = %s 
-					AND user_id = %s 
-					AND amount = %s 
-					AND plan = %s 
-					AND ip = %s 
-					AND paid = '0' 
-					AND metadata = %s",
-				$table,
-				$insert['post_id'], 
-				$insert['email'],
-				$insert['user_id'],
-				$insert['amount'],
-				$insert['plan'],
-				$insert['ip'],
-				$insert['metadata']
-			)
-		);
+
+		$current_version = get_bloginfo('version');
+		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$exist = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * 
+					 FROM $table
+					 WHERE post_id = %d 
+					 AND email = %s 
+					 AND user_id = %d 
+					 AND amount = %f 
+					 AND plan = %s 
+					 AND ip = %s 
+					 AND paid = '0' 
+					 AND metadata = %s",
+					$insert['post_id'], 
+					$insert['email'],
+					$insert['user_id'],
+					$insert['amount'],
+					$insert['plan'],
+					$insert['ip'],
+					$insert['metadata']
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		} else {
+			// phpcs:disable WordPress.DB -- Start ignoring
+			$exist = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * 
+					 FROM `$table`
+					 WHERE post_id = '%d' 
+					 AND email = '%s' 
+					 AND user_id = '%d' 
+					 AND amount = '%f'
+					 AND plan = '%s' 
+					 AND ip = '%s' 
+					 AND paid = '0' 
+					 AND metadata = '%s'",
+					$insert['post_id'], 
+					$insert['email'],
+					$insert['user_id'],
+					$insert['amount'],
+					$insert['plan'],
+					$insert['ip'],
+					$insert['metadata']
+				)
+			);
+			// phpcs:enable -- Stop ignoring
+		}
+
 
 		if ( count( $exist ) > 0 ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
