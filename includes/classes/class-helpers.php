@@ -633,7 +633,7 @@ class Helpers {
 			$meta['usevariableamount'] = (int) $meta['usevariableamount'];
 		}
 
-		$meta['minimum']   = floatval( $meta['minimum'] );
+		$meta['minimum']   = (int) $meta['minimum'];
 		//$meta['txncharge'] = floatval( $meta['txncharge'] );
 		return $meta;
 	}

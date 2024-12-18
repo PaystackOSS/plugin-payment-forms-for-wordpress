@@ -157,7 +157,7 @@ class Form_Submit {
 	 * @return integer
 	 */
 	public function process_amount( $amount = 0 ) {
-		$original_amount  = $amount;
+		$original_amount = $amount;
 
 		if ( 'no' === $this->meta['recur'] && 1 !== $this->meta['usevariableamount'] ) {
 			if ( 0 !== (int) floatval( $this->meta['amount'] ) ) {
@@ -168,12 +168,8 @@ class Form_Submit {
 			$amount = (int) str_replace( ' ', '', floatval( $amount ) );
 		}
 
-		if ( 1 === $this->meta['minimum'] && 0 !== floatval( $this->meta['amount'] ) ) {
-			if ( $original_amount < floatval( $this->meta['amount'] ) ) {
-				$amount = floatval( $this->meta['amount'] );
-			} else {
-				$amount = $original_amount;
-			}
+		if ( 1 === $this->meta['minimum'] && 0 !== floatval( $this->form_data['pf-amount'] ) ) {
+			$amount = floatval( $this->form_data['pf-amount'] );
 		}
 
 		if ( 1 === $this->meta['usevariableamount'] ) {

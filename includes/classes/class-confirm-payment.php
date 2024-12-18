@@ -38,7 +38,7 @@ class Confirm_Payment {
 	protected $transaction = false;
 
 	/**
-	 * Holds the current payment meta retrieved from the DB.
+	 * Holds the verified payment meta from the DB
 	 *
 	 * @var object
 	 */
@@ -104,18 +104,10 @@ class Confirm_Payment {
 	protected function setup_data( $payment ) {
 		$this->payment_meta = $payment;
 		$this->meta         = $this->helpers->parse_meta_values( get_post( $this->payment_meta->post_id ) );
-		$this->amount       = $this->payment_meta->amount;
-		$this->oamount      = $this->meta['amount'];
 		$this->form_id      = $this->payment_meta->post_id;
-
-		// First Process our quantity amount
-		$this->oamount = $this->process_amount_quantity( $this->oamount );
-		
-		if ( 'customer' === $this->meta['txncharge'] ) {
-			$this->oamount = $this->helpers->process_transaction_fees( $this->oamount );
-		}
-
-		$this->reference = $this->payment_meta->txn_code;
+		$this->amount       = $this->payment_meta->amount;
+		$this->oamount      = $this->amount;
+		$this->reference    = $this->payment_meta->txn_code;
 		if ( isset( $this->payment_meta->txn_code_2 ) && ! empty( $this->payment_meta->txn_code_2 ) ) {
 			$this->reference = $this->payment_meta->txn_code_2;
 		}
@@ -401,19 +393,5 @@ class Confirm_Payment {
 				// Nothing defined for this.
 			}
 		}
-	}
-
-	/**
-	 * This will adjust the amount if the quantity fields are being used.
-	 *
-	 * @param integer $amount
-	 * @return integer
-	 */
-	public function process_amount_quantity( $amount = 0 ) {
-		if ( $this->meta['usequantity'] === 'yes' && ! ( 'optional' === $this->meta['recur'] || 'plan' === $this->meta['recur'] ) ) {
-			$unit_amt   = (int) str_replace( ' ', '', $amount );
-			$amount     = (int) $this->quantity * $unit_amt;
-		}
-		return $amount;
 	}
 }
