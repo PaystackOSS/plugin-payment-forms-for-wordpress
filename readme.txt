@@ -91,12 +91,13 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
-= 4.0.1 - 14 Nov 2024 =
+= 4.0.1 =
 * Updating the class initiation to be 7.4 compatible and additional 7.4 fixes
 * Fixing the split transaction field
 * Fixing the receipt owner amount and email address
 * Fixing the display of the submissions page.
-* Fixing the minimum amount field
+* Fixing the minimum amount field function and validation
+* Updating sprintf for SQL injections.
 
 = 4.0.0 =
 * An entire plugin rewrite, keeping the same functionality.
