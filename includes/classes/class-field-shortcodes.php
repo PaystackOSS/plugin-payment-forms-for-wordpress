@@ -44,7 +44,8 @@ class Field_Shortcodes {
 			'text'
 		);
 	
-		$name     = sanitize_text_field( $atts['name'] );
+		// translators: %s: input field name to be entered by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 		$id       = uniqid( 'text-' );
 	
@@ -57,10 +58,7 @@ class Field_Shortcodes {
 	
 		$code .= '</label>
 			<div class="input">
-				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . 
-				// translators: %s: input field name to be entered by the user
-				sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-				'" ' . esc_attr( $required ) . ' /></div></div>';
+				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . $name . '" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}
@@ -80,7 +78,8 @@ class Field_Shortcodes {
 			'textarea'
 		);
 
-		$name     = sanitize_text_field( $atts['name'] );
+		// translators: %s: textarea field to be entered by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 
 		$id = uniqid( 'textarea-' );
@@ -94,10 +93,7 @@ class Field_Shortcodes {
 
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . 
-		// translators: %s: textarea field to be entered by the user
-		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-		'" ' . esc_attr( $required ) . '></textarea></div></div>';
+		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . $name . '" ' . esc_attr( $required ) . '></textarea></div></div>';
 
 		return $code;
 	}
@@ -200,7 +196,8 @@ class Field_Shortcodes {
 			'datepicker'
 		);
 	
-		$name     = sanitize_text_field( $atts['name'] );
+		// translators: %s: datepicker field to be selected by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 		$id       = uniqid( 'datepicker-' );
 	
@@ -213,10 +210,7 @@ class Field_Shortcodes {
 	
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . 
-		// translators: %s: datepicker field to be selected by the user
-		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-		'" ' . esc_attr( $required ) . ' /></div></div>';
+		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . $name . '" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}
