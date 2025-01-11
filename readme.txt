@@ -1,11 +1,10 @@
 === Payment Forms for Paystack ===
-Contributors: paystack, kendysond, steveamaza, sourcecodeink, krugazul, feedmymedia
+Contributors: paystack, kendysond, steveamaza, sourcecodeink
 Donate link: https://paystack.com/demo
-Tags: paystack, recurrent payments, donation, forms, payments
-Requires at least: 5.0
-Tested up to: 6.6
-Stable tag: 4.0.0
-Requires PHP: 7.2
+Tags: paystack, recurrent payments, nigeria, mastercard, visa, target, Naira, payments, verve, donation, church, NGO, form, contact form 7, form
+Requires at least: 3.1
+Tested up to: 6.4
+Stable tag: 3.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,12 +87,11 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
  
 = Payment Forms for Paystack is awesome! Can I contribute? =
  
-Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
+Yes you can! Join in on our [GitHub repository](https://github.com/PaystackHQ/wordpress-payment-forms-for-paystack) :)
+
+
 
 == Changelog ==
-= 4.0.0 =
-* An entire plugin rewrite, keeping the same functionality.
-* Tested with WordPress 6.2
 = 3.4.0 =
 * Support for WordPress 5.9
 * Support for PHP 8
