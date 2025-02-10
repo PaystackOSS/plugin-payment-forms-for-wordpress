@@ -189,6 +189,11 @@ class Helpers {
 		$current_version = get_bloginfo('version');
 		if ( version_compare( '6.2', $current_version, '<=' ) ) {
 
+			// Make sure $order only handles 2 possible values.
+			if ( 'ASC' !== $order ) {
+				$order = 'DESC';
+			}
+
 			// phpcs:disable WordPress.DB -- Start ignoring
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
@@ -200,7 +205,7 @@ class Helpers {
 					$table,
 					$form_id,
 					$args['paid'],
-					$args['orderby'],
+					$args['orderby']
 				)
 			);
 			// phpcs:enable -- Stop ignoring
@@ -214,11 +219,12 @@ class Helpers {
 					FROM `%s` 
 					WHERE post_id = '%d'
 					AND paid = '%s'
-					ORDER BY '%s' $order",
+					ORDER BY '%s' %s",
 					$table,
 					$form_id,
 					$args['paid'],
 					$args['orderby'],
+					$order
 				)
 			);
 			// phpcs:enable -- Stop ignoring
