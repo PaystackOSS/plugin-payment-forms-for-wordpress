@@ -1,5 +1,5 @@
 === Payment Forms for Paystack ===
-Contributors: paystack, kendysond, steveamaza, sourcecodeink, krugazul, feedmymedia
+Contributors: paystack, kendysond, steveamaza, krugazul, feedmymedia
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
