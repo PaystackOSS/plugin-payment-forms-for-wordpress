@@ -43,7 +43,9 @@ class Field_Shortcodes {
 			$atts,
 			'text'
 		);
-	
+		
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
+
 		// translators: %s: input field name to be entered by the user
 		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
@@ -78,6 +80,8 @@ class Field_Shortcodes {
 			'textarea'
 		);
 
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
+		
 		// translators: %s: textarea field to be entered by the user
 		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
@@ -156,7 +160,9 @@ class Field_Shortcodes {
 			$atts,
 			'input'
 		);
-
+		
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
+		
 		$name       = sanitize_text_field( $atts['name'] );
 		$required   = $atts['required'] === 'required' ? 'required' : '';
 		$fileInputId = uniqid( 'file-input-' );
@@ -195,7 +201,9 @@ class Field_Shortcodes {
 			$atts,
 			'datepicker'
 		);
-	
+		
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
+
 		// translators: %s: datepicker field to be selected by the user
 		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
@@ -230,6 +238,7 @@ class Field_Shortcodes {
 			$atts,
 			'select'
 		);
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
 	
 		$name     = sanitize_text_field( $atts['name'] );
 		$options  = array_map( 'sanitize_text_field', explode( ',', $atts['options'] ) );
@@ -271,7 +280,9 @@ class Field_Shortcodes {
 			$atts,
 			'radio'
 		);
-	
+		
+		$atts['name'] = sanitize_text_field( esc_attr( esc_html__($atts['name']) ) );
+
 		$name     = sanitize_text_field( $atts['name'] );
 		$options  = array_map( 'sanitize_text_field', explode( ',', $atts['options'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
