@@ -390,6 +390,8 @@ class Form_Shortcode {
 				$html[] = '<small>Transaction Charge: <b class="pf-txncharge"></b>, Total:<b  class="pf-txntotal"></b></small>';
 			}
 
+			$html[] = '<div style="color:red;"><small id="pf-min-val-warn"></small></div>';
+
 		$html[] = '</div></div>';
 
 		return implode( '', $html );
