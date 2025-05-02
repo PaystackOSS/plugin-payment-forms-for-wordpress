@@ -91,6 +91,13 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+= 4.0.4 =
+* Fixing the UAT error with the amount field and minimum amounts.
+
+= 4.0.3 =
+* Security update - Add extra sanitization to form fields
+* Improved input sanitization
+
 = 4.0.2 =
 * Security Update - Adding in sanitization to the Payments List order variable.
 
