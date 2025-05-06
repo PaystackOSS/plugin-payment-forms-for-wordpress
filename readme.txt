@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 4.0.2
+Stable tag: 4.0.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,12 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+= 4.0.4 =
+* Add better sanitization to form fields
+
+= 4.0.3 =
+* Security update - Add extra sanitization to form fields
+
 = 4.0.2 =
 * Security Update - Adding in sanitization to the Payments List order variable.
 

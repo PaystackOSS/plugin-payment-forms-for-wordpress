@@ -193,7 +193,7 @@ class Settings {
 	}
 
 	/**
-	 * Checks to see if the curren value is selected.
+	 * Sanitises the field name
 	 *
 	 * @param string $value
 	 * /
