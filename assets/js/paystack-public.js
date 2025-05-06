@@ -164,7 +164,11 @@ function PffPaystackFee()
                     }
                 }
             );
+
             if ($("#pf-quantity").length) {
+				$( "#pf-quantity" ).on( 'change', function(event){
+					checkMinimumVal();
+				} );
                 calculateTotal();
             };
 
@@ -202,7 +206,6 @@ function PffPaystackFee()
                         .find("#pf-amount")
                         .val();
                     }
-					
 
                     if (Number(amount) > 0) {
                     } else {
@@ -225,6 +228,7 @@ function PffPaystackFee()
                         );
                         return false;
                     }
+
                     if (checkMinimumVal() == false) {
                         $(this)
                         .find("#pf-amount")
@@ -593,11 +597,18 @@ function PffPaystackFee()
                 }
             );
 
-
 			function checkMinimumVal() {
-				if ($("#pf-minimum-hidden").length) {
-					var min_amount = Number($("#pf-minimum-hidden").val());
+				if ( $("#pf-amount").length ) {
+					var min_amount = Number($("#pf-amount").attr('min'));
 					var amt = Number($("#pf-amount").val());
+					var quantity = 1;
+
+					if ( $("#pf-quantity").length ) {
+						quantity = $("#pf-quantity").val();
+					}
+
+					amt = amt * quantity;
+
 					if (min_amount > 0 && amt < min_amount) {
 						$("#pf-min-val-warn").text( "Amount cannot be less than the minimum amount");
 						return false;
@@ -640,12 +651,14 @@ function PffPaystackFee()
 			
 			function calculateTotal() {
 				var unit;
+
 				if ($("#pf-vamount").length) {
 					unit = $("#pf-vamount").val();
 				} else {
 					unit = $("#pf-amount").val();
 				}
 				var quant = $("#pf-quantity").val();
+
 				var newvalue = unit * quant;
 			
 				if (quant == "" || quant == null) {

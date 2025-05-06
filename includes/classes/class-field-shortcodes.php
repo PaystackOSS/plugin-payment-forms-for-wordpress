@@ -37,14 +37,18 @@ class Field_Shortcodes {
 	public function text_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
 			'text'
 		);
-	
-		$name     = sanitize_text_field( $atts['name'] );
+
+		// sanitize name attribute before using it.
+		$atts['name'] = $this->sanitize_and_escape( $atts['name'] );
+		
+		// translators: %s: input field name to be entered by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 		$id       = uniqid( 'text-' );
 	
@@ -57,10 +61,7 @@ class Field_Shortcodes {
 	
 		$code .= '</label>
 			<div class="input">
-				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . 
-				// translators: %s: input field name to be entered by the user
-				sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-				'" ' . esc_attr( $required ) . ' /></div></div>';
+				<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" placeholder="' . $name . '" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}
@@ -71,16 +72,20 @@ class Field_Shortcodes {
 	 * @return string
 	 */
 	public function textarea_field( $atts ) {
+		
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
 			'textarea'
 		);
-
-		$name     = sanitize_text_field( $atts['name'] );
+		// sanitize name attribute before using it
+		$atts['name'] = $this->sanitize_and_escape( $atts['name'] );
+		
+		// translators: %s: textarea field to be entered by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 
 		$id = uniqid( 'textarea-' );
@@ -94,10 +99,7 @@ class Field_Shortcodes {
 
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . 
-		// translators: %s: textarea field to be entered by the user
-		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-		'" ' . esc_attr( $required ) . '></textarea></div></div>';
+		$code .= '<textarea id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" rows="3" placeholder="' . $name . '" ' . esc_attr( $required ) . '></textarea></div></div>';
 
 		return $code;
 	}
@@ -110,7 +112,7 @@ class Field_Shortcodes {
 	public function checkbox_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),
@@ -154,14 +156,16 @@ class Field_Shortcodes {
 	public function input_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
 			'input'
 		);
 
+		$atts['name'] = $this->sanitize_and_escape( $atts['name'] );
 		$name       = sanitize_text_field( $atts['name'] );
+		
 		$required   = $atts['required'] === 'required' ? 'required' : '';
 		$fileInputId = uniqid( 'file-input-' );
 		$textInputId = uniqid( 'text-input-' );
@@ -176,7 +180,7 @@ class Field_Shortcodes {
 		$code .= '</label>';
 		$code .= '<div class="input append-small-btn">';
 		$code .= '<div class="file-button">';
-		$code .= __( 'Browse', 'pff-paystack' );
+		$code .= esc_html__( 'Browse', 'pff-paystack' );
 		$code .= '<input type="file" id="' . esc_attr( $fileInputId ) . '" name="' . esc_attr( $name ) . '" onchange="document.getElementById(\'' . esc_attr( $textInputId ) . '\').value = this.value;" ' . esc_attr( $required ) . '>';
 		$code .= '</div>';
 		$code .= '<input type="text" id="' . esc_attr( $textInputId ) . '" readonly="" placeholder="' . esc_attr__( 'No file selected', 'pff-paystack' ) . '">';
@@ -193,14 +197,18 @@ class Field_Shortcodes {
 	public function datepicker_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'required' => '0',
 			),
 			$atts,
 			'datepicker'
 		);
-	
-		$name     = sanitize_text_field( $atts['name'] );
+
+		// sanitize name attribute before using it
+        $atts['name'] = $this->sanitize_and_escape( $atts['name'] );	
+		
+		// translators: %s: datepicker field to be selected by the user
+		$name     = sanitize_text_field( sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $atts['name'] ) );
 		$required = $atts['required'] === 'required' ? 'required' : '';
 		$id       = uniqid( 'datepicker-' );
 	
@@ -213,10 +221,7 @@ class Field_Shortcodes {
 	
 		$code .= '</label>';
 		$code .= '<div class="input">';
-		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . 
-		// translators: %s: datepicker field to be selected by the user
-		sprintf( esc_attr__( 'Enter %s', 'pff-paystack' ), $name ) . 
-		'" ' . esc_attr( $required ) . ' /></div></div>';
+		$code .= '<input type="date" id="' . esc_attr( $id ) . '" class="date-picker" name="' . esc_attr( $name ) . '" placeholder="' . $name . '" ' . esc_attr( $required ) . ' /></div></div>';
 	
 		return $code;
 	}
@@ -229,7 +234,7 @@ class Field_Shortcodes {
 	public function select_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),
@@ -270,7 +275,7 @@ class Field_Shortcodes {
 	public function radio_field( $atts ) {
 		$atts = shortcode_atts(
 			array(
-				'name'     => __( 'Title', 'pff-paystack' ),
+				'name'     => esc_html__( 'Title', 'pff-paystack' ),
 				'options'  => '',
 				'required' => '0',
 			),
@@ -305,5 +310,25 @@ class Field_Shortcodes {
 		$code .= '</div></div>';
 	
 		return $code;
+	}
+
+	/**
+	 * Sanitize and escape a string for safe HTML output.
+	 *
+	 * @param string $value The input string to sanitize and escape.
+	 * @return string The sanitized and escaped string.
+	 */
+	private function sanitize_and_escape( $value ) {
+	    // Remove all HTML tags, including malformed ones
+		$value = wp_kses( $value, array() );
+
+	    // Replace backticks with single quotes
+	    $value = str_replace( '`', '&#96;', $value );
+
+	    // Sanitize the string for safe database storage
+	    $value = sanitize_text_field( $value );
+
+	    // Escape the string for safe HTML output
+	    return esc_html( $value );
 	}
 }
