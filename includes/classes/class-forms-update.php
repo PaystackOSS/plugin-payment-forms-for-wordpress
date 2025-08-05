@@ -289,7 +289,7 @@ class Forms_Update {
 
 			// Add in our "normal" meta boxes
 			add_meta_box( 'form_data', esc_html__( 'Extra Form Description', 'pff-paystack' ), [ $this, 'form_data' ], 'paystack_form', 'normal', 'default' );
-			add_meta_box( 'email_data', esc_html__( 'Email Receipt Settings', 'pff-paystack' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
+			//add_meta_box( 'email_data', esc_html__( 'Email Receipt Settings', 'pff-paystack' ), [ $this, 'email_data' ], 'paystack_form', 'normal', 'default' );
 
 			// Add in our "side" meta boxes
 			add_meta_box( 'recuring_data', esc_html__( 'Recurring Payment', 'pff-paystack' ), [ $this, 'recur_data' ], 'paystack_form', 'side', 'default' );
@@ -455,7 +455,7 @@ class Forms_Update {
 	 *
 	 * @return void
 	 */
-	public function email_data() {
+	/*public function email_data() {
 		$html   = [];
 		// Echo out the field
 		$html[] = '<p>' . esc_html__('Send an invoice when a payment is attempted:', 'pff-paystack') . '</p>';
@@ -478,7 +478,7 @@ class Forms_Update {
 		$html[] = '<textarea rows="6" name="_message" class="widefat">' . $this->meta['message'] . '</textarea>';
 		
 		echo wp_kses( implode( '', $html ), $this->allowed_html ); 
-	}
+	}*/
 
 	/**
 	 * Add the quantity metabox
