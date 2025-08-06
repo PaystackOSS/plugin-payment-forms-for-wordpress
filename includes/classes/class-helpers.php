@@ -43,6 +43,7 @@ class Helpers {
 	public function __construct() {
 		$this->defaults = [
 			'amount'              => 0,
+			'merchant'            => '',
 			'paybtn'              => esc_html__( 'Pay', 'pff-paystack' ),
 			'successmsg'          => esc_html__( 'Thank you for paying!', 'pff-paystack' ),
 			'txncharge'           => 'merchant',
