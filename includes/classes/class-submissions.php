@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Submissions {
 
+	const EXPORT_NONCE_ACTION = 'pff-paystack-export';
+
 	/**
 	 * Constructor
 	 */
@@ -19,12 +21,21 @@ class Submissions {
 	}
 
 	/**
+	 * Returns the capability required to view and export payment data.
+	 *
+	 * @return string
+	 */
+	public static function get_capability() {
+		return apply_filters( 'pff_paystack_payments_capability', 'manage_options' );
+	}
+
+	/**
 	 * Register the submissions page
 	 *
 	 * @return void
 	 */
 	public function register_submissions_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Submissions', 'pff-paystack' ), esc_html__( 'Submissions', 'pff-paystack' ), 'administrator', 'submissions', [ $this, 'output_submissions_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Submissions', 'pff-paystack' ), esc_html__( 'Submissions', 'pff-paystack' ), self::get_capability(), 'submissions', [ $this, 'output_submissions_page' ] );
 		remove_submenu_page( 'edit.php?post_type=paystack_form', 'submissions' );
 	}
 
@@ -34,6 +45,10 @@ class Submissions {
 	 * @return void
 	 */
 	public function output_submissions_page() {
+		if ( ! current_user_can( self::get_capability() ) ) {
+			return;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['form'] ) ) { 
 			return esc_html__( 'No form set', 'pff-paystack' );
@@ -61,6 +76,7 @@ class Submissions {
 					<?php if ( $data > 0 ) { ?>
 						<form action="<?php echo esc_html( admin_url( 'admin-post.php' ) ); ?>" method="post">
 							<input type="hidden" name="action" value="pff_paystack_export_excel">
+							<?php wp_nonce_field( self::EXPORT_NONCE_ACTION ); ?>
 							<input type="hidden" name="form_id" value="<?php echo esc_html( $form_id ); ?>">
 							<button type="submit" class="button button-primary button-hero load-customize"><?php esc_html_e( 'Export Data to Excel', 'pff-paystack' ); ?></button>
 						</form>
@@ -98,6 +114,19 @@ class Submissions {
 	 * @return string
 	 */
 	public function prep_csv_data( $item ) {
+		if ( null === $item ) {
+			$item = '';
+		} elseif ( is_scalar( $item ) ) {
+			$item = (string) $item;
+		} else {
+			$item = wp_json_encode( $item );
+		}
+
+		// Neutralise spreadsheet formulas; phone-number-style values are left intact (negatives are escaped).
+		if ( preg_match( '/^(?:[\s\x00]*[=+\-@]|[\t\r\n])/', $item ) && ! preg_match( '/^\+?\d[\d\s()-]*$/', $item ) ) {
+			$item = "'" . $item;
+		}
+
 		return '"' . str_replace( '"', '""', $item ) . '"';
 	}
 	
@@ -109,14 +138,23 @@ class Submissions {
 	public function export_excel() {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! current_user_can( self::get_capability() ) ) {
+			wp_die( esc_html__( 'You do not have permission to export this data.', 'pff-paystack' ), 403 );
+		}
+
+		check_admin_referer( self::EXPORT_NONCE_ACTION );
+
 		if ( ! isset( $_POST['form_id'] ) || empty( $_POST['form_id'] ) ) {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$form_id    = sanitize_text_field( wp_unslash( $_POST['form_id'] ) );
+		$form_id    = absint( wp_unslash( $_POST['form_id'] ) );
 		$obj        = get_post( $form_id );
+
+		if ( ! $obj || 'paystack_form' !== $obj->post_type ) {
+			wp_die( esc_html__( 'Form not found.', 'pff-paystack' ), 404 );
+		}
+
 		$csv_output = '';
 		$currency   = get_post_meta( $form_id, '_currency', true );
 
@@ -135,10 +173,14 @@ class Submissions {
 			$csv_output .= "Date Paid,";
 			$csv_output .= "Reference,";
 
-			$new = json_decode( $header->metadata );
+			$new = json_decode( $header->metadata, true );
+			if ( ! is_array( $new ) ) {
+				$new = array();
+			}
 			if ( array_key_exists( 0, $new ) ) {
 				foreach ( $new as $item ) {
-					$csv_output .= $this->prep_csv_data( $item->display_name ) . ',';
+					$display_name = is_array( $item ) && isset( $item['display_name'] ) ? $item['display_name'] : '';
+					$csv_output  .= $this->prep_csv_data( $display_name ) . ',';
 				}
 			} elseif ( count( $new ) > 0 ) {
 				foreach ( $new as $key => $item ) {
@@ -155,13 +197,17 @@ class Submissions {
 				$csv_output .= $this->prep_csv_data( $newkey ) . ',';
 				$csv_output .= $this->prep_csv_data( $dbdata->email ) . ',';
 				$csv_output .= $this->prep_csv_data( $currency . ' ' . $dbdata->amount ) . ',';
-				$csv_output .= $this->prep_csv_data( substr( $dbdata->paid_at, 0, 10 ) ) . ',';
+				$csv_output .= $this->prep_csv_data( substr( (string) $dbdata->paid_at, 0, 10 ) ) . ',';
 				$csv_output .= $this->prep_csv_data( $txn_code ) . ',';
 
-				$new = json_decode( $dbdata->metadata );
+				$new = json_decode( $dbdata->metadata, true );
+				if ( ! is_array( $new ) ) {
+					$new = array();
+				}
 				if ( array_key_exists( 0, $new ) ) {
 					foreach ( $new as $item ) {
-						$csv_output .= $this->prep_csv_data( $item->value ) . ',';
+						$value       = is_array( $item ) && isset( $item['value'] ) ? $item['value'] : '';
+						$csv_output .= $this->prep_csv_data( $value ) . ',';
 					}
 				} elseif ( count( $new ) > 0 ) {
 					foreach ( $new as $item ) {
@@ -172,7 +218,7 @@ class Submissions {
 				$csv_output .= "\n";
 			}
 
-			$filename = $obj->post_title . "_payments_" . gmdate( 'Y-m-d_H-i' );
+			$filename = sanitize_file_name( $obj->post_title ) . "_payments_" . gmdate( 'Y-m-d_H-i' );
 
 			header( 'Content-Type: application/vnd.ms-excel' );
 			header( 'Content-Disposition: attachment; filename="' . $filename . '.csv"' );

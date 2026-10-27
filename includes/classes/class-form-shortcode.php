@@ -111,6 +111,9 @@ class Form_Shortcode {
 		// First lets check for a public key.
 		$public_key = $this->helpers->get_public_key();
 		if ( ! $public_key ) {
+			if ( ! current_user_can( Settings::get_capability() ) ) {
+				return '<h5>' . esc_html__( 'Payment is not available right now. Please contact the site administrator.', 'pff-paystack' ) . '</h5>';
+			}
 			$settings_link = esc_url( get_admin_url( null, 'edit.php?post_type=paystack_form&page=settings' ) );
 			return sprintf(
 				'<h5>%s <a href="%s">%s</a></h5>',

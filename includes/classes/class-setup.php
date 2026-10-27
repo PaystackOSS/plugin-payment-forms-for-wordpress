@@ -85,6 +85,9 @@ class Setup {
 	 * Add a link to our settings page in the plugin action links.
 	 */
 	public function add_action_links( $links ) {
+		if ( ! current_user_can( Settings::get_capability() ) ) {
+			return $links;
+		}
 		$settings_link = array(
 			'<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=settings') . '">' . esc_html__( 'Settings', 'pff-paystack' ) . '</a>',
 		);

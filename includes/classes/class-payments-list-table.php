@@ -164,11 +164,11 @@ class Payments_List_Table extends \WP_List_Table
 			}
 			$new_data[] = array(
 				'id'       => $new_key,
-				'email'    => '<a href="mailto:' . $row->email . '">' . $row->email . '</a>',
-				'amount'   => $currency . '<b>' . number_format( $row->amount ) . '</b>',
-				'txn_code' => $txn_code,
+				'email'    => '<a href="' . esc_url( 'mailto:' . $row->email ) . '">' . esc_html( $row->email ) . '</a>',
+				'amount'   => esc_html( $currency ) . '<b>' . number_format( $row->amount ) . '</b>',
+				'txn_code' => esc_html( $txn_code ),
 				'metadata' => $this->format_metadata( $row->metadata ),
-				'date'     => $row->created_at
+				'date'     => esc_html( $row->created_at )
 			);
 		}
 		return $new_data;
@@ -181,24 +181,33 @@ class Payments_List_Table extends \WP_List_Table
 	 * @return string
 	 */
 	public function format_metadata( $data ) {
-		$new = json_decode( $data );
+		$new  = json_decode( $data, true );
 		$text = '';
 
+		if ( ! is_array( $new ) ) {
+			return '';
+		}
+
 		// Determine both for backwards compatability
-		if ( array_key_exists( "0", $new ) ) {
-			foreach ( $new as $key => $item ) {
-				if ( $item->type == 'text' ) {
-					$text .= '<b>' . $item->display_name . ": </b> " . $item->value . "<br />";
+		if ( array_key_exists( 0, $new ) ) {
+			foreach ( $new as $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$display_name = isset( $item['display_name'] ) ? esc_html( (string) $item['display_name'] ) : '';
+				$value        = isset( $item['value'] ) && is_scalar( $item['value'] ) ? (string) $item['value'] : '';
+				if ( isset( $item['type'] ) && 'text' === $item['type'] ) {
+					$text .= '<b>' . $display_name . ": </b> " . esc_html( $value ) . "<br />";
 				} else {
-					$text .= '<b>' . $item->display_name . ": </b>  <a target='_blank' href='" . $item->value . "'>link</a><br />";
+					$text .= '<b>' . $display_name . ": </b>  <a target='_blank' rel='noopener noreferrer' href='" . esc_url( $value ) . "'>link</a><br />";
 				}
 			}
 		} else {
-			$text = '';
-			if ( count( $new ) > 0 ) {
-				foreach ( $new as $key => $item ) {
-					$text .= '<b>' . $key . ": </b> " . $item . "<br />";
+			foreach ( $new as $key => $item ) {
+				if ( ! is_scalar( $item ) ) {
+					continue;
 				}
+				$text .= '<b>' . esc_html( $key ) . ": </b> " . esc_html( (string) $item ) . "<br />";
 			}
 		}
 		return $text;
