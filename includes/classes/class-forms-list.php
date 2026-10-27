@@ -36,7 +36,7 @@ class Forms_List {
 		if ( get_post_type( $post ) === 'paystack_form' ) {
 			unset( $actions['view'] );
 			unset( $actions['quick edit'] );
-			if ( current_user_can( Settings::get_capability() ) ) {
+			if ( current_user_can( Submissions::get_capability() ) ) {
 				$actions['export'] = '<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=submissions&form=' . $post->ID ) . '" >' . esc_html__( 'View Payments', 'payment_forms' ) . '</a>';
 			}
 		}
@@ -55,7 +55,7 @@ class Forms_List {
 			'title'     => esc_html__( 'Name', 'pff-paystack' ),
 			'shortcode' => esc_html__( 'Shortcode', 'pff-paystack' ),
 		);
-		if ( current_user_can( Settings::get_capability() ) ) {
+		if ( current_user_can( Submissions::get_capability() ) ) {
 			$columns['payments'] = esc_html__( 'Payments', 'pff-paystack' );
 		}
 		$columns['date'] = esc_html__( 'Date', 'pff-paystack' );

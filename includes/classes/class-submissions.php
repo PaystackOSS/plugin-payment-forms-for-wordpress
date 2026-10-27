@@ -21,12 +21,21 @@ class Submissions {
 	}
 
 	/**
+	 * Returns the capability required to view and export payment data.
+	 *
+	 * @return string
+	 */
+	public static function get_capability() {
+		return apply_filters( 'pff_paystack_payments_capability', 'manage_options' );
+	}
+
+	/**
 	 * Register the submissions page
 	 *
 	 * @return void
 	 */
 	public function register_submissions_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Submissions', 'pff-paystack' ), esc_html__( 'Submissions', 'pff-paystack' ), Settings::get_capability(), 'submissions', [ $this, 'output_submissions_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Submissions', 'pff-paystack' ), esc_html__( 'Submissions', 'pff-paystack' ), self::get_capability(), 'submissions', [ $this, 'output_submissions_page' ] );
 		remove_submenu_page( 'edit.php?post_type=paystack_form', 'submissions' );
 	}
 
@@ -36,7 +45,7 @@ class Submissions {
 	 * @return void
 	 */
 	public function output_submissions_page() {
-		if ( ! current_user_can( Settings::get_capability() ) ) {
+		if ( ! current_user_can( self::get_capability() ) ) {
 			return;
 		}
 
@@ -129,7 +138,7 @@ class Submissions {
 	public function export_excel() {
 		global $wpdb;
 
-		if ( ! current_user_can( Settings::get_capability() ) ) {
+		if ( ! current_user_can( self::get_capability() ) ) {
 			wp_die( esc_html__( 'You do not have permission to export this data.', 'pff-paystack' ), 403 );
 		}
 
@@ -164,10 +173,14 @@ class Submissions {
 			$csv_output .= "Date Paid,";
 			$csv_output .= "Reference,";
 
-			$new = json_decode( $header->metadata );
+			$new = json_decode( $header->metadata, true );
+			if ( ! is_array( $new ) ) {
+				$new = array();
+			}
 			if ( array_key_exists( 0, $new ) ) {
 				foreach ( $new as $item ) {
-					$csv_output .= $this->prep_csv_data( $item->display_name ) . ',';
+					$display_name = is_array( $item ) && isset( $item['display_name'] ) ? $item['display_name'] : '';
+					$csv_output  .= $this->prep_csv_data( $display_name ) . ',';
 				}
 			} elseif ( count( $new ) > 0 ) {
 				foreach ( $new as $key => $item ) {
@@ -184,13 +197,17 @@ class Submissions {
 				$csv_output .= $this->prep_csv_data( $newkey ) . ',';
 				$csv_output .= $this->prep_csv_data( $dbdata->email ) . ',';
 				$csv_output .= $this->prep_csv_data( $currency . ' ' . $dbdata->amount ) . ',';
-				$csv_output .= $this->prep_csv_data( substr( $dbdata->paid_at, 0, 10 ) ) . ',';
+				$csv_output .= $this->prep_csv_data( substr( (string) $dbdata->paid_at, 0, 10 ) ) . ',';
 				$csv_output .= $this->prep_csv_data( $txn_code ) . ',';
 
-				$new = json_decode( $dbdata->metadata );
+				$new = json_decode( $dbdata->metadata, true );
+				if ( ! is_array( $new ) ) {
+					$new = array();
+				}
 				if ( array_key_exists( 0, $new ) ) {
 					foreach ( $new as $item ) {
-						$csv_output .= $this->prep_csv_data( $item->value ) . ',';
+						$value       = is_array( $item ) && isset( $item['value'] ) ? $item['value'] : '';
+						$csv_output .= $this->prep_csv_data( $value ) . ',';
 					}
 				} elseif ( count( $new ) > 0 ) {
 					foreach ( $new as $item ) {
