@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Settings {
 
+	const OPTION_GROUP = 'kkd-pff-paystack-settings-group';
+
 	/**
 	 * Holdes the array of settings fields.
 	 *
@@ -37,6 +39,7 @@ class Settings {
 				'tsk' => array(
 					'title'   => esc_html__( 'Test Secret Key', 'pff-paystack' ),
 					'type'    => 'password',
+					'prefix'  => 'sk_test_',
 					'default' => '',
 				),
 				'tpk' => array(
@@ -47,6 +50,7 @@ class Settings {
 				'lsk' => array(
 					'title'   => esc_html__( 'Live Secret Key', 'pff-paystack' ),
 					'type'    => 'password',
+					'prefix'  => 'sk_live_',
 					'default' => '',
 				),
 				'lpk' => array(
@@ -80,6 +84,96 @@ class Settings {
 		);
 		add_action( 'admin_menu', [ $this, 'register_settings_page' ] );
 		add_action( 'admin_menu', [ $this, 'register_settings_fields' ] );
+		add_action( 'admin_init', [ $this, 'register_secret_key_guards' ] );
+	}
+
+	/**
+	 * Returns the capability required to view and save the settings.
+	 *
+	 * @return string
+	 */
+	public static function get_capability() {
+		return apply_filters( 'option_page_capability_' . self::OPTION_GROUP, 'manage_options' );
+	}
+
+	/**
+	 * Keeps stored secret keys when left blank and rejects keys with the wrong prefix.
+	 *
+	 * @return void
+	 */
+	public function register_secret_key_guards() {
+		// phpcs:disable WordPress.Security.NonceVerification -- options.php verifies the nonce before update_option runs.
+		$option_page = '';
+		if ( isset( $_POST['option_page'] ) ) {
+			$option_page = sanitize_key( wp_unslash( $_POST['option_page'] ) );
+		} elseif ( isset( $_GET['option_page'] ) ) {
+			$option_page = sanitize_key( wp_unslash( $_GET['option_page'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification
+		if ( self::OPTION_GROUP !== $option_page ) {
+			return;
+		}
+
+		foreach ( $this->get_settings_fields() as $fields ) {
+			foreach ( $fields as $key => $args ) {
+				if ( ! empty( $args['type'] ) && 'password' === $args['type'] ) {
+					add_filter( "pre_update_option_{$key}", [ $this, 'filter_secret_key' ], 10, 3 );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Keeps the stored key when the submitted one is blank or has the wrong prefix.
+	 *
+	 * @param mixed  $new    Submitted value.
+	 * @param mixed  $old    Stored value.
+	 * @param string $option Option name.
+	 * @return mixed
+	 */
+	public function filter_secret_key( $new, $old, $option ) {
+		if ( '' === $new ) {
+			return $old;
+		}
+
+		$field = null;
+		foreach ( $this->get_settings_fields() as $fields ) {
+			if ( isset( $fields[ $option ] ) ) {
+				$field = $fields[ $option ];
+				break;
+			}
+		}
+
+		$prefix = isset( $field['prefix'] ) ? $field['prefix'] : '';
+		if ( '' !== $prefix && 0 !== strpos( (string) $new, $prefix ) ) {
+			add_settings_error(
+				self::OPTION_GROUP,
+				"pff-paystack-invalid-{$option}",
+				sprintf(
+					/* translators: 1: field title, 2: required key prefix */
+					esc_html__( 'Invalid %1$s: it must start with %2$s. The previous key was kept; other settings were saved.', 'pff-paystack' ),
+					wp_strip_all_tags( $field['title'] ),
+					$prefix
+				),
+				'error'
+			);
+			return $old;
+		}
+
+		return $new;
+	}
+
+	/**
+	 * Builds the masked hint for a stored secret key.
+	 *
+	 * @param string $value Stored key.
+	 * @return string
+	 */
+	private function mask_key( $value ) {
+		if ( strlen( $value ) < 12 ) {
+			return '…' . substr( $value, -2 );
+		}
+		return substr( $value, 0, 8 ) . '…' . substr( $value, -4 );
 	}
 
 	/**
@@ -88,7 +182,7 @@ class Settings {
 	 * @return void
 	 */
 	public function register_settings_page() {
-		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Settings', 'pff-paystack' ), esc_html__( 'Settings', 'pff-paystack' ), 'edit_posts', 'settings', [ $this, 'output_settings_page' ] );
+		add_submenu_page( 'edit.php?post_type=paystack_form', esc_html__( 'Settings', 'pff-paystack' ), esc_html__( 'Settings', 'pff-paystack' ), self::get_capability(), 'settings', [ $this, 'output_settings_page' ] );
 	}
 
 	/**
@@ -101,23 +195,27 @@ class Settings {
 		// Run through each group, and the fields in there.
 		foreach ( $fields as $group => $fields ) {
 			foreach ( $fields as $field_key => $args ) {
-				register_setting( 'kkd-pff-paystack-settings-group', $field_key, [ $this, 'sanitise_field' ] );
+				register_setting( self::OPTION_GROUP, $field_key, [ $this, 'sanitise_field' ] );
 			}
 		}
 	}
 
 	public function output_settings_page() {
+		if ( ! current_user_can( self::get_capability() ) ) {
+			return;
+		}
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Paystack Forms Settings', 'pff-paystack' ); ?></h1>
+			<?php settings_errors(); ?>
 			<h2><?php esc_html_e( 'API Keys Settings', 'pff-paystack' ); ?></h2>
 
 			<span><?php echo wp_kses_post( __( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'pff-paystack' ) ); ?> </span>
 			
 			<form method="post" action="options.php">
 				<?php 
-					settings_fields( 'kkd-pff-paystack-settings-group' );
-					do_settings_sections( 'kkd-pff-paystack-settings-group' );
+					settings_fields( self::OPTION_GROUP );
+					do_settings_sections( self::OPTION_GROUP );
 					$settings_fields = $this->get_settings_fields();
 				?>
 				<table class="form-table paystack_setting_page">
@@ -134,6 +232,13 @@ class Settings {
 									<option value="test" <?php echo esc_attr( $this->is_option_selected( 'test', $saved_val ) ); ?>><?php esc_html_e( 'Test Mode', 'pff-paystack' ); ?></option>
 									<option value="live" <?php echo esc_attr( $this->is_option_selected( 'live', $saved_val ) ); ?>><?php esc_html_e( 'Live Mode', 'pff-paystack' ); ?></option>
 								</select>
+							<?php } elseif ( 'password' === $field['type'] ) { ?>
+								<input type="password" name="<?php echo esc_attr( $key ); ?>" value="" autocomplete="new-password" />
+								<?php $saved_key = (string) get_option( $key, '' ); ?>
+								<?php if ( '' !== $saved_key ) { ?>
+									<?php /* translators: %s: masked saved key */ ?>
+									<p class="description"><?php echo esc_html( sprintf( __( 'Saved key: %s. Leave blank to keep it.', 'pff-paystack' ), $this->mask_key( $saved_key ) ) ); ?></p>
+								<?php } ?>
 							<?php } else { ?>
 								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, $field['default'] ) ); ?>" />
 							<?php } ?>
@@ -195,11 +300,10 @@ class Settings {
 	/**
 	 * Sanitises the field name
 	 *
-	 * @param string $value
-	 * /
-	 * 
+	 * @param mixed $value
+	 * @return string
 	 */
-	private function sanitise_field( $value ) {
-		return sanitize_text_field( $value );
+	public function sanitise_field( $value ) {
+		return sanitize_text_field( is_scalar( $value ) ? (string) $value : '' );
 	}
 }
