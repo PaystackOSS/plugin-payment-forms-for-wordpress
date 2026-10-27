@@ -767,7 +767,7 @@ class Helpers {
 					break;
 
 				default:
-					$display_name = ucwords( str_replace( array( '_', '-', 'pf' ), ' ', $key ) );
+					$display_name = sanitize_text_field( ucwords( str_replace( array( '_', '-', 'pf' ), ' ', $key ) ) );
 					$fields[] = array(
 						'display_name'  => $display_name,
 						'variable_name' => $key,

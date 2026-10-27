@@ -36,7 +36,9 @@ class Forms_List {
 		if ( get_post_type( $post ) === 'paystack_form' ) {
 			unset( $actions['view'] );
 			unset( $actions['quick edit'] );
-			$actions['export'] = '<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=submissions&form=' . $post->ID ) . '" >' . esc_html__( 'View Payments', 'payment_forms' ) . '</a>';
+			if ( current_user_can( Settings::get_capability() ) ) {
+				$actions['export'] = '<a href="' . admin_url( 'edit.php?post_type=paystack_form&page=submissions&form=' . $post->ID ) . '" >' . esc_html__( 'View Payments', 'payment_forms' ) . '</a>';
+			}
 		}
 		return $actions;
 	}
@@ -52,9 +54,11 @@ class Forms_List {
 			'cb'        => '<input type="checkbox" />',
 			'title'     => esc_html__( 'Name', 'pff-paystack' ),
 			'shortcode' => esc_html__( 'Shortcode', 'pff-paystack' ),
-			'payments'  => esc_html__( 'Payments', 'pff-paystack' ),
-			'date'      => esc_html__( 'Date', 'pff-paystack' )
 		);
+		if ( current_user_can( Settings::get_capability() ) ) {
+			$columns['payments'] = esc_html__( 'Payments', 'pff-paystack' );
+		}
+		$columns['date'] = esc_html__( 'Date', 'pff-paystack' );
 		return $columns;
 	}
 
