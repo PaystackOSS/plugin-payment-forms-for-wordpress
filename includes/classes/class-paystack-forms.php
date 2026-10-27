@@ -113,6 +113,7 @@ final class Payment_Forms {
 			'email-receipt'        => 'Email_Receipt',
 			'email-receipt-owner'  => 'Email_Receipt_Owner',
 			'retry-submit'         => 'Retry_Submit',
+			'php-version-notice'   => 'PHP_Version_Notice',
 		);
 	}
 
