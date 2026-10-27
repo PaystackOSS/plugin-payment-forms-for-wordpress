@@ -166,14 +166,18 @@ class Settings {
 	/**
 	 * Builds the masked hint for a stored secret key.
 	 *
-	 * @param string $value Stored key.
+	 * @param string $value  Stored key.
+	 * @param string $prefix Expected key prefix, or '' if none.
 	 * @return string
 	 */
-	private function mask_key( $value ) {
-		if ( strlen( $value ) < 12 ) {
-			return '…' . substr( $value, -2 );
+	private function mask_key( $value, $prefix ) {
+		if ( '' === $prefix || 0 !== strpos( $value, $prefix ) ) {
+			return '••••';
 		}
-		return substr( $value, 0, 8 ) . '…' . substr( $value, -4 );
+		if ( strlen( $value ) < strlen( $prefix ) + 20 ) {
+			return $prefix . '••••';
+		}
+		return $prefix . '…' . substr( $value, -4 );
 	}
 
 	/**
@@ -237,7 +241,7 @@ class Settings {
 								<?php $saved_key = (string) get_option( $key, '' ); ?>
 								<?php if ( '' !== $saved_key ) { ?>
 									<?php /* translators: %s: masked saved key */ ?>
-									<p class="description"><?php echo esc_html( sprintf( __( 'Saved key: %s. Leave blank to keep it.', 'pff-paystack' ), $this->mask_key( $saved_key ) ) ); ?></p>
+									<p class="description"><?php echo esc_html( sprintf( __( 'Saved key: %s. Leave blank to keep it.', 'pff-paystack' ), $this->mask_key( $saved_key, isset( $field['prefix'] ) ? $field['prefix'] : '' ) ) ); ?></p>
 								<?php } ?>
 							<?php } else { ?>
 								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, $field['default'] ) ); ?>" />

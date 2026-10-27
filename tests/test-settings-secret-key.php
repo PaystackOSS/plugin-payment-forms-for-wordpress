@@ -11,7 +11,7 @@ if ( ! function_exists( 'add_settings_error' ) ) {
 
 require dirname( __DIR__ ) . '/includes/classes/class-settings.php';
 
-define( 'EXPECTED', 26 );
+define( 'EXPECTED', 27 );
 
 $s = new \paystack\payment_forms\Settings();
 
@@ -61,9 +61,10 @@ $m = new ReflectionMethod( $s, 'mask_key' );
 if ( PHP_VERSION_ID < 80100 ) {
 	$m->setAccessible( true );
 }
-check( 'mask long with prefix', "sk_test_\u{2026}wxyz", $m->invoke( $s, 'sk_test_abcdefghwxyz' ) );
-check( 'mask long wrong prefix', "abcdefgh\u{2026}wxyz", $m->invoke( $s, 'abcdefghijklmnopwxyz' ) );
-check( 'mask short', "\u{2026}yz", $m->invoke( $s, 'abcdwxyz' ) );
+check( 'mask long with prefix', "sk_test_\u{2026}wxyz", $m->invoke( $s, 'sk_test_abcdefghijklmnopwxyz', 'sk_test_' ) );
+check( 'mask legacy key without prefix', "\u{2022}\u{2022}\u{2022}\u{2022}", $m->invoke( $s, 'abcdefghijklmnopqrstuvwxyz', '' ) );
+check( 'mask wrong prefix', "\u{2022}\u{2022}\u{2022}\u{2022}", $m->invoke( $s, 'sk_live_abcdefghijklmnopwxyz', 'sk_test_' ) );
+check( 'mask short prefixed', "sk_test_\u{2022}\u{2022}\u{2022}\u{2022}", $m->invoke( $s, 'sk_test_abcdwxyz', 'sk_test_' ) );
 
 echo "$total assertions, $failures failures\n";
 $completed = true;
