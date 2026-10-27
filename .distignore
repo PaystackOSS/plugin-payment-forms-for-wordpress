@@ -5,3 +5,5 @@
 
 .distignore
 .gitignore
+/tests
+/docs

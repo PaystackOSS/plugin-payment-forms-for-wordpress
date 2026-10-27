@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 4.0.5
+Stable tag: 4.0.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,13 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+
+= 4.0.6 =
+* Security: the Settings page and payment data export are now restricted to administrators.
+* Security: secret keys are no longer displayed on the Settings page; leave the field blank to keep the saved key.
+* Security: payment data exports are protected against spreadsheet formula injection.
+* Security: payment submission details are now escaped on the Submissions page.
+* Adds a Site Health check and admin warning when the server's PHP version needs a security update.
 
 = 4.0.5 =
 * * Compatibility with WordPress 6.8.1 and PHP 8.4.4
@@ -232,3 +239,8 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 == Screenshots ==
 1. Adding a new payment form.
 2. What customer sees for making payment.
+
+== Upgrade Notice ==
+
+= 4.0.6 =
+Security release. Update recommended.
