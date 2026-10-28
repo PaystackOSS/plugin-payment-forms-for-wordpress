@@ -599,6 +599,11 @@ class Forms_Update {
 	 */
 	public function save_post_meta( $form_id, $post ) {
 
+		// save_post also fires from REST, cron and front-end inserts, where get_current_screen() is undefined.
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
 		$screen = get_current_screen();
 		if ( null !== $screen && isset( $screen->post_type ) && 'paystack_form' === $screen->post_type ) {
 			$this->is_screen = true;

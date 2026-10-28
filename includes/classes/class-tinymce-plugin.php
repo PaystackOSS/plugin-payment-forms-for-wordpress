@@ -60,7 +60,8 @@ class TinyMCE_Plugin {
      */
     function add_tinymce_plugin( $plugin_array ) {
 		$current_version = get_bloginfo('version');
-		if ( version_compare( '6.2', $current_version, '<=' ) ) {
+		// Page builders such as Bricks call wp_editor() on the front end, where get_current_screen() is undefined.
+		if ( version_compare( '6.2', $current_version, '<=' ) && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
 			if ( null !== $screen && isset( $screen->post_type ) && 'paystack_form' === $screen->post_type ) {
 				$this->is_screen = true;

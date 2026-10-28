@@ -4,7 +4,7 @@ Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
 Tested up to: 6.8.1
-Stable tag: 4.0.6
+Stable tag: 4.0.7
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,10 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+
+= 4.0.7 =
+* Fix: a fatal error when a page builder such as Bricks loads the editor on the front end.
+* Fix: a fatal error when posts are saved through the REST API, including from the block editor.
 
 = 4.0.6 =
 * Security: the Settings page and payment data export are now restricted to administrators.
@@ -241,6 +245,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 2. What customer sees for making payment.
 
 == Upgrade Notice ==
+
+= 4.0.7 =
+Fixes fatal errors with page builders such as Bricks and with REST API saves. Update recommended.
 
 = 4.0.6 =
 Security release. Update recommended.
