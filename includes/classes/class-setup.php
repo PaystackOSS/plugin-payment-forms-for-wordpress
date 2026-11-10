@@ -127,29 +127,43 @@ class Setup {
     }
 
 	/**
-	 * Enqueue the frontend scripts.
+	 * Registers the frontend scripts on every page and enqueues them early when the post content has a form.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-
-		$page_content = get_the_content();
-		if ( ! has_shortcode( $page_content, 'pff-paystack' ) ) {
-			return;
-		}
-
-		wp_enqueue_script( 'blockUI', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/jquery.blockUI.min.js', array( 'jquery', 'jquery-ui-core' ), PFF_PAYSTACK_VERSION, true );
-
+		wp_register_script( 'blockUI', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/jquery.blockUI.min.js', array( 'jquery', 'jquery-ui-core' ), PFF_PAYSTACK_VERSION, true );
 		wp_register_script( 'Paystack', 'https://js.paystack.co/v1/inline.js', false, PFF_PAYSTACK_VERSION, true );
-		wp_enqueue_script( 'Paystack' );
+		wp_register_script( PFF_PLUGIN_NAME . '-public', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-public.js', array( 'jquery', 'blockUI', 'Paystack' ), PFF_PAYSTACK_VERSION, true );
 
-		wp_enqueue_script( PFF_PLUGIN_NAME . '-public', PFF_PAYSTACK_PLUGIN_URL . '/assets/js/paystack-public.js', array( 'jquery' ), PFF_PAYSTACK_VERSION, true );
-		
 		$helpers = new Helpers();
 		$js_args = [
 			'key' => $helpers->get_public_key(),
 			'fee' => $helpers->get_fees(),
 		];
-		wp_localize_script( PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args , PFF_PAYSTACK_VERSION, true );
+		wp_localize_script( PFF_PLUGIN_NAME . '-public', 'pffSettings', $js_args );
+
+		$post = get_post();
+		if ( $post && ( has_shortcode( $post->post_content, 'pff-paystack' ) || has_shortcode( $post->post_content, 'paystack_form' ) ) ) {
+			self::enqueue_public_scripts();
+		}
+	}
+
+	/**
+	 * Enqueues the frontend script and its dependencies.
+	 *
+	 * Also called while the shortcode renders, because page builders, widgets and templates
+	 * keep the shortcode outside post_content. Forms rendered after the footer scripts have
+	 * printed (e.g. builder popups hooked late into wp_footer) get the scripts printed directly.
+	 *
+	 * @return void
+	 */
+	public static function enqueue_public_scripts() {
+		$handle = PFF_PLUGIN_NAME . '-public';
+		if ( did_action( 'wp_print_footer_scripts' ) ) {
+			wp_print_scripts( $handle );
+		} else {
+			wp_enqueue_script( $handle );
+		}
 	}
 }
