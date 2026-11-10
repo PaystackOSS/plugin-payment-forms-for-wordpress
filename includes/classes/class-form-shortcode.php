@@ -123,6 +123,8 @@ class Form_Shortcode {
 			); // Return early to avoid further processing
 		}
 
+		Setup::enqueue_public_scripts();
+
 		// Store our items in an array and not an object.
 		$html = [];
 	
