@@ -39,7 +39,7 @@ class Settings {
 	);
 
 	/**
-	 * Collapses the secret key section and wires its toggle; static so it can be printed under a strict CSP.
+	 * Collapses the secret key section and wires its toggle; printed with wp_print_inline_script_tag so CSP plugins can add a nonce; without JS the section stays open and the server rules still apply.
 	 */
 	const SECRET_KEYS_JS = <<<'JS'
 (function () {
@@ -208,19 +208,14 @@ JS;
 		}
 
 		// Attached before the auth gate so an undecided rk save keeps the old key instead of storing it unverified.
-		$rk_options = array();
-		$sk_options = array();
 		foreach ( self::SECRET_PAIRS as $pair ) {
-			$rk_options[] = $pair['rk'];
-			$sk_options[] = $pair['sk'];
 			add_filter( "pre_update_option_{$pair['rk']}", [ $this, 'filter_restricted_key' ], 10, 3 );
 			add_filter( "pre_update_option_{$pair['sk']}", [ $this, 'filter_secret_key' ], 10, 3 );
 		}
 
 		foreach ( $this->get_settings_fields() as $fields ) {
 			foreach ( $fields as $key => $args ) {
-				$guarded = in_array( $key, $rk_options, true ) || in_array( $key, $sk_options, true );
-				if ( ! $guarded && ! empty( $args['type'] ) && 'password' === $args['type'] ) {
+				if ( null === $this->locate_key_option( $key ) && ! empty( $args['type'] ) && 'password' === $args['type'] ) {
 					add_filter( "pre_update_option_{$key}", [ $this, 'filter_secret_key' ], 10, 3 );
 				}
 			}
@@ -462,16 +457,6 @@ JS;
 	}
 
 	/**
-	 * Clears a mode's runtime key-denied record after a successful key save.
-	 *
-	 * @param string $mode 'test' or 'live'.
-	 * @return void
-	 */
-	private function clear_denied( $mode ) {
-		Restricted_Key::clear_denied( $mode );
-	}
-
-	/**
 	 * Applies the mode's restricted key decision to its option.
 	 *
 	 * @param mixed  $new    Submitted value.
@@ -492,11 +477,11 @@ JS;
 				return $old;
 			}
 			delete_option( self::SECRET_PAIRS[ $mode ]['sk'] );
-			$this->clear_denied( $mode );
+			Restricted_Key::clear_denied( $mode );
 			return $new;
 		}
 		if ( 'remove' === $decision['rk'] ) {
-			$this->clear_denied( $mode );
+			Restricted_Key::clear_denied( $mode );
 			return '';
 		}
 		return $old;
@@ -529,7 +514,7 @@ JS;
 				return $old;
 			}
 			if ( 'accept' === $sk_state ) {
-				$this->clear_denied( $mode );
+				Restricted_Key::clear_denied( $mode );
 				return $new;
 			}
 		}
@@ -541,7 +526,7 @@ JS;
 		}
 
 		if ( $is_sk ) {
-			$this->clear_denied( $located[0] );
+			Restricted_Key::clear_denied( $located[0] );
 		}
 
 		return $new;

@@ -52,7 +52,7 @@ require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\API;
 
-define( 'EXPECTED', 185 );
+define( 'EXPECTED', 183 );
 
 $deny = RK::SCOPE_DENIED_MESSAGE;
 $mor  = RK::MOR_MESSAGE;
@@ -427,13 +427,8 @@ check( 'clear_denied removes mode', array( 'live' ), array_keys( RK::get_denied(
 check( 'clear_denied writes non-autoloaded', false, end( $GLOBALS['pff_updates'] )[2] );
 RK::clear_denied( 'test' );
 check( 'clear_denied absent mode does not write', 4, count( $GLOBALS['pff_updates'] ) );
-$GLOBALS['pff_options']['pff_paystack_rk_denied'] = array( 'test' => array( 'module' => 'plan/', 'time' => 5 ), 'live' => 'junk', 'x' => array( 'time' => 1 ) );
-check( 'old-shape option converted', array( 'test' => array( 'plan' => 5 ) ), RK::get_denied() );
-$before = count( $GLOBALS['pff_updates'] );
-RK::record_denied( 'test', 'plan' );
-check( 'old-shape same module does not write', $before, count( $GLOBALS['pff_updates'] ) );
-RK::record_denied( 'test', 'subscription' );
-check( 'old-shape record keeps converted module', array( 'plan', 'subscription' ), array_keys( $GLOBALS['pff_options']['pff_paystack_rk_denied']['test'] ) );
+$GLOBALS['pff_options']['pff_paystack_rk_denied'] = array( 'test' => array( 'plan' => 5, 5 => 6, 'subscription' => 'x' ), 'live' => 'junk', 'x' => array( 'plan' => 1 ) );
+check( 'malformed entries dropped', array( 'test' => array( 'plan' => 5 ) ), RK::get_denied() );
 $GLOBALS['pff_options']['pff_paystack_rk_denied'] = 'corrupt';
 check( 'get_denied non-array', array(), RK::get_denied() );
 check( 'module_label known', 'Reading or creating plans', RK::module_label( 'plan/' ) );

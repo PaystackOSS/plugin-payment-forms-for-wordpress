@@ -50,11 +50,11 @@ class API {
 	protected $public = '';
 
 	/**
-	 * The Private API Key
+	 * The Private API Key, memoised by secret().
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	private $secret = '';
+	private $secret = null;
 
 	/**
 	 * The mode the keys were resolved for, "test" or "live".
@@ -69,12 +69,19 @@ class API {
 	public function __construct() {
 		$mode = esc_attr( get_option( 'mode' ) );
 		$this->mode   = 'test' == $mode ? 'test' : 'live';
-		$this->secret = esc_attr( Helpers::get_secret_key( $this->mode ) );
-		if ( $mode == 'test' ) {
-			$this->public = esc_attr( get_option( 'tpk' ) );
-		} else {
-			$this->public = esc_attr( get_option( 'lpk' ) );
+		$this->public = esc_attr( get_option( 'test' === $this->mode ? 'tpk' : 'lpk' ) );
+	}
+
+	/**
+	 * Resolves the secret key on first use so pages that make no Paystack request skip the key options.
+	 *
+	 * @return string
+	 */
+	private function secret() {
+		if ( null === $this->secret ) {
+			$this->secret = esc_attr( Helpers::get_secret_key( $this->mode ) );
 		}
+		return $this->secret;
 	}
 
 	/**
@@ -104,7 +111,7 @@ class API {
 	 */
 	protected function get_headers(){
 		return array(
-			'Authorization' => 'Bearer ' . $this->secret
+			'Authorization' => 'Bearer ' . $this->secret()
 		);
 	}
 
@@ -136,11 +143,14 @@ class API {
 	 * @return void
 	 */
 	private function track_scope_denied( $return ) {
-		if ( is_wp_error( $return ) || 403 !== (int) wp_remote_retrieve_response_code( $return ) ) {
+		if ( is_wp_error( $return ) ) {
 			return;
 		}
-		$message = Restricted_Key::message_of( wp_remote_retrieve_body( $return ) );
-		if ( Restricted_Key::is_scope_denied( 403, $message ) ) {
+		$status = (int) wp_remote_retrieve_response_code( $return );
+		if ( 403 !== $status ) {
+			return;
+		}
+		if ( Restricted_Key::is_scope_denied( $status, Restricted_Key::message_of( wp_remote_retrieve_body( $return ) ) ) ) {
 			Restricted_Key::record_denied( $this->mode, $this->module );
 		}
 	}
@@ -187,7 +197,7 @@ class API {
 	 */
 	public function api_ready() {
 		$ready = false;
-		if ( '' !== $this->secret ) {
+		if ( '' !== $this->secret() ) {
 			$ready = true;
 		}
 		return $ready;

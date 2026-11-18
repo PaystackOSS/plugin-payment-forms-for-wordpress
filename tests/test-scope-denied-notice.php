@@ -106,7 +106,7 @@ use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\Restricted_Key_Notice;
 use paystack\payment_forms\Test_API;
 
-define( 'EXPECTED', 31 );
+define( 'EXPECTED', 30 );
 
 function reply( $code, $message ) {
 	$GLOBALS['pff_reply'] = array(
@@ -194,10 +194,6 @@ $GLOBALS['pff_options']['pff_paystack_rk_denied'] = array(
 $html = render();
 check( 'unknown stored module skipped', 1, substr_count( $html, 'notice notice-error' ) );
 check( 'no raw stored markup', false, strpos( $html, '<script>' ) || strpos( $html, '<b>' ) );
-
-$GLOBALS['pff_options']['pff_paystack_rk_denied'] = array( 'live' => array( 'module' => 'plan', 'time' => 1 ) );
-$html = render();
-check( 'old-shape record still renders', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'Reading or creating plans' ) );
 
 echo "$total assertions, $failures failures\n";
 $completed = true;

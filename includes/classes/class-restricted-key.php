@@ -562,9 +562,6 @@ class Restricted_Key {
 			if ( ! is_array( $entry ) || ! in_array( $mode, array( 'test', 'live' ), true ) ) {
 				continue;
 			}
-			if ( isset( $entry['module'] ) && is_string( $entry['module'] ) ) {
-				$entry = array( rtrim( $entry['module'], '/' ) => isset( $entry['time'] ) ? (int) $entry['time'] : 0 );
-			}
 			foreach ( $entry as $module => $time ) {
 				if ( is_string( $module ) && is_int( $time ) ) {
 					$denied[ $mode ][ $module ] = $time;
