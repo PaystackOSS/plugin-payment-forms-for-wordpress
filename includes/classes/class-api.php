@@ -130,6 +130,22 @@ class API {
 	}
 
 	/**
+	 * Records a restricted-key scope denial for the current module.
+	 *
+	 * @param array|\WP_Error $return The HTTP response.
+	 * @return void
+	 */
+	private function track_scope_denied( $return ) {
+		if ( is_wp_error( $return ) || ! class_exists( __NAMESPACE__ . '\\Restricted_Key' ) ) {
+			return;
+		}
+		$message = Restricted_Key::message_of( wp_remote_retrieve_body( $return ) );
+		if ( Restricted_Key::is_scope_denied( (int) wp_remote_retrieve_response_code( $return ), $message ) ) {
+			Restricted_Key::record_denied( $this->mode, $this->module );
+		}
+	}
+
+	/**
 	 * Sends a GET request and checks to see is is_wp_error().
 	 *
 	 * @return boolean|object
@@ -137,6 +153,7 @@ class API {
 	public function get_request() {
 		$response = false;
 		$return   = wp_remote_get( $this->get_url(), $this->get_args() );
+		$this->track_scope_denied( $return );
 		if ( ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
@@ -156,6 +173,7 @@ class API {
 			'timeout' => 60,
 		);
 		$return   = wp_remote_post( $this->get_url(), $args );
+		$this->track_scope_denied( $return );
 		if ( ! empty( $body ) && ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}

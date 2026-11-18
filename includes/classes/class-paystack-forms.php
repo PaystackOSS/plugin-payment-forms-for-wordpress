@@ -103,6 +103,7 @@ final class Payment_Forms {
 			'field-shortcodes'     => 'Field_Shortcodes',
 			'api'                  => '',
 			'restricted-key'       => '',
+			'restricted-key-notice' => 'Restricted_Key_Notice',
 			'request-plan'         => 'Request_Plan',
 			'request-subscription' => 'Request_Subscription',
 			'transaction-verify'   => 'Transaction_Verify',
