@@ -97,7 +97,7 @@ use paystack\payment_forms\Helpers;
 use paystack\payment_forms\Restricted_Key;
 use paystack\payment_forms\Settings;
 
-define( 'EXPECTED', 152 );
+define( 'EXPECTED', 154 );
 
 $GLOBALS['pff_calls']   = array();
 $GLOBALS['pff_verdict'] = array( 'code' => 'ok', 'scopes' => array(), 'reason' => null );
@@ -301,6 +301,8 @@ $out = save( array( 'trk_remove' => '0' ), array( 'trk' => $RK ) );
 check( 'remove flag must be 1', $RK, $out['trk'] );
 $out = save( array( 'trk' => $RK2, 'trk_remove' => '1' ), array( 'trk' => $RK, 'tsk' => 'sk_test_stored' ) );
 check( 'new rk beats remove flag', $RK2, $out['trk'] );
+check( 'new rk beats remove flag notice', array( 'pff-paystack-rk-remove-ignored-trk' ), error_codes() );
+check( 'remove ignored copy', true, false !== strpos( error_text(), 'Remove was ignored because a new restricted key was submitted.' ) );
 
 // Blank rk without a stored rk leaves sk behaviour as today.
 $out = save( array( 'tsk' => 'sk_test_new' ), array() );

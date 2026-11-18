@@ -18,6 +18,8 @@ class Settings {
 
 	const OPTION_GROUP = 'kkd-pff-paystack-settings-group';
 
+	const DASHBOARD_URL = 'https://dashboard.paystack.com/v2/developers/api-configuration';
+
 	/**
 	 * Restricted key, secret key and remove-restricted-key field names for each mode.
 	 *
@@ -35,6 +37,44 @@ class Settings {
 			'remove' => 'lrk_remove',
 		),
 	);
+
+	/**
+	 * Collapses the secret key section and wires its toggle; static so it can be printed under a strict CSP.
+	 */
+	const SECRET_KEYS_JS = <<<'JS'
+(function () {
+	var box = document.getElementById('pff-secret-keys');
+	var btn = document.getElementById('pff-secret-keys-toggle');
+	if (!box || !btn || box.getAttribute('data-collapsed') !== '1') {
+		return;
+	}
+	var inputs = box.querySelectorAll('input');
+	var removes = document.querySelectorAll('.pff-rk-remove');
+	function setDisabled(state) {
+		for (var i = 0; i < inputs.length; i++) {
+			inputs[i].disabled = state;
+		}
+	}
+	function expand() {
+		box.hidden = false;
+		box.removeAttribute('data-collapsed');
+		setDisabled(false);
+		btn.setAttribute('aria-expanded', 'true');
+		btn.hidden = true;
+	}
+	box.hidden = true;
+	setDisabled(true);
+	btn.hidden = false;
+	btn.addEventListener('click', expand);
+	for (var i = 0; i < removes.length; i++) {
+		removes[i].addEventListener('change', function () {
+			if (this.checked) {
+				expand();
+			}
+		});
+	}
+})();
+JS;
 
 	/**
 	 * Holdes the array of settings fields.
@@ -169,14 +209,18 @@ class Settings {
 
 		// Attached before the auth gate so an undecided rk save keeps the old key instead of storing it unverified.
 		$rk_options = array();
+		$sk_options = array();
 		foreach ( self::SECRET_PAIRS as $pair ) {
 			$rk_options[] = $pair['rk'];
+			$sk_options[] = $pair['sk'];
 			add_filter( "pre_update_option_{$pair['rk']}", [ $this, 'filter_restricted_key' ], 10, 3 );
+			add_filter( "pre_update_option_{$pair['sk']}", [ $this, 'filter_secret_key' ], 10, 3 );
 		}
 
 		foreach ( $this->get_settings_fields() as $fields ) {
 			foreach ( $fields as $key => $args ) {
-				if ( ! empty( $args['type'] ) && 'password' === $args['type'] && ! in_array( $key, $rk_options, true ) ) {
+				$guarded = in_array( $key, $rk_options, true ) || in_array( $key, $sk_options, true );
+				if ( ! $guarded && ! empty( $args['type'] ) && 'password' === $args['type'] ) {
 					add_filter( "pre_update_option_{$key}", [ $this, 'filter_secret_key' ], 10, 3 );
 				}
 			}
@@ -259,6 +303,12 @@ class Settings {
 			} else {
 				$decision['rk']         = 'reject';
 				$decision['messages'][] = array( "pff-paystack-rk-{$pair['rk']}", $message );
+			}
+			if ( $remove ) {
+				$decision['messages'][] = array(
+					"pff-paystack-rk-remove-ignored-{$pair['rk']}",
+					esc_html__( 'Remove was ignored because a new restricted key was submitted.', 'pff-paystack' ),
+				);
 			}
 			if ( '' !== $sk_in ) {
 				$decision['messages'][] = array(
@@ -538,64 +588,215 @@ class Settings {
 		}
 	}
 
+	/**
+	 * Whether the secret key section should start open: a mode holds a secret key, or a save just reported a problem with one.
+	 *
+	 * @internal
+	 *
+	 * @param array $errors Settings errors, as returned by get_settings_errors().
+	 * @return bool
+	 */
+	public function secret_keys_expanded( $errors = array() ) {
+		$prefixes = array( 'pff-paystack-sk-ignored-', 'pff-paystack-rk-remove-' );
+		foreach ( self::SECRET_PAIRS as $pair ) {
+			if ( '' !== (string) get_option( $pair['sk'], '' ) ) {
+				return true;
+			}
+			$prefixes[] = "pff-paystack-invalid-{$pair['sk']}";
+		}
+
+		foreach ( $errors as $error ) {
+			$code = isset( $error['code'] ) ? (string) $error['code'] : '';
+			foreach ( $prefixes as $prefix ) {
+				if ( 0 === strpos( $code, $prefix ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Prints the masked hint for a stored key; the value itself is never echoed.
+	 *
+	 * @param string $key    Option name.
+	 * @param string $prefix Expected key prefix, or '' if none.
+	 * @return void
+	 */
+	private function render_saved_hint( $key, $prefix ) {
+		$saved_key = (string) get_option( $key, '' );
+		if ( '' === $saved_key ) {
+			return;
+		}
+		/* translators: %s: masked saved key */
+		?>
+		<p class="description"><?php echo esc_html( sprintf( __( 'Saved key: %s. Leave blank to keep it.', 'pff-paystack' ), $this->mask_key( $saved_key, $prefix ) ) ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Prints a settings row for a restricted or secret key field, which is never echoed back, only masked.
+	 *
+	 * @param string $key         Option name.
+	 * @param array  $field       Field definition.
+	 * @param string $remove_name Name of the remove-saved-key checkbox (restricted keys only), or ''.
+	 * @return void
+	 */
+	private function render_key_row( $key, $field, $remove_name = '' ) {
+		$prefix = isset( $field['prefix'] ) ? $field['prefix'] : '';
+		?>
+		<tr valign="top">
+			<th scope="row"><label for="<?php echo esc_attr( 'pff-' . $key ); ?>"><?php echo wp_kses_post( $field['title'] ); ?></label></th>
+			<td>
+				<input type="password" id="<?php echo esc_attr( 'pff-' . $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="" placeholder="<?php echo esc_attr( $prefix . '…' ); ?>" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" />
+				<?php $this->render_saved_hint( $key, $prefix ); ?>
+				<?php if ( '' !== $remove_name && '' !== (string) get_option( $key, '' ) ) { ?>
+					<p><label><input type="checkbox" class="pff-rk-remove" name="<?php echo esc_attr( $remove_name ); ?>" value="1" /> <?php esc_html_e( 'Remove saved restricted key', 'pff-paystack' ); ?></label></p>
+					<p class="description"><?php esc_html_e( "To switch back to a secret key, also paste one under 'Use secret keys instead'.", 'pff-paystack' ); ?></p>
+				<?php } ?>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Prints a generic settings row: a password field shows only a masked hint, anything else shows its saved value.
+	 *
+	 * @param string $key   Option name.
+	 * @param array  $field Field definition.
+	 * @return void
+	 */
+	private function render_field_row( $key, $field ) {
+		?>
+		<tr valign="top">
+			<th scope="row"><label for="<?php echo esc_attr( 'pff-' . $key ); ?>"><?php echo wp_kses_post( $field['title'] ); ?></label></th>
+			<td>
+			<?php if ( 'password' === $field['type'] ) { ?>
+				<input type="password" id="<?php echo esc_attr( 'pff-' . $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="" autocomplete="new-password" />
+				<?php $this->render_saved_hint( $key, isset( $field['prefix'] ) ? $field['prefix'] : '' ); ?>
+			<?php } else { ?>
+				<input type="<?php echo esc_attr( $field['type'] ); ?>" id="<?php echo esc_attr( 'pff-' . $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, isset( $field['default'] ) ? $field['default'] : '' ) ); ?>" />
+			<?php } ?>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Prints a form table of the given fields that are present, if any.
+	 *
+	 * @param array    $general  General fields.
+	 * @param array    $keys     Option names to render, in order.
+	 * @param callable $renderer function( $key, $field ) printing one row.
+	 * @return void
+	 */
+	private function render_rows( $general, $keys, $renderer ) {
+		$present = array_values( array_intersect( $keys, array_keys( $general ) ) );
+		if ( ! $present ) {
+			return;
+		}
+		?>
+		<table class="form-table paystack_setting_page">
+			<?php
+			foreach ( $present as $key ) {
+				call_user_func( $renderer, $key, $general[ $key ] );
+			}
+			?>
+		</table>
+		<?php
+	}
+
 	public function output_settings_page() {
 		if ( ! current_user_can( self::get_capability() ) ) {
 			return;
 		}
+		$settings_fields = $this->get_settings_fields();
+		$general         = isset( $settings_fields['general'] ) ? $settings_fields['general'] : array();
+		$rk_keys         = array_column( self::SECRET_PAIRS, 'rk' );
+		$sk_keys         = array_column( self::SECRET_PAIRS, 'sk' );
+		$remove_names    = array_combine( $rk_keys, array_column( self::SECRET_PAIRS, 'remove' ) );
+		$known           = array_merge( array( 'mode', 'tpk', 'lpk' ), $rk_keys, $sk_keys );
+		$has_rk          = (bool) array_intersect( $rk_keys, array_keys( $general ) );
+		$has_sk          = (bool) array_intersect( $sk_keys, array_keys( $general ) );
+		$collapsed       = $has_rk && ! $this->secret_keys_expanded( get_settings_errors( self::OPTION_GROUP ) );
+		$dashboard_url   = esc_url( self::DASHBOARD_URL );
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Paystack Forms Settings', 'pff-paystack' ); ?></h1>
 			<?php settings_errors(); ?>
 			<h2><?php esc_html_e( 'API Keys Settings', 'pff-paystack' ); ?></h2>
 
-			<span><?php echo wp_kses_post( __( 'Get your API Keys <a href="https://dashboard.paystack.co/#/settings/developer" target="_blank">here</a>', 'pff-paystack' ) ); ?> </span>
-			
+			<?php /* translators: %s: Paystack Dashboard URL */ ?>
+			<span><?php echo wp_kses_post( sprintf( __( 'Get your API Keys <a href="%s" target="_blank" rel="noopener noreferrer">here</a>', 'pff-paystack' ), $dashboard_url ) ); ?> </span>
+
 			<form method="post" action="options.php">
-				<?php 
+				<?php
 					settings_fields( self::OPTION_GROUP );
 					do_settings_sections( self::OPTION_GROUP );
-					$settings_fields = $this->get_settings_fields();
 				?>
-				<table class="form-table paystack_setting_page">
-				<?php
-					foreach ( $settings_fields['general'] as $key => $field ) {
-						?>
+				<?php if ( isset( $general['mode'] ) ) { ?>
+					<?php $saved_mode = get_option( 'mode', isset( $general['mode']['default'] ) ? $general['mode']['default'] : 'test' ); ?>
+					<table class="form-table paystack_setting_page">
 						<tr valign="top">
-							<th scope="row"><?php echo wp_kses_post( $field['title'] ); ?></th>
+							<th scope="row"><?php echo wp_kses_post( $general['mode']['title'] ); ?></th>
 							<td>
-							<?php if ( 'mode' === $key ) {
-								$saved_val = get_option( 'mode', $field['default'] );
-								?>
-								<select class="form-control" name="<?php echo esc_attr( $key ); ?>" id="parent_id">
-									<option value="test" <?php echo esc_attr( $this->is_option_selected( 'test', $saved_val ) ); ?>><?php esc_html_e( 'Test Mode', 'pff-paystack' ); ?></option>
-									<option value="live" <?php echo esc_attr( $this->is_option_selected( 'live', $saved_val ) ); ?>><?php esc_html_e( 'Live Mode', 'pff-paystack' ); ?></option>
+								<select class="form-control" name="mode" id="parent_id">
+									<option value="test" <?php echo esc_attr( $this->is_option_selected( 'test', $saved_mode ) ); ?>><?php esc_html_e( 'Test Mode', 'pff-paystack' ); ?></option>
+									<option value="live" <?php echo esc_attr( $this->is_option_selected( 'live', $saved_mode ) ); ?>><?php esc_html_e( 'Live Mode', 'pff-paystack' ); ?></option>
 								</select>
-							<?php } elseif ( 'password' === $field['type'] ) { ?>
-								<input type="password" name="<?php echo esc_attr( $key ); ?>" value="" autocomplete="new-password" />
-								<?php $saved_key = (string) get_option( $key, '' ); ?>
-								<?php if ( '' !== $saved_key ) { ?>
-									<?php /* translators: %s: masked saved key */ ?>
-									<p class="description"><?php echo esc_html( sprintf( __( 'Saved key: %s. Leave blank to keep it.', 'pff-paystack' ), $this->mask_key( $saved_key, isset( $field['prefix'] ) ? $field['prefix'] : '' ) ) ); ?></p>
-								<?php } ?>
-							<?php } else { ?>
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, $field['default'] ) ); ?>" />
-							<?php } ?>
 							</td>
 						</tr>
+					</table>
+				<?php } ?>
+
+				<?php if ( $has_rk ) { ?>
+					<h2><?php esc_html_e( 'Restricted keys', 'pff-paystack' ); ?></h2>
+					<ol class="pff-rk-steps">
+						<li><a href="<?php echo $dashboard_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above. ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Create a restricted key in your Paystack Dashboard', 'pff-paystack' ); ?></a></li>
+						<?php /* translators: %s: list of required permissions */ ?>
+						<li><?php echo esc_html( sprintf( __( 'Turn on only these permissions: %s. Leave every other permission off, including Account: Write.', 'pff-paystack' ), Restricted_Key::required_scopes_label() ) ); ?></li>
+						<li><?php esc_html_e( 'Paste a test key for Test mode and a live key for Live mode.', 'pff-paystack' ); ?></li>
+					</ol>
+					<?php
+					$this->render_rows(
+						$general,
+						$rk_keys,
+						function ( $key, $field ) use ( $remove_names ) {
+							$this->render_key_row( $key, $field, $remove_names[ $key ] );
+						}
+					);
+					?>
+				<?php } ?>
+
+				<?php $this->render_rows( $general, array( 'tpk', 'lpk' ), [ $this, 'render_field_row' ] ); ?>
+
+				<?php if ( $has_sk ) { ?>
+					<p><button type="button" class="button-link" id="pff-secret-keys-toggle" aria-expanded="false" aria-controls="pff-secret-keys" hidden><?php esc_html_e( 'Use secret keys instead', 'pff-paystack' ); ?></button></p>
+					<div id="pff-secret-keys"<?php if ( $collapsed ) { ?> data-collapsed="1"<?php } ?>>
 						<?php
-					}
-				?>
-				</table>
+						$this->render_rows(
+							$general,
+							$sk_keys,
+							function ( $key, $field ) {
+								$this->render_key_row( $key, $field );
+							}
+						);
+						?>
+					</div>
+				<?php } ?>
+
+				<?php $this->render_rows( $general, array_diff( array_keys( $general ), $known ), [ $this, 'render_field_row' ] ); ?>
 				<hr>
 				<table class="form-table paystack_setting_page" id="paystack_setting_fees">
 					<h2><?php esc_html_e( 'Fees Settings', 'pff-paystack' ); ?></h2>
 					<?php
-					foreach ( $settings_fields['fees'] as $key => $field ) {
+					$fees = isset( $settings_fields['fees'] ) ? $settings_fields['fees'] : array();
+					foreach ( $fees as $key => $field ) {
 						?>
 						<tr valign="top">
 							<th scope="row"><?php echo wp_kses_post( $field['title'] ); ?></th>
 							<td>
-								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, $field['default'] ) ); ?>" />
+								<input type="<?php echo esc_attr( $field['type'] ); ?>" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( get_option( $key, isset( $field['default'] ) ? $field['default'] : '' ) ); ?>" />
 							</td>
 						</tr>
 						<?php
@@ -606,6 +807,14 @@ class Settings {
 				<?php submit_button(); ?>
 
 			</form>
+			<?php
+			// Collapsing is done by the script, not in markup, so the fields stay visible and submittable without JS.
+			if ( function_exists( 'wp_print_inline_script_tag' ) ) {
+				wp_print_inline_script_tag( self::SECRET_KEYS_JS );
+			} else {
+				echo '<script>' . self::SECRET_KEYS_JS . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static string.
+			}
+			?>
 		</div>
 		<?php
 	}
