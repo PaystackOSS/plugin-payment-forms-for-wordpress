@@ -57,16 +57,23 @@ class API {
 	private $secret = '';
 
 	/**
+	 * The mode the keys were resolved for, "test" or "live".
+	 *
+	 * @var string
+	 */
+	private $mode = 'live';
+
+	/**
 	 * Construct the class.
 	 */
 	public function __construct() {
 		$mode = esc_attr( get_option( 'mode' ) );
+		$this->mode   = 'test' == $mode ? 'test' : 'live';
+		$this->secret = esc_attr( Helpers::get_secret_key( $this->mode ) );
 		if ( $mode == 'test' ) {
 			$this->public = esc_attr( get_option( 'tpk' ) );
-			$this->secret = esc_attr( get_option( 'tsk' ) );
 		} else {
 			$this->public = esc_attr( get_option( 'lpk' ) );
-			$this->secret = esc_attr( get_option( 'lsk' ) );
 		}
 	}
 

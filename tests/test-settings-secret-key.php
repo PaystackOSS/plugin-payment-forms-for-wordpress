@@ -9,7 +9,14 @@ if ( ! function_exists( 'add_settings_error' ) ) {
 	}
 }
 
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( $name, $default = false ) {
+		return $default;
+	}
+}
+
 require dirname( __DIR__ ) . '/includes/classes/class-settings.php';
+require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 
 define( 'EXPECTED', 27 );
 
