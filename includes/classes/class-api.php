@@ -17,11 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class API {
 
 	/**
+	 * The API base URL.
+	 */
+	const BASE_URL = 'https://api.paystack.co/';
+
+	/**
 	 * The API Request URL
 	 *
 	 * @var string
 	 */
-	protected $url = 'https://api.paystack.co/';
+	protected $url = self::BASE_URL;
 
 	/**
 	 * The module you are try to access "plan", "subscription", "transaction".
