@@ -136,11 +136,11 @@ class API {
 	 * @return void
 	 */
 	private function track_scope_denied( $return ) {
-		if ( is_wp_error( $return ) || ! class_exists( __NAMESPACE__ . '\\Restricted_Key' ) ) {
+		if ( is_wp_error( $return ) || 403 !== (int) wp_remote_retrieve_response_code( $return ) ) {
 			return;
 		}
 		$message = Restricted_Key::message_of( wp_remote_retrieve_body( $return ) );
-		if ( Restricted_Key::is_scope_denied( (int) wp_remote_retrieve_response_code( $return ), $message ) ) {
+		if ( Restricted_Key::is_scope_denied( 403, $message ) ) {
 			Restricted_Key::record_denied( $this->mode, $this->module );
 		}
 	}

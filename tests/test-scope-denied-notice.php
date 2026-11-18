@@ -6,6 +6,8 @@ $GLOBALS['pff_options'] = array( 'mode' => 'test' );
 $GLOBALS['pff_updates'] = array();
 $GLOBALS['pff_reply']   = null;
 $GLOBALS['pff_can']     = true;
+$GLOBALS['pff_screen']  = (object) array( 'id' => 'dashboard', 'post_type' => '' );
+$GLOBALS['pff_body_reads'] = 0;
 
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( $name, $default = false ) {
@@ -27,6 +29,11 @@ if ( ! function_exists( 'esc_attr' ) ) {
 if ( ! function_exists( 'current_user_can' ) ) {
 	function current_user_can( $cap ) {
 		return $GLOBALS['pff_can'];
+	}
+}
+if ( ! function_exists( 'get_current_screen' ) ) {
+	function get_current_screen() {
+		return $GLOBALS['pff_screen'];
 	}
 }
 if ( ! function_exists( 'admin_url' ) ) {
@@ -59,6 +66,7 @@ if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
 }
 if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
 	function wp_remote_retrieve_body( $r ) {
+		$GLOBALS['pff_body_reads']++;
 		return $r['body'];
 	}
 }
@@ -75,6 +83,7 @@ eval(
 			public static function get_capability() {
 				return "manage_options";
 			}
+			const DASHBOARD_URL = "https://dashboard.example.test/api";
 		}
 	}
 	if ( ! class_exists( __NAMESPACE__ . "\\Helpers" ) ) {
@@ -97,7 +106,7 @@ use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\Restricted_Key_Notice;
 use paystack\payment_forms\Test_API;
 
-define( 'EXPECTED', 24 );
+define( 'EXPECTED', 31 );
 
 function reply( $code, $message ) {
 	$GLOBALS['pff_reply'] = array(
@@ -117,7 +126,12 @@ function render() {
 $deny = RK::SCOPE_DENIED_MESSAGE;
 
 reply( 200, $deny );
+( new Test_API( 'plan' ) )->get_request();
 check( 'get 200 not recorded', array(), denied() );
+$GLOBALS['pff_body_reads'] = 0;
+( new Test_API( 'plan' ) )->post_request( array() );
+check( 'post 200 not recorded', array(), denied() );
+check( '200 body is not read by the tracker', 0, $GLOBALS['pff_body_reads'] );
 reply( 403, 'Some other forbidden' );
 ( new Test_API( 'plan' ) )->get_request();
 check( 'other 403 not recorded', array(), denied() );
@@ -152,13 +166,26 @@ check( 'unknown module ignored', array( 'transaction/verify' ), array_keys( deni
 
 $html = render();
 check( 'one notice per mode', 2, substr_count( $html, 'notice notice-error' ) );
-check( 'test entry lists both modules', true, false !== strpos( $html, 'in test mode because your restricted key is missing a permission needed for creating plans, creating subscriptions.' ) );
-check( 'live entry copy', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'verifying payments' ) );
+check( 'test entry lists both modules', true, false !== strpos( $html, 'in test mode because your restricted key is missing a permission needed for: Reading or creating plans, Creating subscriptions.' ) );
+check( 'live entry copy', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'Verifying payments' ) );
 check( 'links to settings', true, false !== strpos( $html, 'href="https://example.test/wp-admin/edit.php?post_type=paystack_form&page=settings"' ) );
+
+check( 'links to dashboard', true, false !== strpos( $html, 'href="https://dashboard.example.test/api"' ) );
 
 $GLOBALS['pff_can'] = false;
 check( 'capability gate hides notice', '', render() );
 $GLOBALS['pff_can'] = true;
+
+foreach ( array(
+	'plugins screen'      => array( 'plugins', '', true ),
+	'paystack_form screen' => array( 'edit-paystack_form', 'paystack_form', true ),
+	'other screen'        => array( 'options-general', '', false ),
+	'no screen'           => array( null, null, false ),
+) as $label => $case ) {
+	$GLOBALS['pff_screen'] = null === $case[0] ? null : (object) array( 'id' => $case[0], 'post_type' => $case[1] );
+	check( "notice on $label", $case[2], '' !== render() );
+}
+$GLOBALS['pff_screen'] = (object) array( 'id' => 'dashboard', 'post_type' => '' );
 
 $GLOBALS['pff_options']['pff_paystack_rk_denied'] = array(
 	'test' => array( '<script>alert(1)</script>' => 1 ),
@@ -170,7 +197,7 @@ check( 'no raw stored markup', false, strpos( $html, '<script>' ) || strpos( $ht
 
 $GLOBALS['pff_options']['pff_paystack_rk_denied'] = array( 'live' => array( 'module' => 'plan', 'time' => 1 ) );
 $html = render();
-check( 'old-shape record still renders', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'creating plans' ) );
+check( 'old-shape record still renders', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'Reading or creating plans' ) );
 
 echo "$total assertions, $failures failures\n";
 $completed = true;

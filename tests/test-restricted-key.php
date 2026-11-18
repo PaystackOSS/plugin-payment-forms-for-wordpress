@@ -436,7 +436,7 @@ RK::record_denied( 'test', 'subscription' );
 check( 'old-shape record keeps converted module', array( 'plan', 'subscription' ), array_keys( $GLOBALS['pff_options']['pff_paystack_rk_denied']['test'] ) );
 $GLOBALS['pff_options']['pff_paystack_rk_denied'] = 'corrupt';
 check( 'get_denied non-array', array(), RK::get_denied() );
-check( 'module_label known', 'Creating plans', RK::module_label( 'plan/' ) );
+check( 'module_label known', 'Reading or creating plans', RK::module_label( 'plan/' ) );
 check( 'module_label unknown', '', RK::module_label( 'nope' ) );
 
 echo "$total assertions, $failures failures\n";

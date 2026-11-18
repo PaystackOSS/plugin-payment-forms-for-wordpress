@@ -620,7 +620,7 @@ class Restricted_Key {
 			case 'transaction/verify':
 				return __( 'Verifying payments', 'pff-paystack' );
 			case 'plan':
-				return __( 'Creating plans', 'pff-paystack' );
+				return __( 'Reading or creating plans', 'pff-paystack' );
 			case 'subscription':
 				return __( 'Creating subscriptions', 'pff-paystack' );
 		}
