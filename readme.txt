@@ -3,8 +3,8 @@ Contributors: paystack, kendysond, steveamaza, krugazul, feedmymedia, kaneahabag
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
-Tested up to: 6.8.1
-Stable tag: 4.0.8
+Tested up to: 7.1
+Stable tag: 4.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,11 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+
+= 4.1.0 =
+* New: connect with a Paystack restricted key (rk_test_ / rk_live_) instead of your secret key. The plugin checks the key's permissions when you save and only accepts it if it can do what the plugin needs (Transactions: Read, Plans: Write) and nothing riskier.
+* New: a warning in wp-admin if Paystack refuses a request because your restricted key is missing a permission.
+* Existing secret keys keep working; nothing changes until you save a restricted key.
 
 = 4.0.8 =
 * Fix: the payment popup did not open when a form was added with a page builder such as Bricks, a widget or a template; the form submitted and showed raw response data instead.
@@ -249,6 +254,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 2. What customer sees for making payment.
 
 == Upgrade Notice ==
+
+= 4.1.0 =
+Adds support for Paystack restricted keys. Your existing secret keys keep working; switch to a restricted key whenever you're ready.
 
 = 4.0.8 =
 Fixes the payment popup not opening on pages built with page builders such as Bricks. Update recommended.
