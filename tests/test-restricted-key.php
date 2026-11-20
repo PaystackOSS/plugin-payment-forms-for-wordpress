@@ -52,7 +52,7 @@ require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\API;
 
-define( 'EXPECTED', 183 );
+define( 'EXPECTED', 187 );
 
 $deny = RK::SCOPE_DENIED_MESSAGE;
 $mor  = RK::MOR_MESSAGE;
@@ -121,9 +121,13 @@ check( 'body 15 chars', false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a',
 check( 'body 16 chars', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 16 ), 'test' ) );
 check( 'body 256 chars', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 256 ), 'test' ) );
 check( 'body 257 chars', false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 257 ), 'test' ) );
-foreach ( array( '&', '<', '"', "'", '>', '-', '_' ) as $sym ) {
+foreach ( array( '&', '<', '"', "'", '>', '-', ' ', ':' ) as $sym ) {
 	check( "symbol $sym", false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 16 ) . $sym, 'test' ) );
 }
+// Real Paystack restricted keys put an underscore at varying positions in the body.
+check( 'real shape, underscore after 9', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 9 ) . '_' . str_repeat( 'B', 30 ), 'test' ) );
+check( 'real shape, underscore after 25', true, RK::is_valid_shape( 'rk_live_' . str_repeat( 'c', 25 ) . '_' . str_repeat( 'D', 14 ), 'live' ) );
+check( 'real shape, wrong mode', false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 9 ) . '_' . str_repeat( 'B', 30 ), 'live' ) );
 check( 'trailing newline', false, RK::is_valid_shape( $KEY . "\n", 'test' ) );
 check( 'sk key', false, RK::is_valid_shape( 'sk_test_' . str_repeat( 'a', 20 ), 'test' ) );
 check( 'unknown mode', false, RK::is_valid_shape( $KEY, 'staging' ) );

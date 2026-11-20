@@ -188,14 +188,14 @@ class Restricted_Key {
 	);
 
 	/**
-	 * Checks the key is an rk_ key of the given mode with a plain alphanumeric body.
+	 * Checks the key is an rk_ key of the given mode with a body of letters, digits and underscores, as real keys contain underscores.
 	 *
 	 * @param mixed  $key  Submitted key.
 	 * @param string $mode 'test' or 'live'.
 	 * @return boolean
 	 */
 	public static function is_valid_shape( $key, $mode ) {
-		if ( ! is_string( $key ) || ! preg_match( '/^rk_(test|live)_[A-Za-z0-9]{16,256}\z/', $key, $m ) ) {
+		if ( ! is_string( $key ) || ! preg_match( '/^rk_(test|live)_[A-Za-z0-9_]{16,256}\z/', $key, $m ) ) {
 			return false;
 		}
 		return $m[1] === $mode;
