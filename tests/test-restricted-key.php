@@ -52,7 +52,7 @@ require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\API;
 
-define( 'EXPECTED', 187 );
+define( 'EXPECTED', 185 );
 
 $deny = RK::SCOPE_DENIED_MESSAGE;
 $mor  = RK::MOR_MESSAGE;
@@ -134,8 +134,10 @@ check( 'unknown mode', false, RK::is_valid_shape( $KEY, 'staging' ) );
 
 // Probe table.
 $sensitive = array_filter( RK::PROBES, function ( $p ) { return ! $p['required']; } );
-check( 'probe count', 17, count( RK::PROBES ) );
-check( 'sensitive count', 15, count( $sensitive ) );
+check( 'probe count', 16, count( RK::PROBES ) );
+check( 'sensitive count', 14, count( $sensitive ) );
+// Cloudflare answers POST /verifications with an HTML 403 for every client, so it can't be probed.
+check( 'no verifications probe', array(), array_filter( RK::PROBES, function ( $p ) { return 'verifications' === $p['path']; } ) );
 check( 'no account:read', null, probe_for( 'account:read' ) );
 check( 'required label', 'Transactions: Read, Plans: Write', RK::required_scopes_label() );
 check( 'label known', 'Disputes and refunds', RK::label( 'disputes_refunds' ) );
@@ -183,10 +185,6 @@ check( 'check_authorization 404 with message present', 'present', RK::classify( 
 check( 'check_authorization 404 without message', 'indeterminate', RK::classify( $auth, 404, null, 'present' ) );
 check( 'check_authorization 404 other message', 'indeterminate', RK::classify( $auth, 404, 'Not found', 'present' ) );
 check( 'check_authorization 400 indeterminate', 'indeterminate', RK::classify( $auth, 400, null, 'present' ) );
-$ver = probe_for( 'verification' );
-check( 'verification 400 exact present', 'present', RK::classify( $ver, 400, 'verification_type is missing in request body', 'present' ) );
-check( 'verification 400 other indeterminate', 'indeterminate', RK::classify( $ver, 400, 'other', 'present' ) );
-check( 'verification 200 indeterminate', 'indeterminate', RK::classify( $ver, 200, null, 'present' ) );
 $sub = probe_for( 'subaccounts' );
 check( 'subaccounts MoR 403 present', 'present', RK::classify( $sub, 403, $mor, 'present' ) );
 check( 'subaccounts 200 present', 'present', RK::classify( $sub, 200, null, 'present' ) );
@@ -201,7 +199,7 @@ check( 'verdict keys', array( 'code', 'scopes', 'reason', 'sensitive_scopes', 'p
 check( 'ok has no sensitive_scopes', array(), $v['sensitive_scopes'] );
 
 $v = run_validate( $ok_map, null, null, $sent );
-check( 'ok sends all probes', 17, count( $sent ) );
+check( 'ok sends all probes', count( RK::PROBES ), count( $sent ) );
 check( 'ok sends baseline first', 'transaction?perPage=1', $sent[0][2] );
 check( 'probes carry the key', true, $sent[3][5] === $KEY );
 
@@ -226,7 +224,7 @@ check( 'baseline other 403 blocked', 'blocked', $v['reason'] );
 $v = run_validate( array_merge( $ok_map, array( 'transactions:read' => r( 403, $deny ) ) ), null, null, $sent );
 check( 'baseline scope 403 missing_scope', 'missing_scope', $v['code'] );
 check( 'baseline scope 403 names read', array( 'Transactions: Read' ), $v['scopes'] );
-check( 'baseline scope 403 continues probing', 17, count( $sent ) );
+check( 'baseline scope 403 continues probing', count( RK::PROBES ), count( $sent ) );
 
 $v = run_validate( array_merge( $ok_map, array( 'plans:write' => r( 403, $deny ) ) ) );
 check( 'plans:write absent missing_scope', array( 'Plans: Write' ), $v['scopes'] );
@@ -240,9 +238,9 @@ check( 'both required missing', array( 'Transactions: Read', 'Plans: Write' ), $
 $v = run_validate( array_merge( $ok_map, array( 'plans:write' => r( 403, $mor ) ) ) );
 check( 'plans:write MoR ok', 'ok', $v['code'] );
 
-$v = run_validate( array_merge( $ok_map, array( 'transfers' => r( 200 ), 'verification' => r( 400, 'verification_type is missing in request body' ) ) ) );
+$v = run_validate( array_merge( $ok_map, array( 'transfers' => r( 200 ), 'balance' => r( 200 ) ) ) );
 check( 'sensitive_scope code', 'sensitive_scope', $v['code'] );
-check( 'sensitive_scope labels', array( 'Transfers', 'Verification' ), $v['scopes'] );
+check( 'sensitive_scope labels', array( 'Transfers', 'Balance' ), $v['scopes'] );
 check( 'sensitive_scope keeps sensitive_scopes empty', array(), $v['sensitive_scopes'] );
 $v = run_validate( array_merge( $ok_map, array( 'transactions:write' => r( 404, 'Sorry, this feature is no longer available.' ) ) ) );
 check( 'transactions:write sensitive', array( 'Transactions: Write' ), $v['scopes'] );
@@ -290,7 +288,7 @@ check( 'wrong mode sends nothing', 'invalid_shape', RK::validate( $KEY, 'live', 
 $v = RK::decide( array() );
 check( 'decide empty unverifiable', 'unverifiable', $v['code'] );
 check( 'decide empty transient', 'transient', $v['reason'] );
-check( 'decide empty probes all not run', true, 17 === substr_count( $v['probes'], ':-' ) );
+check( 'decide empty probes all not run', true, count( RK::PROBES ) === substr_count( $v['probes'], ':-' ) );
 $v = RK::decide( array(
 	array( 'scope' => 'transactions:read', 'outcome' => 'present', 'status' => 200 ),
 	array( 'scope' => 'plans:write', 'outcome' => 'present', 'status' => 400 ),
@@ -307,7 +305,7 @@ check( 'decide partial still reports missing_scope', 'missing_scope', $v['code']
 // Probes diagnostic.
 $v = run_validate( $ok_map );
 check( 'probes starts with baseline', 0, strpos( $v['probes'], 'transactions:read:200,plans:write:400,transactions:write:403,' ) );
-check( 'probes lists every scope', 17, count( explode( ',', $v['probes'] ) ) );
+check( 'probes lists every scope', count( RK::PROBES ), count( explode( ',', $v['probes'] ) ) );
 $v = run_validate( array(), r( 401 ) );
 check( 'probes marks unrun', true, 0 === strpos( $v['probes'], 'transactions:read:401,plans:write:-,' ) );
 check( 'probes never has the key', false, false !== strpos( $v['probes'], $KEY ) );
@@ -388,7 +386,7 @@ check( 'send non-string message null', null, RK::send( 'GET', 'balance', null, 4
 $GLOBALS['pff_wp_calls'] = array();
 $GLOBALS['pff_wp_reply'] = array( 'code' => 200, 'body' => '{}' );
 RK::validate( $KEY, 'test' );
-check( 'default validate uses wp_remote_request', 17, count( $GLOBALS['pff_wp_calls'] ) );
+check( 'default validate uses wp_remote_request', count( RK::PROBES ), count( $GLOBALS['pff_wp_calls'] ) );
 
 // message_of.
 check( 'message_of string', 'hi', RK::message_of( '{"message":"hi"}' ) );

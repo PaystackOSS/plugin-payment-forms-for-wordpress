@@ -167,15 +167,6 @@ class Restricted_Key {
 			'required' => false,
 			'match'    => 'generic',
 		),
-		array(
-			'scope'    => 'verification',
-			'method'   => 'POST',
-			'path'     => 'verifications',
-			'body'     => '{}',
-			'required' => false,
-			'match'    => 'exact',
-			'exact'    => array( array( 400, 'verification_type is missing in request body' ) ),
-		),
 	);
 
 	/**
@@ -241,8 +232,6 @@ class Restricted_Key {
 				return __( 'Customers', 'pff-paystack' );
 			case 'balance':
 				return __( 'Balance', 'pff-paystack' );
-			case 'verification':
-				return __( 'Verification', 'pff-paystack' );
 		}
 		return '';
 	}
