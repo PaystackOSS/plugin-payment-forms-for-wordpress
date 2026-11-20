@@ -354,14 +354,6 @@ span.shortcode > input {
   width: 50%;
 }
 
-.js #pff-secret-keys[data-collapsed="1"] {
-  display: none;
-}
-
-#pff-secret-keys-toggle[hidden] {
-  display: none;
-}
-
 #custom-metabox-holder-sortables {
   margin-top: 30px;
 }

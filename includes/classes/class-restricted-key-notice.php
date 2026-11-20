@@ -52,7 +52,7 @@ class Restricted_Key_Notice {
 
 			$message = sprintf(
 				/* translators: 1: test or live, 2: the features that were refused. */
-				esc_html__( 'Paystack refused a request in %1$s mode because your restricted key is missing a permission needed for: %2$s. Update the key\'s permissions in your Paystack Dashboard, then save it again in Paystack Forms settings.', 'pff-paystack' ),
+				esc_html__( 'Paystack refused a request in %1$s mode because your restricted key is missing a permission needed for: %2$s. Update the key\'s permissions in your Paystack Dashboard, then paste the key again and save in Paystack Forms settings.', 'pff-paystack' ),
 				esc_html( $mode ),
 				implode( ', ', $labels )
 			);

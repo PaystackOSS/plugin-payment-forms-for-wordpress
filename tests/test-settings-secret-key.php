@@ -18,50 +18,45 @@ if ( ! function_exists( 'get_option' ) ) {
 require dirname( __DIR__ ) . '/includes/classes/class-settings.php';
 require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 
-define( 'EXPECTED', 27 );
+define( 'EXPECTED', 31 );
 
 $s = new \paystack\payment_forms\Settings();
 
-// Blank keeps old.
-check( 'blank keeps old', 'sk_test_old', $s->filter_secret_key( '', 'sk_test_old', 'tsk' ) );
-check( 'blank no error', 0, count( $GLOBALS['pff_errors'] ) );
-
-// tsk.
-check( 'tsk accepts test key', 'sk_test_abc', $s->filter_secret_key( 'sk_test_abc', 'sk_test_old', 'tsk' ) );
-check( 'tsk accept no error', 0, count( $GLOBALS['pff_errors'] ) );
-check( 'tsk rejects live key', 'sk_test_old', $s->filter_secret_key( 'sk_live_abc', 'sk_test_old', 'tsk' ) );
-check( 'error recorded', 1, count( $GLOBALS['pff_errors'] ) );
-check( 'error group', 'kkd-pff-paystack-settings-group', $GLOBALS['pff_errors'][0][0] );
-check( 'error code', 'pff-paystack-invalid-tsk', $GLOBALS['pff_errors'][0][1] );
-check( 'error type', 'error', $GLOBALS['pff_errors'][0][3] );
-check( 'error names prefix', true, false !== strpos( $GLOBALS['pff_errors'][0][2], 'sk_test_' ) );
-check( 'tsk rejects password', 'sk_test_old', $s->filter_secret_key( 'password', 'sk_test_old', 'tsk' ) );
-check( 'second error recorded', 2, count( $GLOBALS['pff_errors'] ) );
-check( 'tsk rejects wrong case prefix', '', $s->filter_secret_key( 'SK_TEST_abc', '', 'tsk' ) );
-
-// lsk mirror.
-$GLOBALS['pff_errors'] = array();
-check( 'lsk accepts live key', 'sk_live_abc', $s->filter_secret_key( 'sk_live_abc', 'sk_live_old', 'lsk' ) );
-check( 'lsk no error', 0, count( $GLOBALS['pff_errors'] ) );
-check( 'lsk rejects test key', 'sk_live_old', $s->filter_secret_key( 'sk_test_abc', 'sk_live_old', 'lsk' ) );
-check( 'lsk rejects password', 'sk_live_old', $s->filter_secret_key( 'password', 'sk_live_old', 'lsk' ) );
-check( 'lsk error code', 'pff-paystack-invalid-lsk', $GLOBALS['pff_errors'][0][1] );
-check( 'lsk blank keeps old', 'sk_live_old', $s->filter_secret_key( '', 'sk_live_old', 'lsk' ) );
-
-// Unknown option and password field without prefix accept any non-blank.
-$GLOBALS['pff_errors'] = array();
-check( 'unknown option accepts', 'anything', $s->filter_secret_key( 'anything', 'old', 'nope' ) );
+// Third-party password fields: blank keeps old, a wrong prefix is rejected, anything else is stored.
 $GLOBALS['pff_filter_overrides'] = array(
 	'kkd_pff_paystack_settings_fields' => array(
 		'general' => array(
 			'custom_secret' => array( 'title' => 'Custom', 'type' => 'password', 'default' => '' ),
+			'prefixed'      => array( 'title' => 'Prefixed', 'type' => 'password', 'prefix' => 'zz_', 'default' => '' ),
 		),
 	),
 );
+check( 'blank keeps old', 'old', $s->filter_secret_key( '', 'old', 'custom_secret' ) );
 check( 'no-prefix password accepts any', 'whatever', $s->filter_secret_key( 'whatever', 'old', 'custom_secret' ) );
-check( 'no-prefix password blank keeps old', 'old', $s->filter_secret_key( '', 'old', 'custom_secret' ) );
+check( 'prefixed field accepts its prefix', 'zz_abc', $s->filter_secret_key( 'zz_abc', 'old', 'prefixed' ) );
 check( 'no errors for accepted', 0, count( $GLOBALS['pff_errors'] ) );
+check( 'prefixed field rejects another prefix', 'old', $s->filter_secret_key( 'yy_abc', 'old', 'prefixed' ) );
+check( 'error recorded', 1, count( $GLOBALS['pff_errors'] ) );
+check( 'error group', 'kkd-pff-paystack-settings-group', $GLOBALS['pff_errors'][0][0] );
+check( 'error code', 'pff-paystack-invalid-prefixed', $GLOBALS['pff_errors'][0][1] );
+check( 'error type', 'error', $GLOBALS['pff_errors'][0][3] );
+check( 'error names prefix', true, false !== strpos( $GLOBALS['pff_errors'][0][2], 'zz_' ) );
+check( 'blank is silent', 1, count( $GLOBALS['pff_errors'] ) );
 $GLOBALS['pff_filter_overrides'] = array();
+
+// The sk and pk options belong to filter_mode_key; without a decision they keep the stored value.
+foreach ( array( 'tsk', 'tpk', 'lsk', 'lpk' ) as $option ) {
+	check( "$option undecided keeps old", 'old', $s->filter_mode_key( 'sk_test_new', 'old', $option ) );
+	check( "$option undecided blank keeps old", 'old', $s->filter_mode_key( '', 'old', $option ) );
+	check( "$option undecided null keeps old", 'old', $s->filter_mode_key( null, 'old', $option ) );
+}
+check( 'mode key filter ignores other options', 'old', $s->filter_mode_key( 'x', 'old', 'custom_secret' ) );
+check( 'undecided sk adds no error', 1, count( $GLOBALS['pff_errors'] ) );
+
+// Fields: sk and pk definitions carry their prefixes and the pk is a plain text field.
+$general = $s->get_settings_fields()['general'];
+check( 'sk prefixes', array( 'sk_test_', 'sk_live_' ), array( $general['tsk']['prefix'], $general['lsk']['prefix'] ) );
+check( 'pk prefixes and type', array( 'pk_test_', 'pk_live_', 'text', 'text' ), array( $general['tpk']['prefix'], $general['lpk']['prefix'], $general['tpk']['type'], $general['lpk']['type'] ) );
 
 // mask_key (private).
 $m = new ReflectionMethod( $s, 'mask_key' );

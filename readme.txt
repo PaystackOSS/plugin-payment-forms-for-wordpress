@@ -93,9 +93,11 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 == Changelog ==
 
 = 4.1.0 =
-* New: connect with a Paystack restricted key (rk_test_ / rk_live_) instead of your secret key. The plugin checks the key's permissions when you save and only accepts it if it can do what the plugin needs (Transactions: Read, Plans: Write) and nothing riskier.
+* New: connect with a Paystack restricted key (rk_test_ / rk_live_) instead of your secret key. The plugin checks the key's permissions when you save and only accepts it if it can do what the plugin needs (Account: Read, Transactions: Read and Plans: Write). It rejects keys with money-moving permissions, and warns you if it couldn't confirm the rest.
+* New: the public key is fetched automatically when you save a restricted key.
+* New: a Disconnect option for each mode that clears its saved keys.
 * New: a warning in wp-admin if Paystack refuses a request because your restricted key is missing a permission.
-* Existing secret keys keep working; nothing changes until you save a restricted key.
+* Secret and public key fields show only on sites that already use a secret key; existing secret keys keep working until you save a restricted key.
 
 = 4.0.8 =
 * Fix: the payment popup did not open when a form was added with a page builder such as Bricks, a widget or a template; the form submitted and showed raw response data instead.
@@ -256,7 +258,7 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 == Upgrade Notice ==
 
 = 4.1.0 =
-Adds support for Paystack restricted keys. Your existing secret keys keep working; switch to a restricted key whenever you're ready.
+Adds support for Paystack restricted keys, which need the Account: Read permission along with Transactions: Read and Plans: Write. New installs use restricted keys only; your existing secret keys keep working until you save a restricted key.
 
 = 4.0.8 =
 Fixes the payment popup not opening on pages built with page builders such as Bricks. Update recommended.

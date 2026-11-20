@@ -106,7 +106,7 @@ use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\Restricted_Key_Notice;
 use paystack\payment_forms\Test_API;
 
-define( 'EXPECTED', 30 );
+define( 'EXPECTED', 32 );
 
 function reply( $code, $message ) {
 	$GLOBALS['pff_reply'] = array(
@@ -168,6 +168,8 @@ $html = render();
 check( 'one notice per mode', 2, substr_count( $html, 'notice notice-error' ) );
 check( 'test entry lists both modules', true, false !== strpos( $html, 'in test mode because your restricted key is missing a permission needed for: Reading or creating plans, Creating subscriptions.' ) );
 check( 'live entry copy', true, false !== strpos( $html, 'in live mode' ) && false !== strpos( $html, 'Verifying payments' ) );
+check( 'asks to paste the key again', true, false !== strpos( $html, 'then paste the key again and save in Paystack Forms settings.' ) );
+check( 'no save-it-again wording', false, strpos( $html, 'save it again' ) );
 check( 'links to settings', true, false !== strpos( $html, 'href="https://example.test/wp-admin/edit.php?post_type=paystack_form&page=settings"' ) );
 
 check( 'links to dashboard', true, false !== strpos( $html, 'href="https://dashboard.example.test/api"' ) );

@@ -18,63 +18,29 @@ class Settings {
 
 	const OPTION_GROUP = 'kkd-pff-paystack-settings-group';
 
+	const UNCONFIRMED_OPTION = 'pff_paystack_rk_unconfirmed';
+
 	const DASHBOARD_URL = 'https://dashboard.paystack.com/v2/developers/api-configuration';
 
 	/**
-	 * Restricted key, secret key and remove-restricted-key field names for each mode.
+	 * Restricted key, secret key, public key and disconnect field names for each mode.
 	 *
 	 * @internal
 	 */
 	const SECRET_PAIRS = array(
 		'test' => array(
-			'rk'     => 'trk',
-			'sk'     => 'tsk',
-			'remove' => 'trk_remove',
+			'rk'         => 'trk',
+			'sk'         => 'tsk',
+			'pk'         => 'tpk',
+			'disconnect' => 'trk_disconnect',
 		),
 		'live' => array(
-			'rk'     => 'lrk',
-			'sk'     => 'lsk',
-			'remove' => 'lrk_remove',
+			'rk'         => 'lrk',
+			'sk'         => 'lsk',
+			'pk'         => 'lpk',
+			'disconnect' => 'lrk_disconnect',
 		),
 	);
-
-	/**
-	 * Collapses the secret key section and wires its toggle; printed with wp_print_inline_script_tag so CSP plugins can add a nonce; without JS the section stays open and the server rules still apply.
-	 */
-	const SECRET_KEYS_JS = <<<'JS'
-(function () {
-	var box = document.getElementById('pff-secret-keys');
-	var btn = document.getElementById('pff-secret-keys-toggle');
-	if (!box || !btn || box.getAttribute('data-collapsed') !== '1') {
-		return;
-	}
-	var inputs = box.querySelectorAll('input');
-	var removes = document.querySelectorAll('.pff-rk-remove');
-	function setDisabled(state) {
-		for (var i = 0; i < inputs.length; i++) {
-			inputs[i].disabled = state;
-		}
-	}
-	function expand() {
-		box.hidden = false;
-		box.removeAttribute('data-collapsed');
-		setDisabled(false);
-		btn.setAttribute('aria-expanded', 'true');
-		btn.hidden = true;
-	}
-	box.hidden = true;
-	setDisabled(true);
-	btn.hidden = false;
-	btn.addEventListener('click', expand);
-	for (var i = 0; i < removes.length; i++) {
-		removes[i].addEventListener('change', function () {
-			if (this.checked) {
-				expand();
-			}
-		});
-	}
-})();
-JS;
 
 	/**
 	 * Holdes the array of settings fields.
@@ -91,7 +57,7 @@ JS;
 	private $decisions = array();
 
 	/**
-	 * Verifies a restricted key; function( $key, $mode ) returning a Restricted_Key verdict.
+	 * Verifies a restricted key; function( $key, $mode, $deadline ) returning a Restricted_Key verdict.
 	 *
 	 * @var callable|null
 	 */
@@ -129,6 +95,7 @@ JS;
 				'tpk' => array(
 					'title'   => esc_html__( 'Test Public Key', 'pff-paystack' ),
 					'type'    => 'text',
+					'prefix'  => 'pk_test_',
 					'default' => '',
 				),
 				'lsk' => array(
@@ -140,6 +107,7 @@ JS;
 				'lpk' => array(
 					'title'   => esc_html__( 'Live Public Key', 'pff-paystack' ),
 					'type'    => 'text',
+					'prefix'  => 'pk_live_',
 					'default' => '',
 				),
 			),
@@ -183,7 +151,7 @@ JS;
 	/**
 	 * Overrides the restricted key validator.
 	 *
-	 * @param callable $validator function( $key, $mode ) returning a verdict array.
+	 * @param callable $validator function( $key, $mode, $deadline ) returning a verdict array.
 	 * @return void
 	 */
 	public function set_validator( $validator ) {
@@ -204,13 +172,22 @@ JS;
 		}
 		// phpcs:enable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		if ( self::OPTION_GROUP !== $option_page ) {
+			// Core's All Settings page saves every option, so it must not reach the keys.
+			if ( isset( $GLOBALS['pagenow'] ) && 'options.php' === $GLOBALS['pagenow'] ) {
+				foreach ( self::SECRET_PAIRS as $pair ) {
+					foreach ( array( $pair['rk'], $pair['sk'], $pair['pk'] ) as $name ) {
+						add_filter( "pre_update_option_{$name}", [ $this, 'keep_stored_key' ], 10, 2 );
+					}
+				}
+			}
 			return;
 		}
 
-		// Attached before the auth gate so an undecided rk save keeps the old key instead of storing it unverified.
+		// Attached before the auth gate so an undecided save keeps the old keys instead of storing them unverified.
 		foreach ( self::SECRET_PAIRS as $pair ) {
 			add_filter( "pre_update_option_{$pair['rk']}", [ $this, 'filter_restricted_key' ], 10, 3 );
-			add_filter( "pre_update_option_{$pair['sk']}", [ $this, 'filter_secret_key' ], 10, 3 );
+			add_filter( "pre_update_option_{$pair['sk']}", [ $this, 'filter_mode_key' ], 10, 3 );
+			add_filter( "pre_update_option_{$pair['pk']}", [ $this, 'filter_mode_key' ], 10, 3 );
 		}
 
 		foreach ( $this->get_settings_fields() as $fields ) {
@@ -232,19 +209,37 @@ JS;
 			return;
 		}
 
+		// Only keys that will be probed take a slice of the budget.
+		$submitted = 0;
+		foreach ( self::SECRET_PAIRS as $mode => $pair ) {
+			if ( Restricted_Key::is_valid_shape( $this->read_post_field( $pair['rk'] ), $mode ) ) {
+				$submitted++;
+			}
+		}
+		// One save shares one budget: probes run in sequence and each mode ends at its own slice boundary.
+		$start = microtime( true );
+		$slice = $submitted > 0 ? Restricted_Key::BUDGET_SECONDS / $submitted : Restricted_Key::BUDGET_SECONDS;
+		$taken = 0;
+
 		$this->decisions = array();
 		foreach ( self::SECRET_PAIRS as $mode => $pair ) {
+			$rk_in = $this->read_post_field( $pair['rk'] );
+			if ( Restricted_Key::is_valid_shape( $rk_in, $mode ) ) {
+				$taken++;
+			}
 			$this->decisions[ $mode ] = $this->decide_mode(
 				$mode,
-				$this->read_post_field( $pair['rk'] ),
+				$rk_in,
 				$this->read_post_field( $pair['sk'] ),
-				'1' === $this->read_post_field( $pair['remove'] )
+				$this->read_post_field( $pair['pk'] ),
+				'1' === $this->read_post_field( $pair['disconnect'] ),
+				$start + $slice * $taken
 			);
 		}
 
 		foreach ( $this->decisions as $decision ) {
 			foreach ( $decision['messages'] as $message ) {
-				add_settings_error( self::OPTION_GROUP, $message[0], $message[1], 'error' );
+				add_settings_error( self::OPTION_GROUP, $message[0], $message[1], isset( $message[2] ) ? $message[2] : 'error' );
 			}
 		}
 	}
@@ -265,111 +260,171 @@ JS;
 	}
 
 	/**
-	 * Works out what to do with one mode's restricted and secret key submissions.
+	 * Works out what to do with one mode's key submissions.
 	 *
-	 * 'rk' is none|accept|reject|remove and 'sk' is none|accept|reject|ignore; 'messages' are array( code, text ) pairs.
+	 * 'rk' is none|accept|reject|disconnect. 'sk_value' and 'pk_value' are the values to store, or null to keep the stored one;
+	 * 'messages' are array( code, text[, type] ).
 	 *
-	 * @param string $mode   'test' or 'live'.
-	 * @param string $rk_in  Submitted restricted key.
-	 * @param string $sk_in  Submitted secret key.
-	 * @param bool   $remove Whether the remove-restricted-key box was ticked.
+	 * @param string     $mode       'test' or 'live'.
+	 * @param string     $rk_in      Submitted restricted key.
+	 * @param string     $sk_in      Submitted secret key.
+	 * @param string     $pk_in      Submitted public key.
+	 * @param bool       $disconnect Whether the disconnect box was ticked.
+	 * @param float|null $deadline   Absolute time by which the restricted key check must finish.
 	 * @return array
 	 */
-	private function decide_mode( $mode, $rk_in, $sk_in, $remove ) {
-		$pair     = self::SECRET_PAIRS[ $mode ];
-		$decision = array(
-			'rk'       => 'none',
-			'rk_value' => '',
-			'sk'       => 'none',
-			'messages' => array(),
+	private function decide_mode( $mode, $rk_in, $sk_in, $pk_in, $disconnect, $deadline = null ) {
+		$pair      = self::SECRET_PAIRS[ $mode ];
+		$decision  = array(
+			'rk'          => 'none',
+			'rk_value'    => '',
+			'unconfirmed' => false,
+			'clear_sk'    => false,
+			'sk_value'    => null,
+			'pk_value'    => null,
+			'messages'    => array(),
 		);
-		$stored_rk = (string) get_option( $pair['rk'], '' );
-		$stored_sk = (string) get_option( $pair['sk'], '' );
-		$sk_error  = '' !== $sk_in ? $this->prefix_error( $pair['sk'], $sk_in ) : '';
+		$stored_pk = (string) get_option( $pair['pk'], '' );
+		// The public key field is pre-filled, so an unchanged value is not a submission.
+		$pk_changed = '' !== $pk_in && $pk_in !== $stored_pk;
 
 		if ( '' !== $rk_in ) {
-			$message = $this->check_restricted_key( $rk_in, $mode );
-			$accept  = '' === $message;
-
-			$decision['sk'] = 'ignore';
-			if ( $accept ) {
+			$check = $this->check_restricted_key( $rk_in, $mode, $deadline );
+			if ( '' === $check['message'] ) {
 				$decision['rk']       = 'accept';
 				$decision['rk_value'] = $rk_in;
+				$decision['pk_value'] = $check['pk'];
+				$decision['unconfirmed'] = $check['unconfirmed'];
 			} else {
 				$decision['rk']         = 'reject';
-				$decision['messages'][] = array( "pff-paystack-rk-{$pair['rk']}", $message );
+				$decision['messages'][] = array( "pff-paystack-rk-{$pair['rk']}", $check['message'] );
 			}
-			if ( $remove ) {
+			if ( '' !== $sk_in || $pk_changed ) {
 				$decision['messages'][] = array(
-					"pff-paystack-rk-remove-ignored-{$pair['rk']}",
-					esc_html__( 'Remove was ignored because a new restricted key was submitted.', 'pff-paystack' ),
+					"pff-paystack-keys-ignored-{$pair['rk']}",
+					esc_html__( 'The secret and public keys you entered were not saved because a restricted key was submitted for this mode.', 'pff-paystack' ),
+					'warning',
 				);
 			}
-			if ( '' !== $sk_in ) {
+			if ( $disconnect ) {
 				$decision['messages'][] = array(
-					"pff-paystack-sk-ignored-{$pair['sk']}",
-					$accept
-						? esc_html__( 'The secret key was not saved because a restricted key was saved for this mode.', 'pff-paystack' )
-						: esc_html__( 'The secret key was not saved because a restricted key was also submitted.', 'pff-paystack' ),
+					"pff-paystack-disconnect-ignored-{$pair['rk']}",
+					esc_html__( 'Disconnect was ignored because a restricted key was submitted for this mode.', 'pff-paystack' ),
+					'warning',
 				);
 			}
-		} elseif ( $remove && '' !== $stored_rk ) {
+		} elseif ( $disconnect ) {
+			$decision['rk'] = 'disconnect';
+			if ( $this->active_mode() === $mode ) {
+				$decision['messages'][] = array(
+					"pff-paystack-disconnect-active-{$pair['rk']}",
+					sprintf(
+						/* translators: %s: Test or Live */
+						esc_html__( '%s mode now has no keys; payments will fail until you save a restricted key.', 'pff-paystack' ),
+						'test' === $mode ? esc_html__( 'Test', 'pff-paystack' ) : esc_html__( 'Live', 'pff-paystack' )
+					),
+					'warning',
+				);
+			}
+		} elseif ( '' !== (string) get_option( $pair['rk'], '' ) ) {
+			// A secret key left beside a restricted key is never used, so a save removes it.
+			$decision['clear_sk'] = '' !== (string) get_option( $pair['sk'], '' );
+		} elseif ( '' !== (string) get_option( $pair['sk'], '' ) && '' === (string) get_option( $pair['rk'], '' ) ) {
+			$sk_error = '' !== $sk_in ? $this->prefix_error( $pair['sk'], $sk_in ) : '';
 			if ( '' !== $sk_error ) {
-				$decision['sk']         = 'reject';
 				$decision['messages'][] = array( "pff-paystack-invalid-{$pair['sk']}", $sk_error );
 			} elseif ( '' !== $sk_in ) {
-				$decision['rk'] = 'remove';
-				$decision['sk'] = 'accept';
-			} elseif ( '' !== $stored_sk ) {
-				$decision['rk'] = 'remove';
-			} else {
-				$decision['messages'][] = array(
-					"pff-paystack-rk-remove-{$pair['rk']}",
-					esc_html__( "To remove the restricted key, paste a secret key for this mode under 'Use secret keys instead'. The restricted key was kept.", 'pff-paystack' ),
-				);
+				$decision['sk_value'] = $sk_in;
 			}
-		} elseif ( '' !== $stored_rk && '' !== $sk_in ) {
-			$decision['sk']         = 'ignore';
-			$decision['messages'][] = array(
-				"pff-paystack-sk-ignored-{$pair['sk']}",
-				esc_html__( 'Remove the restricted key first to use a secret key. The secret key was not saved; other settings were saved.', 'pff-paystack' ),
-			);
-		} elseif ( '' !== $sk_error ) {
-			$decision['sk']         = 'reject';
-			$decision['messages'][] = array( "pff-paystack-invalid-{$pair['sk']}", $sk_error );
-		} elseif ( '' !== $sk_in ) {
-			$decision['sk'] = 'accept';
+			$pk_error = $pk_changed ? $this->prefix_error( $pair['pk'], $pk_in ) : '';
+			if ( '' !== $pk_error ) {
+				$decision['messages'][] = array( "pff-paystack-invalid-{$pair['pk']}", $pk_error );
+			} elseif ( $pk_changed ) {
+				$decision['pk_value'] = $pk_in;
+			}
 		}
 
 		return $decision;
 	}
 
 	/**
+	 * The mode this save leaves active: the submitted one, else the saved one.
+	 *
+	 * @return string 'test' or 'live'
+	 */
+	private function active_mode() {
+		$submitted = $this->read_post_field( 'mode' );
+		if ( in_array( $submitted, array( 'test', 'live' ), true ) ) {
+			return $submitted;
+		}
+		return 'live' === get_option( 'mode', 'test' ) ? 'live' : 'test';
+	}
+
+	/**
 	 * Verifies a submitted restricted key.
 	 *
-	 * @param string $key  Submitted key.
-	 * @param string $mode 'test' or 'live'.
-	 * @return string The error message, or '' when the key is accepted.
+	 * @param string     $key      Submitted key.
+	 * @param string     $mode     'test' or 'live'.
+	 * @param float|null $deadline Absolute time by which the check must finish.
+	 * @return array 'message' is the error or '' when accepted, 'pk' the public key to store, 'unconfirmed' whether the extra-permission check was cut short.
 	 */
-	private function check_restricted_key( $key, $mode ) {
-		$validator = null !== $this->validator ? $this->validator : [ Restricted_Key::class, 'validate' ];
-		$verdict   = call_user_func( $validator, $key, $mode );
+	private function check_restricted_key( $key, $mode, $deadline = null ) {
+		$result    = array(
+			'message'     => '',
+			'pk'          => '',
+			'unconfirmed' => false,
+		);
+		$validator = null !== $this->validator ? $this->validator : [ $this, 'run_validator' ];
+		$verdict   = call_user_func( $validator, $key, $mode, $deadline );
 		$code      = isset( $verdict['code'] ) ? $verdict['code'] : 'unverifiable';
 		$reason    = isset( $verdict['reason'] ) ? $verdict['reason'] : null;
 		$scopes    = isset( $verdict['scopes'] ) && is_array( $verdict['scopes'] ) ? implode( ', ', array_map( 'esc_html', $verdict['scopes'] ) ) : '';
-		$sensitive = isset( $verdict['sensitive_scopes'] ) && is_array( $verdict['sensitive_scopes'] ) ? implode( ', ', array_map( 'esc_html', $verdict['sensitive_scopes'] ) ) : '';
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$probes = isset( $verdict['probes'] ) && is_string( $verdict['probes'] ) ? $verdict['probes'] : '';
 			error_log( 'pff-paystack rk check mode=' . $mode . ' code=' . $code . ' probes=' . $probes ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- debug only, never the key.
 		}
 
+		if ( 'ok' === $code ) {
+			$pk = isset( $verdict['public_key'] ) && is_string( $verdict['public_key'] ) ? $verdict['public_key'] : '';
+			if ( Restricted_Key::is_valid_public_key( $pk, $mode ) ) {
+				$result['pk']          = $pk;
+				$result['unconfirmed'] = ! empty( $verdict['unconfirmed'] );
+				return $result;
+			}
+			$code = 'no_public_key';
+		}
+
+		$result['message'] = $this->rejection_message( $code, $reason, $mode, $scopes );
+		return $result;
+	}
+
+	/**
+	 * Runs the real restricted key check.
+	 *
+	 * @param string     $key      Restricted key.
+	 * @param string     $mode     'test' or 'live'.
+	 * @param float|null $deadline Absolute time by which the check must finish.
+	 * @return array Verdict.
+	 */
+	private function run_validator( $key, $mode, $deadline = null ) {
+		return Restricted_Key::validate( $key, $mode, null, null, $deadline );
+	}
+
+	/**
+	 * Builds the message for a rejected restricted key.
+	 *
+	 * @param string      $code      Verdict code.
+	 * @param string|null $reason    Verdict reason.
+	 * @param string      $mode      'test' or 'live'.
+	 * @param string      $scopes    Escaped, comma separated missing or sensitive permissions.
+	 * @return string
+	 */
+	private function rejection_message( $code, $reason, $mode, $scopes ) {
 		switch ( $code ) {
-			case 'ok':
-				return '';
 			case 'invalid_shape':
 				if ( 'secret_key' === $reason ) {
-					return esc_html__( "This is a secret key. Paste it under 'Use secret keys instead', or create a restricted key. The previous key was kept; other settings were saved.", 'pff-paystack' );
+					return esc_html__( 'This is a secret key. Create a restricted key in your Paystack Dashboard and paste that instead. The previous key was kept; other settings were saved.', 'pff-paystack' );
 				}
 				if ( 'wrong_mode' === $reason ) {
 					return 'test' === $mode
@@ -384,25 +439,19 @@ JS;
 			case 'invalid_key':
 				return esc_html__( "This restricted key is invalid, or your Paystack account isn't enabled for restricted keys yet. The previous key was kept; other settings were saved.", 'pff-paystack' );
 			case 'missing_scope':
-				$message = sprintf(
+				return sprintf(
 					/* translators: %s: list of permissions */
 					esc_html__( 'Your restricted key is missing: %s. Turn these on in your Paystack Dashboard. The previous key was kept; other settings were saved.', 'pff-paystack' ),
 					$scopes
 				);
-				if ( '' !== $sensitive ) {
-					$message .= sprintf(
-						/* translators: %s: list of permissions */
-						esc_html__( ' Also turn off: %s.', 'pff-paystack' ),
-						$sensitive
-					);
-				}
-				return $message;
 			case 'sensitive_scope':
 				return sprintf(
 					/* translators: %s: list of permissions */
 					esc_html__( "Your restricted key has permissions this plugin doesn't need: %s. Turn them off, then save again. The previous key was kept; other settings were saved.", 'pff-paystack' ),
 					$scopes
 				);
+			case 'no_public_key':
+				return esc_html__( "Paystack didn't return a public key for this restricted key. Paste it again and save; if it keeps happening, contact Paystack support. The previous key was kept; other settings were saved.", 'pff-paystack' );
 			default:
 				if ( 'blocked' === $reason ) {
 					return esc_html__( "Paystack blocked the check. If you've set an IP whitelist in your Paystack Dashboard, allow this server's IP, then save again. The previous key was kept; other settings were saved.", 'pff-paystack' );
@@ -443,7 +492,7 @@ JS;
 	 * Finds the mode and role of a key option.
 	 *
 	 * @param string $option Option name.
-	 * @return array|null array( mode, 'rk'|'sk' ), or null for any other option.
+	 * @return array|null array( mode, 'rk'|'sk'|'pk'|'disconnect' ), or null for any other option.
 	 */
 	private function locate_key_option( $option ) {
 		foreach ( self::SECRET_PAIRS as $mode => $pair ) {
@@ -476,19 +525,125 @@ JS;
 			if ( $new !== $decision['rk_value'] ) {
 				return $old;
 			}
-			delete_option( self::SECRET_PAIRS[ $mode ]['sk'] );
 			Restricted_Key::clear_denied( $mode );
+			$this->set_unconfirmed( $mode, $decision['unconfirmed'] );
+			if ( $decision['unconfirmed'] ) {
+				add_settings_error(
+					self::OPTION_GROUP,
+					"pff-paystack-rk-unconfirmed-{$option}",
+					sprintf(
+						/* translators: %s: Test or Live */
+						esc_html__( "Saved. We couldn't confirm your %s restricted key has no extra permissions. Check it in your Paystack Dashboard.", 'pff-paystack' ),
+						'test' === $mode ? esc_html__( 'Test', 'pff-paystack' ) : esc_html__( 'Live', 'pff-paystack' )
+					),
+					'warning'
+				);
+			}
 			return $new;
 		}
-		if ( 'remove' === $decision['rk'] ) {
+		if ( 'disconnect' === $decision['rk'] ) {
 			Restricted_Key::clear_denied( $mode );
-			return '';
+			$this->set_unconfirmed( $mode, false );
+			return false === $old ? $old : '';
 		}
 		return $old;
 	}
 
 	/**
-	 * Keeps the stored key when the submitted one is blank, ignored or has the wrong prefix.
+	 * Keeps a key option unchanged; used where only our own settings page may write it.
+	 *
+	 * @param mixed $new Submitted value.
+	 * @param mixed $old Stored value.
+	 * @return mixed
+	 */
+	public function keep_stored_key( $new, $old ) {
+		return $old;
+	}
+
+	/**
+	 * Gets the modes whose stored restricted key was accepted without a full permission check.
+	 *
+	 * @return array array( mode => true )
+	 */
+	private function get_unconfirmed() {
+		$stored = get_option( self::UNCONFIRMED_OPTION, array() );
+		$flags  = array();
+		foreach ( is_array( $stored ) ? $stored : array() as $mode => $flag ) {
+			if ( isset( self::SECRET_PAIRS[ $mode ] ) && true === $flag ) {
+				$flags[ $mode ] = true;
+			}
+		}
+		return $flags;
+	}
+
+	/**
+	 * Sets or clears a mode's unconfirmed flag, writing only on change.
+	 *
+	 * @param string $mode 'test' or 'live'.
+	 * @param bool   $flag Whether the stored key is unconfirmed.
+	 * @return void
+	 */
+	private function set_unconfirmed( $mode, $flag ) {
+		$flags = $this->get_unconfirmed();
+		if ( $flag === isset( $flags[ $mode ] ) ) {
+			return;
+		}
+		if ( $flag ) {
+			$flags[ $mode ] = true;
+		} else {
+			unset( $flags[ $mode ] );
+		}
+		update_option( self::UNCONFIRMED_OPTION, $flags, false );
+	}
+
+	/**
+	 * Applies the mode's decision to its secret or public key option.
+	 *
+	 * Runs after the restricted key option is processed, so the public key is written and the secret key cleared only once that key is stored.
+	 *
+	 * @param mixed  $new    Submitted value.
+	 * @param mixed  $old    Stored value.
+	 * @param string $option Option name.
+	 * @return mixed
+	 */
+	public function filter_mode_key( $new, $old, $option ) {
+		$located = $this->locate_key_option( $option );
+		if ( null === $located || ! isset( $this->decisions[ $located[0] ] ) || ! in_array( $located[1], array( 'sk', 'pk' ), true ) ) {
+			return $old;
+		}
+		list( $mode, $role ) = $located;
+		$decision            = $this->decisions[ $mode ];
+
+		// An option that was never stored stays absent rather than gaining an empty row.
+		if ( 'disconnect' === $decision['rk'] ) {
+			return false === $old ? $old : '';
+		}
+		if ( 'accept' === $decision['rk'] ) {
+			if ( (string) get_option( self::SECRET_PAIRS[ $mode ]['rk'], '' ) !== $decision['rk_value'] ) {
+				return $old;
+			}
+			if ( 'pk' === $role ) {
+				return $decision['pk_value'];
+			}
+			return false === $old ? $old : '';
+		}
+
+		if ( 'sk' === $role && $decision['clear_sk'] ) {
+			return false === $old ? $old : '';
+		}
+
+		$value = $decision[ $role . '_value' ];
+		if ( null === $value || $new !== $value ) {
+			return $old;
+		}
+		if ( 'sk' === $role ) {
+			Restricted_Key::clear_denied( $mode );
+		}
+		return $value;
+	}
+
+	/**
+	 * Keeps the stored value when a third-party secret field is submitted blank or with the wrong prefix.
 	 *
 	 * @param mixed  $new    Submitted value.
 	 * @param mixed  $old    Stored value.
@@ -500,33 +655,10 @@ JS;
 			return $old;
 		}
 
-		$located = $this->locate_key_option( $option );
-		$is_sk   = null !== $located && 'sk' === $located[1];
-		if ( $is_sk ) {
-			$mode     = $located[0];
-			$sk_state = isset( $this->decisions[ $mode ] ) ? $this->decisions[ $mode ]['sk'] : 'none';
-			$rk_state = isset( $this->decisions[ $mode ] ) ? $this->decisions[ $mode ]['rk'] : 'none';
-
-			if ( '' !== (string) get_option( self::SECRET_PAIRS[ $mode ]['rk'], '' ) && 'accept' !== $sk_state && 'remove' !== $rk_state ) {
-				return $old;
-			}
-			if ( 'ignore' === $sk_state || 'reject' === $sk_state ) {
-				return $old;
-			}
-			if ( 'accept' === $sk_state ) {
-				Restricted_Key::clear_denied( $mode );
-				return $new;
-			}
-		}
-
 		$error = $this->prefix_error( $option, (string) $new );
 		if ( '' !== $error ) {
 			add_settings_error( self::OPTION_GROUP, "pff-paystack-invalid-{$option}", $error, 'error' );
 			return $old;
-		}
-
-		if ( $is_sk ) {
-			Restricted_Key::clear_denied( $located[0] );
 		}
 
 		return $new;
@@ -574,34 +706,6 @@ JS;
 	}
 
 	/**
-	 * Whether the secret key section should start open: a mode holds a secret key, or a save just reported a problem with one.
-	 *
-	 * @internal
-	 *
-	 * @param array $errors Settings errors, as returned by get_settings_errors().
-	 * @return bool
-	 */
-	public function secret_keys_expanded( $errors = array() ) {
-		$prefixes = array( 'pff-paystack-sk-ignored-', 'pff-paystack-rk-remove-' );
-		foreach ( self::SECRET_PAIRS as $pair ) {
-			if ( '' !== (string) get_option( $pair['sk'], '' ) ) {
-				return true;
-			}
-			$prefixes[] = "pff-paystack-invalid-{$pair['sk']}";
-		}
-
-		foreach ( $errors as $error ) {
-			$code = isset( $error['code'] ) ? (string) $error['code'] : '';
-			foreach ( $prefixes as $prefix ) {
-				if ( 0 === strpos( $code, $prefix ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Prints the masked hint for a stored key; the value itself is never echoed.
 	 *
 	 * @param string $key    Option name.
@@ -622,12 +726,14 @@ JS;
 	/**
 	 * Prints a settings row for a restricted or secret key field, which is never echoed back, only masked.
 	 *
-	 * @param string $key         Option name.
-	 * @param array  $field       Field definition.
-	 * @param string $remove_name Name of the remove-saved-key checkbox (restricted keys only), or ''.
+	 * @param string $key             Option name.
+	 * @param array  $field           Field definition.
+	 * @param string $disconnect_name Name of the disconnect checkbox (restricted keys only), or ''.
+	 * @param bool   $can_disconnect  Whether the mode holds any saved key to disconnect.
+	 * @param bool   $unconfirmed     Whether the saved key was accepted without a full permission check.
 	 * @return void
 	 */
-	private function render_key_row( $key, $field, $remove_name = '' ) {
+	private function render_key_row( $key, $field, $disconnect_name = '', $can_disconnect = false, $unconfirmed = false ) {
 		$prefix = isset( $field['prefix'] ) ? $field['prefix'] : '';
 		?>
 		<tr valign="top">
@@ -635,9 +741,11 @@ JS;
 			<td>
 				<input type="password" id="<?php echo esc_attr( 'pff-' . $key ); ?>" name="<?php echo esc_attr( $key ); ?>" value="" placeholder="<?php echo esc_attr( $prefix . '…' ); ?>" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" />
 				<?php $this->render_saved_hint( $key, $prefix ); ?>
-				<?php if ( '' !== $remove_name && '' !== (string) get_option( $key, '' ) ) { ?>
-					<p><label><input type="checkbox" class="pff-rk-remove" name="<?php echo esc_attr( $remove_name ); ?>" value="1" /> <?php esc_html_e( 'Remove saved restricted key', 'pff-paystack' ); ?></label></p>
-					<p class="description"><?php esc_html_e( "To switch back to a secret key, also paste one under 'Use secret keys instead'.", 'pff-paystack' ); ?></p>
+				<?php if ( $unconfirmed ) { ?>
+					<p class="description"><?php esc_html_e( "Not fully checked: we couldn't confirm this key has no extra permissions. Paste it again and save to re-check.", 'pff-paystack' ); ?></p>
+				<?php } ?>
+				<?php if ( '' !== $disconnect_name && $can_disconnect ) { ?>
+					<p><label><input type="checkbox" name="<?php echo esc_attr( $disconnect_name ); ?>" value="1" /> <?php esc_html_e( 'Disconnect this mode (clears its saved keys)', 'pff-paystack' ); ?></label></p>
 				<?php } ?>
 			</td>
 		</tr>
@@ -697,14 +805,18 @@ JS;
 		}
 		$settings_fields = $this->get_settings_fields();
 		$general         = isset( $settings_fields['general'] ) ? $settings_fields['general'] : array();
-		$rk_keys         = array_column( self::SECRET_PAIRS, 'rk' );
-		$sk_keys         = array_column( self::SECRET_PAIRS, 'sk' );
-		$remove_names    = array_combine( $rk_keys, array_column( self::SECRET_PAIRS, 'remove' ) );
-		$known           = array_merge( array( 'mode', 'tpk', 'lpk' ), $rk_keys, $sk_keys );
-		$has_rk          = (bool) array_intersect( $rk_keys, array_keys( $general ) );
-		$has_sk          = (bool) array_intersect( $sk_keys, array_keys( $general ) );
-		$collapsed       = $has_rk && ! $this->secret_keys_expanded( get_settings_errors( self::OPTION_GROUP ) );
-		$dashboard_url   = esc_url( self::DASHBOARD_URL );
+		$rk_keys          = array_column( self::SECRET_PAIRS, 'rk' );
+		$disconnect_names = array_combine( $rk_keys, array_column( self::SECRET_PAIRS, 'disconnect' ) );
+		$known            = array_merge( array( 'mode' ), $rk_keys, array_column( self::SECRET_PAIRS, 'sk' ), array_column( self::SECRET_PAIRS, 'pk' ) );
+		$has_rk           = (bool) array_intersect( $rk_keys, array_keys( $general ) );
+		$holders          = array();
+		foreach ( self::SECRET_PAIRS as $pair ) {
+			if ( '' !== (string) get_option( $pair['rk'], '' ) || '' !== (string) get_option( $pair['sk'], '' ) ) {
+				$holders[] = $pair['rk'];
+			}
+		}
+		$unconfirmed      = $this->get_unconfirmed();
+		$dashboard_url    = esc_url( self::DASHBOARD_URL );
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Paystack Forms Settings', 'pff-paystack' ); ?></h1>
@@ -746,29 +858,37 @@ JS;
 					$this->render_rows(
 						$general,
 						$rk_keys,
-						function ( $key, $field ) use ( $remove_names ) {
-							$this->render_key_row( $key, $field, $remove_names[ $key ] );
+						function ( $key, $field ) use ( $disconnect_names, $holders, $unconfirmed ) {
+							$mode = $this->locate_key_option( $key )[0];
+							$this->render_key_row( $key, $field, $disconnect_names[ $key ], in_array( $key, $holders, true ), isset( $unconfirmed[ $mode ] ) && '' !== (string) get_option( $key, '' ) );
 						}
 					);
 					?>
 				<?php } ?>
 
-				<?php $this->render_rows( $general, array( 'tpk', 'lpk' ), [ $this, 'render_field_row' ] ); ?>
-
-				<?php if ( $has_sk ) { ?>
-					<p><button type="button" class="button-link" id="pff-secret-keys-toggle" aria-expanded="false" aria-controls="pff-secret-keys" hidden><?php esc_html_e( 'Use secret keys instead', 'pff-paystack' ); ?></button></p>
-					<div id="pff-secret-keys"<?php if ( $collapsed ) { ?> data-collapsed="1"<?php } ?>>
-						<?php
-						$this->render_rows(
-							$general,
-							$sk_keys,
-							function ( $key, $field ) {
+				<?php
+				foreach ( self::SECRET_PAIRS as $pair ) {
+					$stored_sk = (string) get_option( $pair['sk'], '' );
+					if ( '' === $stored_sk || '' !== (string) get_option( $pair['rk'], '' ) ) {
+						continue;
+					}
+					?>
+					<?php /* translators: %s: masked saved secret key */ ?>
+					<p class="description"><?php echo esc_html( sprintf( __( 'This mode uses a secret key (%s). Save a restricted key to switch; the secret and public keys are then replaced.', 'pff-paystack' ), $this->mask_key( $stored_sk, $general[ $pair['sk'] ]['prefix'] ) ) ); ?></p>
+					<?php
+					$this->render_rows(
+						$general,
+						array( $pair['sk'], $pair['pk'] ),
+						function ( $key, $field ) use ( $pair ) {
+							if ( $key === $pair['sk'] ) {
 								$this->render_key_row( $key, $field );
+							} else {
+								$this->render_field_row( $key, $field );
 							}
-						);
-						?>
-					</div>
-				<?php } ?>
+						}
+					);
+				}
+				?>
 
 				<?php $this->render_rows( $general, array_diff( array_keys( $general ), $known ), [ $this, 'render_field_row' ] ); ?>
 				<hr>
@@ -792,14 +912,6 @@ JS;
 				<?php submit_button(); ?>
 
 			</form>
-			<?php
-			// Collapsing is done by the script, not in markup, so the fields stay visible and submittable without JS.
-			if ( function_exists( 'wp_print_inline_script_tag' ) ) {
-				wp_print_inline_script_tag( self::SECRET_KEYS_JS );
-			} else {
-				echo '<script>' . self::SECRET_KEYS_JS . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static string.
-			}
-			?>
 		</div>
 		<?php
 	}
@@ -810,7 +922,46 @@ JS;
 	 * @return array
 	 */
 	public function get_settings_fields() {
-		return apply_filters( 'kkd_pff_paystack_settings_fields', $this->fields );
+		$fields = apply_filters( 'kkd_pff_paystack_settings_fields', $this->fields );
+		if ( ! is_array( $fields ) ) {
+			$fields = $this->fields;
+		}
+
+		// Our key fields keep fixed positions: options.php stores in field order and the guards need the rk stored before the sk and pk.
+		$had_rk = array();
+		foreach ( $fields as $group => $group_fields ) {
+			if ( ! is_array( $group_fields ) ) {
+				continue;
+			}
+			foreach ( self::SECRET_PAIRS as $pair ) {
+				if ( 'general' === $group && isset( $group_fields[ $pair['rk'] ] ) ) {
+					$had_rk[ $pair['rk'] ] = $this->fields['general'][ $pair['rk'] ];
+				}
+				foreach ( $pair as $name ) {
+					unset( $group_fields[ $name ] );
+				}
+			}
+			$fields[ $group ] = $group_fields;
+		}
+
+		$general = isset( $fields['general'] ) && is_array( $fields['general'] ) ? $fields['general'] : array();
+		$pinned  = array();
+		foreach ( $general as $name => $args ) {
+			$pinned[ $name ] = $args;
+			if ( 'mode' === $name ) {
+				$pinned += $had_rk;
+			}
+		}
+		if ( ! isset( $pinned['mode'] ) ) {
+			$pinned = $had_rk + $pinned;
+		}
+		foreach ( self::SECRET_PAIRS as $pair ) {
+			foreach ( array( $pair['sk'], $pair['pk'] ) as $name ) {
+				$pinned[ $name ] = $this->fields['general'][ $name ];
+			}
+		}
+		$fields['general'] = $pinned;
+		return $fields;
 	}
 
 	/**

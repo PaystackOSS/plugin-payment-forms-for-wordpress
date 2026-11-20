@@ -24,12 +24,17 @@ class Restricted_Key {
 
 	const DENIED_OPTION = 'pff_paystack_rk_denied';
 
-	const BUDGET_SECONDS = 12;
+	const BUDGET_SECONDS = 20;
 
 	const PROBE_TIMEOUT = 4;
 
 	/**
-	 * Probes in run order; the first is the baseline.
+	 * Money-moving scopes: probed first among the sensitive ones, and a key is rejected unless each is definitively absent.
+	 */
+	const HIGH_RISK = array( 'transactions:write', 'transfers', 'payouts', 'bulk_charges' );
+
+	/**
+	 * Probes in run order; the first is the baseline, the required ones run before any sensitive one.
 	 *
 	 * match: success = 2xx; generic = 2xx or 400; exact = one of the status/message pairs.
 	 * granted_on: extra status/message pairs that also prove the scope exists.
@@ -39,6 +44,14 @@ class Restricted_Key {
 			'scope'    => 'transactions:read',
 			'method'   => 'GET',
 			'path'     => 'transaction?perPage=1',
+			'body'     => null,
+			'required' => true,
+			'match'    => 'success',
+		),
+		array(
+			'scope'    => 'account:read',
+			'method'   => 'GET',
+			'path'     => 'ident',
 			'body'     => null,
 			'required' => true,
 			'match'    => 'success',
@@ -63,9 +76,17 @@ class Restricted_Key {
 			'exact'    => array( array( 404, 'Sorry, this feature is no longer available.' ) ),
 		),
 		array(
-			'scope'    => 'disputes_refunds',
+			'scope'    => 'transfers',
 			'method'   => 'GET',
-			'path'     => 'refund?perPage=1&from=2099-01-01',
+			'path'     => 'transfer?perPage=1&from=2099-01-01',
+			'body'     => null,
+			'required' => false,
+			'match'    => 'generic',
+		),
+		array(
+			'scope'    => 'payouts',
+			'method'   => 'GET',
+			'path'     => 'settlement/instant/requests?perPage=1&from=2099-01-01',
 			'body'     => null,
 			'required' => false,
 			'match'    => 'generic',
@@ -74,6 +95,14 @@ class Restricted_Key {
 			'scope'    => 'bulk_charges',
 			'method'   => 'GET',
 			'path'     => 'bulkcharge?perPage=1',
+			'body'     => null,
+			'required' => false,
+			'match'    => 'generic',
+		),
+		array(
+			'scope'    => 'disputes_refunds',
+			'method'   => 'GET',
+			'path'     => 'refund?perPage=1&from=2099-01-01',
 			'body'     => null,
 			'required' => false,
 			'match'    => 'generic',
@@ -112,14 +141,6 @@ class Restricted_Key {
 			'granted_on' => array( array( 403, self::MOR_MESSAGE ) ),
 		),
 		array(
-			'scope'    => 'transfers',
-			'method'   => 'GET',
-			'path'     => 'transfer?perPage=1&from=2099-01-01',
-			'body'     => null,
-			'required' => false,
-			'match'    => 'generic',
-		),
-		array(
 			'scope'    => 'virtual_accounts',
 			'method'   => 'GET',
 			'path'     => 'pay-with-transfer/custom-accounts/status',
@@ -139,14 +160,6 @@ class Restricted_Key {
 			'scope'    => 'connect',
 			'method'   => 'GET',
 			'path'     => 'connect/platforms?perPage=1',
-			'body'     => null,
-			'required' => false,
-			'match'    => 'generic',
-		),
-		array(
-			'scope'    => 'payouts',
-			'method'   => 'GET',
-			'path'     => 'settlement/instant/requests?perPage=1&from=2099-01-01',
 			'body'     => null,
 			'required' => false,
 			'match'    => 'generic',
@@ -193,6 +206,17 @@ class Restricted_Key {
 	}
 
 	/**
+	 * Checks the key is a pk_ key of the given mode.
+	 *
+	 * @param mixed  $pk   Public key.
+	 * @param string $mode 'test' or 'live'.
+	 * @return boolean
+	 */
+	public static function is_valid_public_key( $pk, $mode ) {
+		return is_string( $pk ) && 1 === preg_match( '/^pk_' . preg_quote( $mode, '/' ) . '_[A-Za-z0-9_]{16,128}\z/', $pk );
+	}
+
+	/**
 	 * Human label for a probe scope; not escaped.
 	 *
 	 * @param string $scope Scope id from PROBES.
@@ -202,6 +226,8 @@ class Restricted_Key {
 		switch ( $scope ) {
 			case 'transactions:read':
 				return __( 'Transactions: Read', 'pff-paystack' );
+			case 'account:read':
+				return __( 'Account: Read', 'pff-paystack' );
 			case 'plans:write':
 				return __( 'Plans: Write', 'pff-paystack' );
 			case 'transactions:write':
@@ -237,7 +263,7 @@ class Restricted_Key {
 	}
 
 	/**
-	 * Lists the required scope labels, e.g. "Transactions: Read, Plans: Write".
+	 * Lists the required scope labels, e.g. "Transactions: Read, Account: Read, Plans: Write".
 	 *
 	 * @return string
 	 */
@@ -308,7 +334,7 @@ class Restricted_Key {
 	 * Reduces classified probe results to a verdict; a probe with no result counts as indeterminate.
 	 *
 	 * @param array $results List of array( 'scope' => string, 'outcome' => string, 'status' => int ).
-	 * @return array array( 'code', 'scopes', 'reason', 'sensitive_scopes', 'probes' )
+	 * @return array array( 'code', 'scopes', 'reason', 'sensitive_scopes', 'probes', 'public_key', 'unconfirmed' )
 	 */
 	public static function decide( $results ) {
 		$by_scope = array();
@@ -322,6 +348,8 @@ class Restricted_Key {
 		$sensitive = array();
 		$blocked   = false;
 		$unknown   = false;
+		$skipped   = false;
+		$high_gap  = false;
 		$trace     = array();
 		foreach ( self::PROBES as $probe ) {
 			$trace[] = $probe['scope'] . ':' . ( isset( $by_scope[ $probe['scope'] ] ) ? (int) $by_scope[ $probe['scope'] ]['status'] : '-' );
@@ -346,9 +374,16 @@ class Restricted_Key {
 					}
 					break;
 				default:
-					$unknown = true;
-					if ( 403 === $status ) {
-						$blocked = true;
+					if ( $probe['required'] ) {
+						$unknown = true;
+						if ( 403 === $status ) {
+							$blocked = true;
+						}
+					} else {
+						$skipped = true;
+						if ( in_array( $probe['scope'], self::HIGH_RISK, true ) ) {
+							$high_gap = true;
+						}
 					}
 			}
 		}
@@ -362,7 +397,10 @@ class Restricted_Key {
 		if ( $unknown ) {
 			return self::verdict( 'unverifiable', array(), $blocked ? 'blocked' : 'transient', array(), $probes );
 		}
-		return self::verdict( 'ok', array(), null, array(), $probes );
+		if ( $high_gap ) {
+			return self::verdict( 'unverifiable', array(), 'transient', array(), $probes );
+		}
+		return self::verdict( 'ok', array(), null, array(), $probes, null, $skipped );
 	}
 
 	/**
@@ -373,15 +411,19 @@ class Restricted_Key {
 	 * @param string|null $reason           Reason for unverifiable and invalid_shape.
 	 * @param string[]    $sensitive_scopes Sensitive scope labels found alongside missing ones.
 	 * @param string      $probes           Key-free scope:status trace.
+	 * @param string|null $public_key       Public key, only on ok verdicts.
+	 * @param boolean     $unconfirmed      Whether some sensitive probes could not be answered.
 	 * @return array
 	 */
-	private static function verdict( $code, $scopes = array(), $reason = null, $sensitive_scopes = array(), $probes = '' ) {
+	private static function verdict( $code, $scopes = array(), $reason = null, $sensitive_scopes = array(), $probes = '', $public_key = null, $unconfirmed = false ) {
 		return array(
 			'code'             => $code,
 			'scopes'           => $scopes,
 			'reason'           => $reason,
 			'sensitive_scopes' => $sensitive_scopes,
 			'probes'           => $probes,
+			'public_key'       => $public_key,
+			'unconfirmed'      => $unconfirmed,
 		);
 	}
 
@@ -403,12 +445,13 @@ class Restricted_Key {
 	}
 
 	/**
-	 * Probes the key's scopes.
+	 * Probes the key's scopes: required ones first, then the sensitive ones until the deadline.
 	 *
-	 * @param string        $key     Restricted key.
-	 * @param string        $mode    'test' or 'live'.
-	 * @param callable|null $request function( $method, $path, $body, $timeout, $key ) returning array( 'status' => int, 'message' => string|null ).
-	 * @param callable|null $clock   Returns the current time in seconds as a float.
+	 * @param string        $key      Restricted key.
+	 * @param string        $mode     'test' or 'live'.
+	 * @param callable|null $request  function( $method, $path, $body, $timeout, $key ) returning array( 'status' => int, 'message' => string|null, 'public_key' => string|null ).
+	 * @param callable|null $clock    Returns the current time in seconds as a float.
+	 * @param float|null    $deadline Absolute time on $clock; defaults to now + BUDGET_SECONDS.
 	 * @return array Verdict, or code 'invalid_shape' when the key shape is wrong.
 	 */
 	public static function validate(
@@ -416,7 +459,8 @@ class Restricted_Key {
 		$key,
 		$mode,
 		$request = null,
-		$clock = null
+		$clock = null,
+		$deadline = null
 	) {
 		if ( ! self::is_valid_shape( $key, $mode ) ) {
 			return self::verdict( 'invalid_shape', array(), self::shape_reason( $key, $mode ) );
@@ -427,11 +471,18 @@ class Restricted_Key {
 		$now = null !== $clock ? $clock : function () {
 			return microtime( true );
 		};
+		if ( null === $deadline ) {
+			$deadline = $now() + self::BUDGET_SECONDS;
+		}
 
-		$deadline = $now() + self::BUDGET_SECONDS;
-		$baseline = null;
-		$results  = array();
+		$baseline    = null;
+		$results     = array();
+		$public_key  = null;
+		$required_ok = true;
 		foreach ( self::PROBES as $index => $probe ) {
+			if ( ! $probe['required'] && ! $required_ok ) {
+				break;
+			}
 			$remaining = $deadline - $now();
 			if ( $remaining <= 0 ) {
 				break;
@@ -449,15 +500,21 @@ class Restricted_Key {
 			} catch ( \Throwable $e ) {
 				$response = null;
 			}
-			$status   = isset( $response['status'] ) ? (int) $response['status'] : 0;
-			$message  = isset( $response['message'] ) && is_string( $response['message'] ) ? $response['message'] : null;
-			$outcome  = self::classify( $probe, $status, $message, $baseline );
+			$status    = isset( $response['status'] ) ? (int) $response['status'] : 0;
+			$message   = isset( $response['message'] ) && is_string( $response['message'] ) ? $response['message'] : null;
+			$outcome   = self::classify( $probe, $status, $message, $baseline );
 			$results[] = array(
 				'scope'   => $probe['scope'],
 				'outcome' => $outcome,
 				'status'  => $status,
 			);
 
+			if ( 'account:read' === $probe['scope'] && isset( $response['public_key'] ) && is_string( $response['public_key'] ) ) {
+				$public_key = $response['public_key'];
+			}
+			if ( 'present' !== $outcome ) {
+				$required_ok = $required_ok && ! $probe['required'];
+			}
 			if ( 0 === $index ) {
 				if ( 'present' !== $outcome && 'absent' !== $outcome ) {
 					break;
@@ -466,7 +523,15 @@ class Restricted_Key {
 			}
 		}
 
-		return self::decide( $results );
+		$verdict = self::decide( $results );
+		if ( 'ok' !== $verdict['code'] ) {
+			return $verdict;
+		}
+		if ( ! self::is_valid_public_key( $public_key, $mode ) ) {
+			return self::verdict( 'no_public_key', array(), null, array(), $verdict['probes'] );
+		}
+		$verdict['public_key'] = $public_key;
+		return $verdict;
 	}
 
 	/**
@@ -477,7 +542,7 @@ class Restricted_Key {
 	 * @param string|null $body    JSON body.
 	 * @param float       $timeout Seconds.
 	 * @param string      $key     Restricted key.
-	 * @return array array( 'status' => int, 'message' => string|null )
+	 * @return array array( 'status' => int, 'message' => string|null, 'public_key' => string|null )
 	 */
 	public static function send(
 		$method,
@@ -502,14 +567,16 @@ class Restricted_Key {
 		);
 		if ( is_wp_error( $response ) ) {
 			return array(
-				'status'  => 0,
-				'message' => null,
+				'status'     => 0,
+				'message'    => null,
+				'public_key' => null,
 			);
 		}
 
 		return array(
-			'status'  => (int) wp_remote_retrieve_response_code( $response ),
-			'message' => self::message_of( wp_remote_retrieve_body( $response ) ),
+			'status'     => (int) wp_remote_retrieve_response_code( $response ),
+			'message'    => self::message_of( wp_remote_retrieve_body( $response ) ),
+			'public_key' => self::public_key_of( wp_remote_retrieve_body( $response ) ),
 		);
 	}
 
@@ -522,6 +589,17 @@ class Restricted_Key {
 	public static function message_of( $raw_body ) {
 		$decoded = is_string( $raw_body ) ? json_decode( $raw_body, true ) : null;
 		return is_array( $decoded ) && isset( $decoded['message'] ) && is_string( $decoded['message'] ) ? $decoded['message'] : null;
+	}
+
+	/**
+	 * Extracts the string data.public_key from a JSON response body.
+	 *
+	 * @param mixed $raw_body Raw response body.
+	 * @return string|null
+	 */
+	public static function public_key_of( $raw_body ) {
+		$decoded = is_string( $raw_body ) ? json_decode( $raw_body, true ) : null;
+		return is_array( $decoded ) && isset( $decoded['data']['public_key'] ) && is_string( $decoded['data']['public_key'] ) ? $decoded['data']['public_key'] : null;
 	}
 
 	/**
