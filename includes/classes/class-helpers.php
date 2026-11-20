@@ -165,6 +165,18 @@ class Helpers {
 	}
 
 	/**
+	 * Gets the stored secret for a mode, preferring a restricted key over a secret key.
+	 *
+	 * @param string $mode 'test' or anything else for live.
+	 * @return string Raw stored value.
+	 */
+	public static function get_secret_key( $mode ) {
+		$pair = Settings::SECRET_PAIRS[ 'test' === $mode ? 'test' : 'live' ];
+		$rk   = (string) get_option( $pair['rk'], '' );
+		return '' !== $rk ? $rk : (string) get_option( $pair['sk'], '' );
+	}
+
+	/**
 	 * Fetch an array of the payments by the form ID.
 	 *
 	 * @param integer $form_id
