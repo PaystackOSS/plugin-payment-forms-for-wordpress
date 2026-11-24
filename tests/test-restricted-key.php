@@ -52,7 +52,7 @@ require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\API;
 
-define( 'EXPECTED', 266 );
+define( 'EXPECTED', 267 );
 
 $deny = RK::SCOPE_DENIED_MESSAGE;
 $mor  = RK::MOR_MESSAGE;
@@ -535,6 +535,9 @@ $GLOBALS['pff_wp_reply'] = array( 'code' => 200, 'body' => 'not json' );
 check( 'send non-json message null', array( 'status' => 200, 'message' => null, 'public_key' => null ), RK::send( 'GET', 'balance', null, 4, $KEY ) );
 $GLOBALS['pff_wp_reply'] = array( 'code' => 200, 'body' => wp_json_encode( array( 'message' => 'Ident', 'data' => array( 'public_key' => $PK, 'secret' => 'sk_test_hidden' ) ) ) );
 check( 'send keeps data.public_key only', array( 'status' => 200, 'message' => 'Ident', 'public_key' => $PK ), RK::send( 'GET', 'ident', null, 4, $KEY ) );
+// Shape of a real GET /ident 200 for a restricted key with Account: Read (recorded 2026-11-24).
+$GLOBALS['pff_wp_reply'] = array( 'code' => 200, 'body' => wp_json_encode( array( 'status' => true, 'message' => 'Integration details', 'data' => array( 'id' => 123456, 'public_key' => $PK ) ) ) );
+check( 'send reads public key from real /ident shape', array( 'status' => 200, 'message' => 'Integration details', 'public_key' => $PK ), RK::send( 'GET', 'ident', null, 4, $KEY ) );
 $GLOBALS['pff_wp_reply'] = array( 'code' => 200, 'body' => wp_json_encode( array( 'data' => array( 'public_key' => array( 'x' ) ) ) ) );
 check( 'send non-string public key null', null, RK::send( 'GET', 'ident', null, 4, $KEY )['public_key'] );
 $GLOBALS['pff_wp_reply'] = array( 'code' => 400, 'body' => wp_json_encode( array( 'message' => array( 'x' ) ) ) );
