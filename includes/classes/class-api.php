@@ -184,7 +184,8 @@ class API {
 		);
 		$return   = wp_remote_post( $this->get_url(), $args );
 		$this->track_scope_denied( $return );
-		if ( ! empty( $body ) && ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
+		$code     = is_wp_error( $return ) ? 0 : (int) wp_remote_retrieve_response_code( $return );
+		if ( ! empty( $body ) && $code >= 200 && $code < 300 ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
 		return $response;

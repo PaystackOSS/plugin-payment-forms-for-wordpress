@@ -65,21 +65,45 @@ class Request_Plan extends API {
 	}
 
 	/**
-	 * Send a request to the Paystack "List plans" request, and return the first found one.
+	 * Send a request to the Paystack "List plans" request, and return the first usable one.
 	 *
+	 * @param string      $url_args Query string for the list request.
+	 * @param string      $currency Only return a plan in this currency, or '' for any.
+	 * @param int|null    $amount   Only return a plan for this amount in subunits, or null for any.
+	 * @param string|null $interval Only return a plan with this interval, or null for any.
 	 * @return boolean|object
 	 */
-	public function list_plans( $url_args = '' ) {
-		$plan = false;
+	public function list_plans( $url_args = '', $currency = '', $amount = null, $interval = null ) {
 		if ( '' === $url_args || ! $this->api_ready() ) {
 			return false;
 		}
 		$this->set_url_args( $url_args );
 		$response = $this->get_request();
-		if ( isset( $response->meta->total ) && $response->meta->total >= 1 && isset( $response->data[0] ) ) {
-			$plan = $response->data[0];
+		if ( ! isset( $response->data ) || ! is_array( $response->data ) ) {
+			return false;
 		}
-		return $plan;
+		// Paystack lists archived and deleted plans too, and checkout rejects them with "Plan not found".
+		// The API filter isn't trusted for the terms: the plan's amount is what checkout charges.
+		foreach ( $response->data as $plan ) {
+			if ( ! isset( $plan->plan_code ) || ! empty( $plan->is_archived ) || ! empty( $plan->is_deleted ) ) {
+				continue;
+			}
+			if ( '' !== $currency && ( ! isset( $plan->currency ) || $currency !== $plan->currency ) ) {
+				continue;
+			}
+			if ( null !== $amount && ( ! isset( $plan->amount ) || (int) $amount !== (int) $plan->amount ) ) {
+				continue;
+			}
+			if ( null !== $interval && ( ! isset( $plan->interval ) || $interval !== $plan->interval ) ) {
+				continue;
+			}
+			// A payment limit would end the customer's subscription early.
+			if ( ! empty( $plan->invoice_limit ) ) {
+				continue;
+			}
+			return $plan;
+		}
+		return false;
 	}
 
 	/**
@@ -93,7 +117,7 @@ class Request_Plan extends API {
 			return false;
 		}
 		$response = $this->post_request( $body );
-		if ( isset( $response->plan_code ) ) {
+		if ( isset( $response->data->plan_code ) ) {
 			$plan = $response;
 		}
 		return $plan;
