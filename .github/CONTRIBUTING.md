@@ -35,7 +35,7 @@ If you believe you have an improvement to the plugin, please feel free to send a
 
 * Fork the repository on GitHub
 * Clone the repository into your local system and create a branch that describes what you are working on by prefixing with `feature/`, `fix/`, `chore/`and so on followed by the title of the fix or feature.
-* Make the changes to your forked repository's branch. Ensure you are using [PHP Coding Standards (PHPCS)](https://github.com/squizlabs/PHP_CodeSniffer)
+* Make the changes to your forked repository's branch. Ensure you are using [PHP Coding Standards (PHPCS)](https://github.com/PHPCSStandards/PHP_CodeSniffer)
 * Make commits that are descriptive and breaks down the process.
 * Please **don't** modify the changelog - this will be maintained by Paystack developers.
 * Push your fix to the remote version of your branch and create a PR that aims to merge that branch into `master`.
