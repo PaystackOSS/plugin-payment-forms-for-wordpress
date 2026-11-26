@@ -3,8 +3,8 @@ Contributors: paystack, kendysond, steveamaza, krugazul, feedmymedia, kaneahabag
 Donate link: https://paystack.com/demo
 Tags: paystack, recurrent payments, donation, forms, payments
 Requires at least: 5.0
-Tested up to: 6.8.1
-Stable tag: 4.0.8
+Tested up to: 7.1
+Stable tag: 4.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -91,6 +91,16 @@ If you get stuck, you can ask for help in the [Payment Forms for Paystack Plugin
 Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/plugin-payment-forms-for-wordpress) :)
 
 == Changelog ==
+
+= 4.1.0 =
+* New: connect with a Paystack restricted key (rk_test_ / rk_live_) instead of your secret key. The plugin checks the key's permissions when you save and only accepts it if it can do what the plugin needs (Account: Read, Transactions: Read and Plans: Write). It rejects keys with money-moving permissions, and warns you if it couldn't confirm the rest.
+* New: the public key is fetched automatically when you save a restricted key.
+* New: a Disconnect option for each mode that clears its saved keys.
+* New: a warning in wp-admin if Paystack refuses a request because your restricted key is missing a permission.
+* Secret and public key fields show only on sites that already use a secret key; existing secret keys keep working until you save a restricted key.
+* Fix: forms where the customer chooses a recurring interval could fail at checkout with "Plan not found" when an archived plan had the same amount, and the first payment for a new amount was charged once without starting a subscription.
+* Fix: if a subscription can't be set up, the payment now stops with a message instead of charging once.
+* Security: forms with a fixed subscription plan now always use the plan set on the form, not the plan code sent from the browser.
 
 = 4.0.8 =
 * Fix: the payment popup did not open when a form was added with a page builder such as Bricks, a widget or a template; the form submitted and showed raw response data instead.
@@ -249,6 +259,9 @@ Yes you can! Join in on our [GitHub repository](https://github.com/PaystackOSS/p
 2. What customer sees for making payment.
 
 == Upgrade Notice ==
+
+= 4.1.0 =
+Adds support for Paystack restricted keys, which need the Account: Read permission along with Transactions: Read and Plans: Write. New installs use restricted keys only; your existing secret keys keep working until you save a restricted key. Also fixes subscription forms and includes a security fix for fixed-plan forms. Update recommended.
 
 = 4.0.8 =
 Fixes the payment popup not opening on pages built with page builders such as Bricks. Update recommended.

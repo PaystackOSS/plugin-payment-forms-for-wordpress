@@ -350,7 +350,7 @@ span.shortcode > input {
   padding: 10px 10px;
 }
 
-.paystack_setting_page input {
+.paystack_setting_page input:not([type=checkbox]):not([type=radio]) {
   width: 50%;
 }
 

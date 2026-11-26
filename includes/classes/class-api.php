@@ -17,11 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class API {
 
 	/**
+	 * The API base URL.
+	 */
+	const BASE_URL = 'https://api.paystack.co/';
+
+	/**
 	 * The API Request URL
 	 *
 	 * @var string
 	 */
-	protected $url = 'https://api.paystack.co/';
+	protected $url = self::BASE_URL;
 
 	/**
 	 * The module you are try to access "plan", "subscription", "transaction".
@@ -45,24 +50,38 @@ class API {
 	protected $public = '';
 
 	/**
-	 * The Private API Key
+	 * The Private API Key, memoised by secret().
+	 *
+	 * @var string|null
+	 */
+	private $secret = null;
+
+	/**
+	 * The mode the keys were resolved for, "test" or "live".
 	 *
 	 * @var string
 	 */
-	private $secret = '';
+	private $mode = 'live';
 
 	/**
 	 * Construct the class.
 	 */
 	public function __construct() {
 		$mode = esc_attr( get_option( 'mode' ) );
-		if ( $mode == 'test' ) {
-			$this->public = esc_attr( get_option( 'tpk' ) );
-			$this->secret = esc_attr( get_option( 'tsk' ) );
-		} else {
-			$this->public = esc_attr( get_option( 'lpk' ) );
-			$this->secret = esc_attr( get_option( 'lsk' ) );
+		$this->mode   = 'test' == $mode ? 'test' : 'live';
+		$this->public = esc_attr( get_option( 'test' === $this->mode ? 'tpk' : 'lpk' ) );
+	}
+
+	/**
+	 * Resolves the secret key on first use so pages that make no Paystack request skip the key options.
+	 *
+	 * @return string
+	 */
+	private function secret() {
+		if ( null === $this->secret ) {
+			$this->secret = esc_attr( Helpers::get_secret_key( $this->mode ) );
 		}
+		return $this->secret;
 	}
 
 	/**
@@ -92,7 +111,7 @@ class API {
 	 */
 	protected function get_headers(){
 		return array(
-			'Authorization' => 'Bearer ' . $this->secret
+			'Authorization' => 'Bearer ' . $this->secret()
 		);
 	}
 
@@ -118,6 +137,25 @@ class API {
 	}
 
 	/**
+	 * Records a restricted-key scope denial for the current module.
+	 *
+	 * @param array|\WP_Error $return The HTTP response.
+	 * @return void
+	 */
+	private function track_scope_denied( $return ) {
+		if ( is_wp_error( $return ) ) {
+			return;
+		}
+		$status = (int) wp_remote_retrieve_response_code( $return );
+		if ( 403 !== $status ) {
+			return;
+		}
+		if ( Restricted_Key::is_scope_denied( $status, Restricted_Key::message_of( wp_remote_retrieve_body( $return ) ) ) ) {
+			Restricted_Key::record_denied( $this->mode, $this->module );
+		}
+	}
+
+	/**
 	 * Sends a GET request and checks to see is is_wp_error().
 	 *
 	 * @return boolean|object
@@ -125,6 +163,7 @@ class API {
 	public function get_request() {
 		$response = false;
 		$return   = wp_remote_get( $this->get_url(), $this->get_args() );
+		$this->track_scope_denied( $return );
 		if ( ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
@@ -144,7 +183,9 @@ class API {
 			'timeout' => 60,
 		);
 		$return   = wp_remote_post( $this->get_url(), $args );
-		if ( ! empty( $body ) && ! is_wp_error( $return ) && 200 === wp_remote_retrieve_response_code( $return ) ) {
+		$this->track_scope_denied( $return );
+		$code     = is_wp_error( $return ) ? 0 : (int) wp_remote_retrieve_response_code( $return );
+		if ( ! empty( $body ) && $code >= 200 && $code < 300 ) {
 			$response = json_decode( wp_remote_retrieve_body( $return ) );
 		}
 		return $response;
@@ -157,7 +198,7 @@ class API {
 	 */
 	public function api_ready() {
 		$ready = false;
-		if ( '' !== $this->secret ) {
+		if ( '' !== $this->secret() ) {
 			$ready = true;
 		}
 		return $ready;

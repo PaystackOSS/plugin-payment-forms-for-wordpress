@@ -17,6 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Form_Submit {
 
 	/**
+	 * Intervals a customer may pick on an optional recurring form; matches Form_Shortcode::get_recurring_field().
+	 */
+	const PLAN_INTERVALS = array( 'daily', 'weekly', 'monthly', 'biannually', 'annually' );
+
+	/**
 	 * The helpers class.
 	 *
 	 * @var object
@@ -462,6 +467,23 @@ class Form_Submit {
 	}
 
 	/**
+	 * Ends the request when a subscription the customer chose can't be set up.
+	 *
+	 * @return void
+	 */
+	protected function fail_recurring() {
+		$message = esc_html__( 'We could not set up this recurring payment. Please try again, or choose a different amount or interval.', 'pff-paystack' );
+		echo wp_json_encode(
+			array(
+				'result'        => 'failed',
+				'message'       => $message,
+				'error_message' => $message,
+			)
+		);
+		die();
+	}
+
+	/**
 	 * This function looks for a recurring plan set by the customer, a recurring plan code set by the owner.
 	 */
 	public function process_recurring_plans( $amount ) {
@@ -472,34 +494,44 @@ class Form_Submit {
 
 			// is the user setting the interval?
 			if ( 'optional' === $this->meta['recur'] ) {
-				$interval = $this->form_data['pf-interval'];
+				$interval = isset( $this->form_data['pf-interval'] ) ? (string) $this->form_data['pf-interval'] : 'no';
 
 				// Only create a subscription plan if they choose an interval.
 				if ( 'no' !== $interval ) {
-					$unit_amount    = $amount * 100;
-					$possible_plan = pff_paystack()->classes['request-plan']->list_plans( '?amount=' . $unit_amount . '&interval=' . $interval );
+					$unit_amount = (int) round( $amount * 100 );
+					if ( ! in_array( $interval, self::PLAN_INTERVALS, true ) || $unit_amount <= 0 ) {
+						$this->fail_recurring();
+					}
+					$plans         = pff_paystack()->classes['request-plan'];
+					$possible_plan = $plans->list_plans(
+						'?' . http_build_query( array( 'amount' => $unit_amount, 'interval' => $interval ) ),
+						$this->meta['currency'],
+						$unit_amount,
+						$interval
+					);
 
 					// If we have found a plan, then use that code, otherwise create a new one.
-					if ( false !== $possible_plan && isset( $possible_plan->plan_code ) ) {
-						$plan_code    = $possible_plan->plan_code;
-						$has_interval = $possible_plan->interval;
+					if ( false !== $possible_plan ) {
+						$plan_code = $possible_plan->plan_code;
 					} else {
-						// Create Plan.
 						$body = array(
 							'name'     => get_the_title( $this->form_id ) . ' [' . $this->meta['currency'] . number_format( $amount ) . '] - ' . $interval,
 							'amount'   => $unit_amount,
 							'interval' => $interval,
+							'currency' => $this->meta['currency'],
 						);
-						$created_plan = pff_paystack()->classes['request-plan']->create_plan( $body );
-						if ( false !== $created_plan && isset( $created_plan->plan_code ) ) {
-							$plan_code    = $created_plan->data->plan_code;
-							$has_interval = $created_plan->data->interval;
+						$created_plan = $plans->create_plan( $body );
+						if ( false === $created_plan ) {
+							// Charging once when the customer asked to subscribe would break the terms they chose.
+							$this->fail_recurring();
 						}
+						$plan_code = $created_plan->data->plan_code;
 					}
+					$has_interval = $interval;
 				}
 			} else {
-				// Use Plan Code.
-				$plan_code = sanitize_text_field( wp_unslash( $this->form_data['pf-plancode'] ) );
+				// The hidden pf-plancode field can be edited by the customer, so only the form's own plan is trusted.
+				$plan_code = '' !== (string) $this->meta['recurplan'] ? (string) $this->meta['recurplan'] : 'none';
 				unset( $this->metadata['pf-plancode'] );
 			}
 		}

@@ -423,7 +423,7 @@ span.shortcode {
 }
 
 .paystack_setting_page {
-    input {
+    input:not([type=checkbox]):not([type=radio]) {
         width: 50%;
     }
 }
