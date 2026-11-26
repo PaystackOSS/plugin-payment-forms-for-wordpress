@@ -121,7 +121,7 @@ use paystack\payment_forms\Helpers;
 use paystack\payment_forms\Restricted_Key;
 use paystack\payment_forms\Settings;
 
-define( 'EXPECTED', 268 );
+define( 'EXPECTED', 269 );
 
 $GLOBALS['pff_calls']   = array();
 $GLOBALS['pff_verdict'] = array();
@@ -229,7 +229,7 @@ $ALL  = array( 'lpk' => $LPK0, 'lsk' => $LSK, 'tpk' => $PK0, 'tsk' => $SK );
 // Each rejecting verdict keeps the old rk and every stored sk and pk, and names its reason.
 $old = array_merge( $ALL, array( 'trk' => 'rk_test_oldoldoldoldoldold' ) );
 foreach ( array(
-	array( 'invalid_shape', array(), null, 'start with rk_test_' ),
+	array( 'invalid_shape', array(), null, 'starts with rk_test_' ),
 	array( 'invalid_key', array(), null, "isn't enabled" ),
 	array( 'missing_scope', array( 'Plans: Write' ), null, 'missing: Plans: Write' ),
 	array( 'sensitive_scope', array( 'Transfers', 'Balance' ), null, 'Transfers, Balance' ),
@@ -282,7 +282,7 @@ check( 'real validator sk in rk field message', true, false !== strpos( error_te
 save( array( 'trk' => $LRK ), $old, array( 'real_validator' => true ) );
 check( 'real validator wrong mode message', true, false !== strpos( error_text(), 'live restricted key' ) );
 save( array( 'trk' => 'rk_test_short' ), $old, array( 'real_validator' => true ) );
-check( 'real validator malformed message', true, false !== strpos( error_text(), 'start with rk_test_' ) );
+check( 'real validator malformed message', true, false !== strpos( error_text(), 'starts with rk_test_' ) );
 
 verdict( 'ok' );
 
@@ -634,6 +634,11 @@ check( 'real validator: ok key is stored', $RK, $out['trk'] );
 check( 'real validator: ok key sets the public key', $PK, $out['tpk'] );
 check( 'real validator: ok key blanks the sk', '', $out['tsk'] );
 check( 'real validator: ok key is silent and sets no flag', array( 0, false ), array( count( $GLOBALS['pff_errors'] ), isset( $out[ $FLAGS ] ) ) );
+
+fake_api();
+$PUNCT = 'rk_test_Ab3-cD.e~F_gHiJkLmNoPq';
+$out   = save( array( 'trk' => $PUNCT ), array(), $real );
+check( 'real validator: punctuated key is stored', array( $PUNCT, $PK, 0 ), array( $out['trk'], $out['tpk'], count( $GLOBALS['pff_errors'] ) ) );
 
 fake_api( array( 'balance' => array( 500, array() ) ) );
 $out = save( array( 'trk' => $RK ), array( 'tsk' => $SK, 'tpk' => $PK0 ), $real );

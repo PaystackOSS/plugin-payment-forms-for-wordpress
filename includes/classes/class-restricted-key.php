@@ -192,14 +192,17 @@ class Restricted_Key {
 	);
 
 	/**
-	 * Checks the key is an rk_ key of the given mode with a body of letters, digits and underscores, as real keys contain underscores.
+	 * Checks the key is an rk_ key of the given mode.
+	 *
+	 * Paystack doesn't document the body's character set, so it is printable ASCII minus space, quotes, angle brackets and backslash, as in the sibling plugins,
+	 * and minus % and &: sanitize_text_field strips %xx octets and API::secret() runs esc_attr, so either would change the key.
 	 *
 	 * @param mixed  $key  Submitted key.
 	 * @param string $mode 'test' or 'live'.
 	 * @return boolean
 	 */
 	public static function is_valid_shape( $key, $mode ) {
-		if ( ! is_string( $key ) || ! preg_match( '/^rk_(test|live)_[A-Za-z0-9_]{16,256}\z/', $key, $m ) ) {
+		if ( ! is_string( $key ) || ! preg_match( '/^rk_(test|live)_[\x21\x23\x24\x28-\x3b\x3d\x3f-\x5b\x5d-\x7e]{16,256}\z/', $key, $m ) ) {
 			return false;
 		}
 		return $m[1] === $mode;

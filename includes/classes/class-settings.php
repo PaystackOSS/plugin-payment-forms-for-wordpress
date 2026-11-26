@@ -433,7 +433,7 @@ class Settings {
 				}
 				return sprintf(
 					/* translators: %s: required key prefix */
-					esc_html__( 'Restricted keys start with %s followed by letters and numbers. The previous key was kept; other settings were saved.', 'pff-paystack' ),
+					esc_html__( 'This doesn\'t look like a restricted key. Paste the full key from your Paystack Dashboard; it starts with %s. The previous key was kept; other settings were saved.', 'pff-paystack' ),
 					'rk_' . $mode . '_'
 				);
 			case 'invalid_key':

@@ -52,7 +52,7 @@ require dirname( __DIR__ ) . '/includes/classes/class-restricted-key.php';
 use paystack\payment_forms\Restricted_Key as RK;
 use paystack\payment_forms\API;
 
-define( 'EXPECTED', 267 );
+define( 'EXPECTED', 299 );
 
 $deny = RK::SCOPE_DENIED_MESSAGE;
 $mor  = RK::MOR_MESSAGE;
@@ -127,9 +127,15 @@ check( 'body 15 chars', false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a',
 check( 'body 16 chars', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 16 ), 'test' ) );
 check( 'body 256 chars', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 256 ), 'test' ) );
 check( 'body 257 chars', false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 257 ), 'test' ) );
-foreach ( array( '&', '<', '"', "'", '>', '-', ' ', ':' ) as $sym ) {
-	check( "symbol $sym", false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 16 ) . $sym, 'test' ) );
+foreach ( array( '%', '&', '<', '"', "'", '>', '\\', ' ', "\t", "\r", "\x7f", "\xC2\xA0", "\xE2\x80\x8B", "\xC3\xA9" ) as $sym ) {
+	check( 'symbol ' . bin2hex( $sym ), false, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 16 ) . $sym, 'test' ) );
 }
+// The body's character set is undocumented, so other printable ASCII is accepted.
+foreach ( array( '-', '.', '~', '!', '#', '$', '(', ')', '*', '+', ',', '/', ':', ';', '=', '?', '@', '[', ']', '^', '`', '{', '|', '}' ) as $sym ) {
+	check( "symbol $sym accepted", true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 8 ) . $sym . str_repeat( 'b', 8 ), 'test' ) );
+}
+check( 'punctuated live key', true, RK::is_valid_shape( 'rk_live_' . 'Ab3-cD.e~F_g' . str_repeat( 'h', 10 ), 'live' ) );
+check( 'punctuated key, wrong mode', false, RK::is_valid_shape( 'rk_live_' . 'Ab3-cD.e~F_g' . str_repeat( 'h', 10 ), 'test' ) );
 // Real Paystack restricted keys put an underscore at varying positions in the body.
 check( 'real shape, underscore after 9', true, RK::is_valid_shape( 'rk_test_' . str_repeat( 'a', 9 ) . '_' . str_repeat( 'B', 30 ), 'test' ) );
 check( 'real shape, underscore after 25', true, RK::is_valid_shape( 'rk_live_' . str_repeat( 'c', 25 ) . '_' . str_repeat( 'D', 14 ), 'live' ) );
